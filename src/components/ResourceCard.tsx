@@ -260,13 +260,15 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
             </div>
           )}
 
-          <button
-            onClick={handleOpen}
+          <a>
+            href={resource.url}
+            target="_blank"
+            rel="noopener noreferrer"
             className={`w-full ${style.buttonBg} py-3 rounded-lg font-semibold transition-all active:scale-95 flex items-center justify-center gap-2`}
-          >
+
             {resource.type === 'image' ? <Download className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
             {style.buttonText}
-          </button>
+          </a>
 
           {showReportButton && (
             <button

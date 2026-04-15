@@ -285,7 +285,7 @@ export default function Admin({ onNavigate }: AdminProps) {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Administration Securicoach
+              Administration CyberKit
             </h1>
             <p className="text-gray-600">
               Gérez les ressources de cybersécurité
@@ -306,11 +306,10 @@ export default function Admin({ onNavigate }: AdminProps) {
               setShowForm(false);
               setShowThemeForm(false);
             }}
-            className={`px-4 py-3 font-semibold transition-colors ${
-              activeTab === 'resources'
+            className={`px-4 py-3 font-semibold transition-colors ${activeTab === 'resources'
                 ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-600 hover:text-gray-900'
-            }`}
+              }`}
           >
             Ressources
           </button>
@@ -320,11 +319,10 @@ export default function Admin({ onNavigate }: AdminProps) {
               setShowForm(false);
               setShowThemeForm(false);
             }}
-            className={`px-4 py-3 font-semibold transition-colors flex items-center gap-2 ${
-              activeTab === 'themes'
+            className={`px-4 py-3 font-semibold transition-colors flex items-center gap-2 ${activeTab === 'themes'
                 ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-600 hover:text-gray-900'
-            }`}
+              }`}
           >
             <Palette className="w-5 h-5" />
             Thèmes
@@ -335,11 +333,10 @@ export default function Admin({ onNavigate }: AdminProps) {
               setShowForm(false);
               setShowThemeForm(false);
             }}
-            className={`px-4 py-3 font-semibold transition-colors flex items-center gap-2 ${
-              activeTab === 'tags'
+            className={`px-4 py-3 font-semibold transition-colors flex items-center gap-2 ${activeTab === 'tags'
                 ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-600 hover:text-gray-900'
-            }`}
+              }`}
           >
             <Tag className="w-5 h-5" />
             Tags
@@ -350,11 +347,10 @@ export default function Admin({ onNavigate }: AdminProps) {
               setShowForm(false);
               setShowThemeForm(false);
             }}
-            className={`px-4 py-3 font-semibold transition-colors flex items-center gap-2 ${
-              activeTab === 'chatbot'
+            className={`px-4 py-3 font-semibold transition-colors flex items-center gap-2 ${activeTab === 'chatbot'
                 ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-600 hover:text-gray-900'
-            }`}
+              }`}
           >
             <MessageCircle className="w-5 h-5" />
             Chatbot
@@ -365,11 +361,10 @@ export default function Admin({ onNavigate }: AdminProps) {
               setShowForm(false);
               setShowThemeForm(false);
             }}
-            className={`px-4 py-3 font-semibold transition-colors flex items-center gap-2 ${
-              activeTab === 'companies'
+            className={`px-4 py-3 font-semibold transition-colors flex items-center gap-2 ${activeTab === 'companies'
                 ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-600 hover:text-gray-900'
-            }`}
+              }`}
           >
             <Building2 className="w-5 h-5" />
             Entreprises
@@ -380,11 +375,10 @@ export default function Admin({ onNavigate }: AdminProps) {
               setShowForm(false);
               setShowThemeForm(false);
             }}
-            className={`px-4 py-3 font-semibold transition-colors flex items-center gap-2 ${
-              activeTab === 'statistics'
+            className={`px-4 py-3 font-semibold transition-colors flex items-center gap-2 ${activeTab === 'statistics'
                 ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-600 hover:text-gray-900'
-            }`}
+              }`}
           >
             <BarChart3 className="w-5 h-5" />
             Statistiques
