@@ -1,5 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
-import { Store, Briefcase, Building2, ArrowRight, RefreshCw, CheckCircle, XCircle, AlertCircle, BookOpen, Award, TrendingUp, FileDown, Printer } from 'lucide-react';
+import {
+  Store,
+  Briefcase,
+  Building2,
+  ArrowRight,
+  RefreshCw,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  BookOpen,
+  Award,
+  TrendingUp,
+  FileDown,
+  Printer,
+  Loader // Ajout de Loader ici pour éviter le crash
+} from 'lucide-react';
 import confetti from 'canvas-confetti';
 import AIAnalysis from '../components/AIAnalysis';
 import GoogleReview from '../components/GoogleReview';
@@ -19,7 +34,7 @@ interface Question {
 
 interface Profile {
   title: string;
-  icon: React.ElementType; // Changé de string à React.ElementType
+  icon: React.ElementType;
   questions: Question[];
 }
 
@@ -96,14 +111,8 @@ const PROFILE_CONFIGS: Record<ProfileType, { icon: any, color: string, bgColor: 
 };
 
 interface QuizProps {
-  onNavigate: (page: 'home' | 'quiz' | 'resources' | 'admin' | 'contact' | 'legal', filter?: string) => void;
+  onNavigate: (page: any, filter?: string) => void;
 }
-
-const PROFILE_DISPLAY_NAMES: Record<string, string> = {
-  'boutique': 'Commerce ou Point de vente',
-  'solo': 'Seul ou en petit cabinet',
-  'equipe': 'Au sein d\'une entreprise'
-};
 
 export default function Quiz({ onNavigate }: QuizProps) {
   const [selectedProfile, setSelectedProfile] = useState<ProfileType | null>(null);
@@ -113,7 +122,6 @@ export default function Quiz({ onNavigate }: QuizProps) {
   const [score, setScore] = useState(0);
   const [recommendedResources, setRecommendedResources] = useState<Resource[]>([]);
   const analysisRef = useRef<{ getAnalysisText: () => string } | null>(null);
-  const [companyDiagnosticProfile, setCompanyDiagnosticProfile] = useState<string | null>(null);
   const [companyProfileLoading, setCompanyProfileLoading] = useState(true);
   const [profileLocked, setProfileLocked] = useState(false);
 
@@ -136,7 +144,6 @@ export default function Quiz({ onNavigate }: QuizProps) {
               'equipe': 'pme'
             };
             const mappedProfile = profileMapping[memberData.diagnostic_profile];
-            setCompanyDiagnosticProfile(memberData.diagnostic_profile);
             if (mappedProfile) {
               setSelectedProfile(mappedProfile);
               setProfileLocked(true);
@@ -170,15 +177,6 @@ export default function Quiz({ onNavigate }: QuizProps) {
     }
   }, [isFinished, score]);
 
-  const handleProfileSelect = (profile: ProfileType) => {
-    if (profileLocked) return;
-    setSelectedProfile(profile);
-    setCurrentQuestion(0);
-    setAnswers({});
-    setIsFinished(false);
-    setScore(0);
-  };
-
   const handleAnswer = (answerType: AnswerType) => {
     if (!selectedProfile) return;
     const questions = CYBER_QUIZ_DATA[selectedProfile].questions;
@@ -190,26 +188,6 @@ export default function Quiz({ onNavigate }: QuizProps) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
       calculateScore(newAnswers);
-    }
-  };
-
-  const fetchRecommendedResources = async (scoreValue: number) => {
-    try {
-      let searchPatterns: string[] = [];
-      if (scoreValue <= 40) searchPatterns = ['%mot de passe%', '%double%authentification%', '%Phishing%'];
-      else if (scoreValue <= 70) searchPatterns = ['%sauvegarde%', '%fraude%', '%clé USB%'];
-      else searchPatterns = ['%Analyse de risques%', '%Facebook Pro%', '%Gestion de crise%'];
-
-      const resources: Resource[] = [];
-      for (const pattern of searchPatterns) {
-        const { data } = await supabase.from('resources')
-          .select('*, theme:themes(*), resource_type:resource_types(*)')
-          .ilike('title', pattern).limit(1).maybeSingle();
-        if (data) resources.push(data);
-      }
-      setRecommendedResources(resources);
-    } catch (error) {
-      console.error('Error resources:', error);
     }
   };
 
@@ -246,6 +224,26 @@ export default function Quiz({ onNavigate }: QuizProps) {
     } catch (error) { console.error('Error saving:', error); }
   };
 
+  const fetchRecommendedResources = async (scoreValue: number) => {
+    try {
+      let searchPatterns: string[] = [];
+      if (scoreValue <= 40) searchPatterns = ['%mot de passe%', '%double%authentification%', '%Phishing%'];
+      else if (scoreValue <= 70) searchPatterns = ['%sauvegarde%', '%fraude%', '%clé USB%'];
+      else searchPatterns = ['%Analyse de risques%', '%Facebook Pro%', '%Gestion de crise%'];
+
+      const resources: Resource[] = [];
+      for (const pattern of searchPatterns) {
+        const { data } = await supabase.from('resources')
+          .select('*, theme:themes(*), resource_type:resource_types(*)')
+          .ilike('title', pattern).limit(1).maybeSingle();
+        if (data) resources.push(data);
+      }
+      setRecommendedResources(resources);
+    } catch (error) {
+      console.error('Error resources:', error);
+    }
+  };
+
   const resetQuiz = () => {
     if (!profileLocked) setSelectedProfile(null);
     setAnswers({});
@@ -253,19 +251,6 @@ export default function Quiz({ onNavigate }: QuizProps) {
     setIsFinished(false);
     setScore(0);
     localStorage.removeItem('cyberkit_score');
-  };
-
-  const getPriorityRecommendations = () => {
-    if (!selectedProfile) return [];
-    return CYBER_QUIZ_DATA[selectedProfile].questions
-      .filter(q => answers[q.id] === 'no' || answers[q.id] === 'unknown')
-      .slice(0, 3);
-  };
-
-  const getAllRecommendations = () => {
-    if (!selectedProfile) return [];
-    return CYBER_QUIZ_DATA[selectedProfile].questions
-      .filter(q => answers[q.id] === 'no' || answers[q.id] === 'unknown');
   };
 
   const handleExportPDF = () => {
@@ -276,21 +261,24 @@ export default function Quiz({ onNavigate }: QuizProps) {
       level: result.title,
       profile: CYBER_QUIZ_DATA[selectedProfile].title,
       analysisText: analysisRef.current?.getAnalysisText() || '',
-      priorities: getPriorityRecommendations().map(q => ({ question: q, answer: answers[q.id] })),
+      priorities: CYBER_QUIZ_DATA[selectedProfile].questions
+        .filter(q => answers[q.id] === 'no' || answers[q.id] === 'unknown')
+        .slice(0, 3)
+        .map(q => ({ question: q, answer: answers[q.id] })),
       resources: recommendedResources,
       allQuestions: CYBER_QUIZ_DATA[selectedProfile].questions.map(q => ({ question: q, answer: answers[q.id] || 'unknown' }))
     });
   };
 
   const getResultMessage = () => {
-    if (score < 50) return { title: "Niveau Critique", message: "Urgence : renforcez vos bases.", color: "text-red-600", bgColor: "bg-red-50", borderColor: "border-red-200", gaugeColor: "bg-red-500" };
-    if (score < 70) return { title: "En Progression", message: "Bon début, mais des failles subsistent.", color: "text-orange-600", bgColor: "bg-orange-50", borderColor: "border-orange-200", gaugeColor: "bg-orange-500" };
-    if (score < 90) return { title: "Bon Niveau", message: "Vous maîtrisez les fondamentaux.", color: "text-blue-600", bgColor: "bg-blue-50", borderColor: "border-blue-200", gaugeColor: "bg-blue-500" };
-    return { title: "Expert Confirmé", message: "Excellent ! Vous êtes un rempart solide.", color: "text-emerald-600", bgColor: "bg-emerald-50", borderColor: "border-emerald-200", gaugeColor: "bg-emerald-500" };
+    if (score < 50) return { title: "Niveau Critique", message: "Urgence : renforcez vos bases.", color: "text-red-600", gaugeColor: "bg-red-500" };
+    if (score < 70) return { title: "En Progression", message: "Bon début, mais des failles subsistent.", color: "text-orange-600", gaugeColor: "bg-orange-500" };
+    if (score < 90) return { title: "Bon Niveau", message: "Vous maîtrisez les fondamentaux.", color: "text-blue-600", gaugeColor: "bg-blue-500" };
+    return { title: "Expert Confirmé", message: "Excellent ! Vous êtes un rempart solide.", color: "text-emerald-600", gaugeColor: "bg-emerald-500" };
   };
 
   if (!selectedProfile) {
-    if (companyProfileLoading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin" /></div>;
+    if (companyProfileLoading) return <div className="flex h-screen items-center justify-center"><Loader className="animate-spin text-blue-600 w-10 h-10" /></div>;
     return (
       <div className="min-h-screen bg-slate-50 py-12 px-4">
         <div className="max-w-5xl mx-auto text-center">
@@ -298,7 +286,7 @@ export default function Quiz({ onNavigate }: QuizProps) {
           <h1 className="text-4xl font-bold mb-8">CyberKit : Diagnostic Adaptatif</h1>
           <div className="grid md:grid-cols-3 gap-6">
             {(Object.entries(PROFILE_CONFIGS) as [ProfileType, any][]).map(([key, config]) => (
-              <button key={key} onClick={() => handleProfileSelect(key)} className={`${config.bgColor} border-2 rounded-2xl p-8 hover:scale-105 transition-all`}>
+              <button key={key} onClick={() => setSelectedProfile(key)} className={`${config.bgColor} border-2 rounded-2xl p-8 hover:scale-105 transition-all`}>
                 <config.icon className={`w-10 h-10 ${config.color} mb-4`} />
                 <h3 className="text-xl font-bold mb-2">{CYBER_QUIZ_DATA[key].title}</h3>
                 <p className="text-sm text-gray-600">{config.description}</p>
@@ -312,8 +300,9 @@ export default function Quiz({ onNavigate }: QuizProps) {
 
   if (isFinished) {
     const result = getResultMessage();
-    const priorities = getPriorityRecommendations();
-    const others = getAllRecommendations().slice(3);
+    const priorities = CYBER_QUIZ_DATA[selectedProfile].questions
+      .filter(q => answers[q.id] === 'no' || answers[q.id] === 'unknown')
+      .slice(0, 3);
 
     return (
       <div className="min-h-screen bg-slate-50 py-12 px-4">
@@ -325,7 +314,6 @@ export default function Quiz({ onNavigate }: QuizProps) {
               <div className={`h-full ${result.gaugeColor}`} style={{ width: `${score}%` }} />
             </div>
             <p className="text-lg font-medium">{result.message}</p>
-
             <div className="mt-8 flex gap-4 no-print">
               <button onClick={() => onNavigate('resources')} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold">Ressources</button>
               <button onClick={resetQuiz} className="border-2 px-6 py-3 rounded-xl font-bold">Recommencer</button>
@@ -350,22 +338,17 @@ export default function Quiz({ onNavigate }: QuizProps) {
             <button onClick={handleExportPDF} className="flex items-center gap-2 bg-[#E8650A] text-white px-6 py-3 rounded-xl font-bold shadow-lg"><FileDown /> PDF</button>
             <button onClick={() => window.print()} className="flex items-center gap-2 border-2 border-[#E8650A] text-[#E8650A] px-6 py-3 rounded-xl font-bold"><Printer /> Imprimer</button>
           </div>
-
-          <div className="hidden print:block text-center mt-12 border-t pt-6 text-sm text-gray-400">
-            Généré par CyberKit — beForensic | cyberkit.be
-          </div>
         </div>
       </div>
     );
   }
 
-  const questions = CYBER_QUIZ_DATA[selectedProfile].questions;
-  const q = questions[currentQuestion];
+  const q = CYBER_QUIZ_DATA[selectedProfile].questions[currentQuestion];
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border-2">
-        <div className="h-2 bg-gray-100"><div className="h-full bg-blue-500 transition-all" style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }} /></div>
+        <div className="h-2 bg-gray-100"><div className="h-full bg-blue-500 transition-all" style={{ width: `${((currentQuestion + 1) / 10) * 100}%` }} /></div>
         <div className="p-10 text-center">
           <span className="text-xs font-bold text-blue-500 uppercase tracking-widest">Question {currentQuestion + 1} / 10</span>
           <h2 className="text-2xl font-bold my-8 leading-tight">{q.label}</h2>
@@ -373,7 +356,7 @@ export default function Quiz({ onNavigate }: QuizProps) {
             <button onClick={() => handleAnswer('yes')} className="py-6 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-700 font-bold hover:bg-emerald-100 transition-all">OUI</button>
             <button onClick={() => handleAnswer('no')} className="py-6 rounded-2xl border-2 border-red-500 bg-red-50 text-red-700 font-bold hover:bg-red-100 transition-all">NON</button>
           </div>
-          <button onClick={() => handleAnswer('unknown')} className="w-full mt-4 py-4 text-gray-400 text-sm hover:text-gray-600 italic">Je ne sais pas</button>
+          <button onClick={() => handleAnswer('unknown')} className="w-full mt-4 text-gray-400 text-sm italic">Je ne sais pas</button>
         </div>
       </div>
     </div>
