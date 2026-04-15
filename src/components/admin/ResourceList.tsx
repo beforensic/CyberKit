@@ -1,4 +1,4 @@
-import { Edit2, Trash2, FileText, PlayCircle, Headphones, ExternalLink, Image } from 'lucide-react';
+import { Edit2, Trash2, FileText, PlayCircle, Headphones, ExternalLink, Image, Download } from 'lucide-react';
 import { Resource } from '../../lib/supabase';
 
 interface ResourceListProps {
@@ -8,15 +8,15 @@ interface ResourceListProps {
 }
 
 export default function ResourceList({ resources, onEdit, onDelete }: ResourceListProps) {
-  const getFileFormatIcon = (format: string | null | undefined) => {
-    switch (format) {
+  const getFileFormatIcon = (type: string | null | undefined) => {
+    switch (type) {
       case 'pdf':
         return FileText;
       case 'video':
         return PlayCircle;
       case 'audio':
         return Headphones;
-      case 'external_link':
+      case 'link':
         return ExternalLink;
       case 'image':
         return Image;
@@ -25,26 +25,26 @@ export default function ResourceList({ resources, onEdit, onDelete }: ResourceLi
     }
   };
 
-  const getFileFormatBadge = (format: string | null | undefined) => {
-    const styles = {
-      pdf: 'bg-black text-white',
+  const getFileFormatBadge = (type: string | null | undefined) => {
+    const styles: Record<string, string> = {
+      pdf: 'bg-slate-900 text-white',
       video: 'bg-sky-500 text-white',
-      audio: 'bg-gray-500 text-white',
-      external_link: 'bg-emerald-500 text-white',
+      audio: 'bg-slate-400 text-white',
+      link: 'bg-emerald-500 text-white',
       image: 'bg-purple-500 text-white'
     };
-    return styles[format as keyof typeof styles] || 'bg-gray-500 text-white';
+    return styles[type || ''] || 'bg-gray-500 text-white';
   };
 
-  const getFileFormatLabel = (format: string | null | undefined) => {
+  const getFileFormatLabel = (type: string | null | undefined) => {
     const labels: Record<string, string> = {
       pdf: 'PDF',
       video: 'Vidéo',
       audio: 'Audio',
-      external_link: 'Lien',
+      link: 'Lien',
       image: 'Image'
     };
-    return labels[format || ''] || 'N/A';
+    return labels[type || ''] || 'N/A';
   };
 
   return (
@@ -60,9 +60,6 @@ export default function ResourceList({ resources, onEdit, onDelete }: ResourceLi
                 Titre
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Type péda.
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Thème
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -75,16 +72,16 @@ export default function ResourceList({ resources, onEdit, onDelete }: ResourceLi
           </thead>
           <tbody className="divide-y divide-gray-200">
             {resources.map((resource) => {
-              const Icon = getFileFormatIcon(resource.file_format);
+              const Icon = getFileFormatIcon(resource.type);
               return (
                 <tr key={resource.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
-                      <div className={`${getFileFormatBadge(resource.file_format)} p-2 rounded-lg`}>
+                      <div className={`${getFileFormatBadge(resource.type)} p-2 rounded-lg`}>
                         <Icon className="w-4 h-4" />
                       </div>
-                      <span className="text-xs font-medium text-gray-600">
-                        {getFileFormatLabel(resource.file_format)}
+                      <span className="text-xs font-medium text-gray-600 uppercase">
+                        {getFileFormatLabel(resource.type)}
                       </span>
                     </div>
                   </td>
@@ -92,18 +89,15 @@ export default function ResourceList({ resources, onEdit, onDelete }: ResourceLi
                     <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
                       {resource.title}
                     </div>
-                    <div className="text-xs text-gray-500 max-w-xs truncate">
-                      {resource.description}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-3 py-1 text-xs font-medium bg-amber-100 text-amber-700 rounded-full">
-                      {resource.resource_type?.name || resource.type}
-                    </span>
+                    {resource.description && (
+                      <div className="text-xs text-gray-500 max-w-xs truncate">
+                        {resource.description}
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">
-                      {resource.theme?.title}
+                      {resource.theme?.title || 'Aucun thème'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
