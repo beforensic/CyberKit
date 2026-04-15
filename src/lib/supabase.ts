@@ -37,7 +37,6 @@ export interface Resource {
   description: string;
   type: 'pdf' | 'audio' | 'video' | 'link' | 'image';
   resource_type_id: string;
-  file_format?: 'pdf' | 'image' | 'video' | 'audio' | 'external_link' | null;
   url: string;
   tags: string[];
   duration?: number | null;
@@ -45,5 +44,5 @@ export interface Resource {
   updated_at: string;
   theme?: Theme;
   resource_type?: ResourceType;
-  isPinned?: boolean;
+  is_pinned: boolean; // Corrigé ici pour correspondre à la DB
 }
