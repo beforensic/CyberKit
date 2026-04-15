@@ -260,14 +260,19 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
             </div>
           )}
 
-          <a>
+          /* C'est ce bloc qui doit remplacer l'ancien <button>...</button> */
+          <a
             href={resource.url}
             target="_blank"
             rel="noopener noreferrer"
             className={`w-full ${style.buttonBg} py-3 rounded-lg font-semibold transition-all active:scale-95 flex items-center justify-center gap-2`}
-
-            {resource.type === 'image' ? <Download className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
-            {style.buttonText}
+          >
+            {resource.type === 'image' ? (
+              <Download className="w-5 h-5" />
+            ) : (
+              <Icon className="w-5 h-5" />
+            )}
+            <span>{style.buttonText}</span>
           </a>
 
           {showReportButton && (
