@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Plus, Loader, Shield, ArrowLeft, Palette, Tag, MessageCircle, Eye, EyeOff, Building2, BarChart3 } from 'lucide-react';
+import {
+  Plus, Loader, Loader2, Save, Shield, ArrowLeft,
+  Palette, Tag, MessageCircle, Eye, EyeOff,
+  Building2, BarChart3
+} from 'lucide-react';
 import { supabase, Resource, Theme, ResourceType } from '../lib/supabase';
 import ResourceList from '../components/admin/ResourceList';
 import ResourceForm from '../components/admin/ResourceForm';
