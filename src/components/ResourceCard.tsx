@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import {
   FileText, PlayCircle, Headphones, ExternalLink, Image as ImageIcon,
-  Download, Clock, Heart, Check, Star
+  Download, Heart, Check, Star, MessageCircle
 } from 'lucide-react';
-import { Resource, supabase } from '../lib/supabase';
-import ResourceError from './ResourceError';
+import { Resource } from '../lib/supabase';
 import KeywordTooltip from './KeywordTooltip';
 import AudioPlayer from './AudioPlayer';
 import { getFavorites, toggleFavorite } from '../utils/storage';
@@ -21,7 +20,6 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
   const [isFavorite, setIsFavorite] = useState(false);
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
 
-  // Utilisation sécurisée du contexte de progression
   const progressContext = useProgress();
   const progress = progressContext?.progress || [];
   const isCompleted = progress.some(p => p.resourceId === resource.id);
@@ -59,22 +57,22 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
   return (
     <div className="group bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-full hover:shadow-md hover:border-slate-300 transition-all duration-300 relative">
 
-      {/* Badge "Essentiel" */}
+      {/* Badge "Essentiel" - Flottant avec marges */}
       {resource.is_pinned && (
-        <div className="absolute top-0 right-0 bg-orange-100 text-[#E8650A] px-3 py-1 rounded-bl-xl flex items-center gap-1.5 z-10">
-          <Star className="w-3.5 h-3.5 fill-[#E8650A]" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Essentiel</span>
+        <div className="absolute top-3 right-3 bg-orange-50 text-[#E8650A] px-2 py-1 rounded-lg flex items-center gap-1 z-10 border border-orange-100 shadow-sm">
+          <Star className="w-3 h-3 fill-[#E8650A]" />
+          <span className="text-[9px] font-bold uppercase tracking-wider">Essentiel</span>
         </div>
       )}
 
-      {/* En-tête : Icône et Favoris */}
+      {/* En-tête */}
       <div className="flex items-start justify-between mb-4">
         <div className="p-3 bg-slate-50 rounded-xl text-slate-700 group-hover:bg-slate-100 transition-colors">
           {getIcon()}
         </div>
         <div className="flex gap-2">
           {isCompleted && (
-            <div className="p-2 bg-emerald-50 text-emerald-500 rounded-full" title="Déjà consulté">
+            <div className="p-2 bg-emerald-50 text-emerald-500 rounded-full">
               <Check className="w-5 h-5" />
             </div>
           )}
@@ -103,7 +101,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         </div>
       )}
 
-      {/* Corps */}
+      {/* Titre & Description */}
       <div className="flex-1">
         <h3 className="text-lg font-semibold text-slate-800 mb-2 line-clamp-2 leading-snug group-hover:text-[#E8650A] transition-colors">
           {resource.title}
@@ -128,14 +126,13 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         </div>
       )}
 
-      {/* Lecteur Audio */}
       {showAudioPlayer && resource.type === 'audio' && (
         <div className="mb-4 p-2 bg-slate-50 rounded-lg border border-slate-100">
           <AudioPlayer url={resource.url} />
         </div>
       )}
 
-      {/* Bouton Principal - Design Outline */}
+      {/* Bouton Principal */}
       <button
         onClick={handleAction}
         className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm border-2 border-[#E8650A] text-[#E8650A] bg-white hover:bg-[#E8650A] hover:text-white transition-all duration-300 shadow-sm active:scale-95"
@@ -143,18 +140,20 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         {resource.type === 'link' ? (
           <>Consulter le lien <ExternalLink className="w-4 h-4" /></>
         ) : resource.type === 'audio' ? (
-          <>{showAudioPlayer ? 'Fermer le lecteur' : 'Écouter la ressource'} <Headphones className="w-4 h-4" /></>
+          <>{showAudioPlayer ? 'Fermer le lecteur' : 'Écouter'} <Headphones className="w-4 h-4" /></>
         ) : (
           <>Télécharger <Download className="w-4 h-4" /></>
         )}
       </button>
 
+      {/* Lien de contact amélioré */}
       {onNavigateToContact && (
         <button
           onClick={(e) => { e.stopPropagation(); onNavigateToContact(); }}
-          className="mt-4 text-[11px] text-slate-400 hover:text-[#E8650A] underline underline-offset-4 text-center transition-colors font-medium"
+          className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-[11px] text-slate-400 hover:text-[#E8650A] transition-colors font-medium group/contact"
         >
-          Besoin d'accompagnement sur ce sujet ?
+          <MessageCircle className="w-3.5 h-3.5" />
+          <span className="group-hover/contact:underline underline-offset-2">Besoin d'aide sur ce sujet ?</span>
         </button>
       )}
     </div>
