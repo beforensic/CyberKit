@@ -169,7 +169,7 @@ export default function Contact({ onNavigate, initialSubject = '' }: ContactProp
 
             <div className="text-gray-700 leading-relaxed mb-6 space-y-3">
               <p className="text-lg">
-                Merci pour votre confiance. L'équipe <span className="font-bold text-primary">beForensic</span> a bien reçu votre demande
+                Merci pour votre confiance. <span className="font-bold text-primary">beForensic</span> a bien reçu votre demande
                 {submittedScore !== null && (
                   <span> concernant votre score de <span className="font-bold text-primary">{submittedScore}/100</span></span>
                 )}.
@@ -290,7 +290,7 @@ export default function Contact({ onNavigate, initialSubject = '' }: ContactProp
             </div>
             <h3 className="font-bold mb-2" style={{ color: '#2D3748' }}>Entreprise</h3>
             <p className="text-gray-600 font-medium">beForensic</p>
-            <p className="text-sm text-gray-500">Services de cybersécurité</p>
+            <p className="text-sm text-gray-500">Consultance en cybersécurité</p>
             <p className="text-sm text-gray-500 mt-2">N° d'entreprise (BCE) : 0724.581.585</p>
           </div>
         </div>

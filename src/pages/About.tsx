@@ -29,7 +29,7 @@ export default function About({ onNavigate }: AboutProps) {
 
               <div className="space-y-4 text-slate-700 leading-relaxed">
                 <p>
-                  Je m'appelle Serge Houtain, fondateur de beForensic et créateur de SecuriCoach.
+                  Je m'appelle Serge Houtain, fondateur de beForensic et créateur de CyberKit.
                 </p>
 
                 <p>
@@ -97,7 +97,7 @@ export default function About({ onNavigate }: AboutProps) {
           </div>
         </section>
 
-        {/* Bloc SecuriCoach */}
+        {/* Bloc CyberKit */}
         <section className="rounded-2xl shadow-md border border-slate-200 p-8 mb-8" style={{ backgroundColor: '#EBF2FA' }}>
           <h2 className="text-2xl font-bold mb-4" style={{ color: '#2D3748' }}>
             Et CyberKit dans tout ça ?
