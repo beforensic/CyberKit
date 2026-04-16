@@ -11,7 +11,7 @@ import { getFavorites, toggleFavorite } from '../utils/storage';
 import { useProgress } from '../contexts/ProgressContext';
 
 interface ResourceCardProps {
-  resource: Resource & { isPinned?: boolean };
+  resource: Resource;
   typeColor?: string;
   typeName?: string;
   onNavigateToContact?: () => void;
@@ -20,9 +20,10 @@ interface ResourceCardProps {
 export default function ResourceCard({ resource, typeColor, typeName, onNavigateToContact }: ResourceCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
-  const { progress } = useProgress();
 
-  // Vérification si la ressource est déjà complétée (progression)
+  // Utilisation sécurisée du contexte de progression
+  const progressContext = useProgress();
+  const progress = progressContext?.progress || [];
   const isCompleted = progress.some(p => p.resourceId === resource.id);
 
   useEffect(() => {
@@ -58,7 +59,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
   return (
     <div className="group bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-full hover:shadow-md hover:border-slate-300 transition-all duration-300 relative">
 
-      {/* Badge "Essentiel" (Nouveau style) */}
+      {/* Badge "Essentiel" - Utilise is_pinned de la DB */}
       {resource.is_pinned && (
         <div className="absolute top-0 right-0 bg-orange-100 text-[#E8650A] px-3 py-1 rounded-bl-xl flex items-center gap-1.5 z-10">
           <Star className="w-3.5 h-3.5 fill-[#E8650A]" />
@@ -86,7 +87,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         </div>
       </div>
 
-      {/* Badge Type */}
+      {/* Badge Type Pédagogique */}
       {typeName && (
         <div className="mb-3">
           <span
@@ -102,7 +103,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         </div>
       )}
 
-      {/* Corps : Titre Semibold (Adouci) */}
+      {/* Corps : Titre Semibold (Moins agressif) */}
       <div className="flex-1">
         <h3 className="text-lg font-semibold text-slate-800 mb-2 line-clamp-2 leading-snug group-hover:text-[#E8650A] transition-colors">
           {resource.title}
@@ -114,7 +115,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         )}
       </div>
 
-      {/* Tags avec Tooltip possible */}
+      {/* Tags avec Tooltips */}
       {resource.tags && resource.tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-5">
           {resource.tags.slice(0, 3).map((tag) => (
@@ -127,35 +128,14 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         </div>
       )}
 
-      {/* Lecteur Audio Intégré */}
+      {/* Lecteur Audio */}
       {showAudioPlayer && resource.type === 'audio' && (
         <div className="mb-4 p-2 bg-slate-50 rounded-lg border border-slate-100">
           <AudioPlayer url={resource.url} />
         </div>
       )}
 
-      {/* Action principale : Bouton Outline */}
+      {/* Action principale : Bouton Outline (Design épuré) */}
       <button
         onClick={handleAction}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm border-2 border-[#E8650A] text-[#E8650A] bg-white hover:bg-[#E8650A] hover:text-white transition-all duration-300 shadow-sm active:scale-95"
-      >
-        {resource.type === 'link' ? (
-          <>Consulter le lien <ExternalLink className="w-4 h-4" /></>
-        ) : resource.type === 'audio' ? (
-          <>{showAudioPlayer ? 'Fermer le lecteur' : 'Écouter la ressource'} <Headphones className="w-4 h-4" /></>
-        ) : (
-          <>Télécharger <Download className="w-4 h-4" /></>
-        )}
-      </button>
-
-      {onNavigateToContact && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onNavigateToContact(); }}
-          className="mt-4 text-[11px] text-slate-400 hover:text-[#E8650A] underline underline-offset-4 text-center transition-colors font-medium"
-        >
-          Besoin d'accompagnement sur ce sujet ?
-        </button>
-      )}
-    </div>
-  );
-}
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold
