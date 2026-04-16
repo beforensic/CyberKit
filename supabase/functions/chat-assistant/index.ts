@@ -1,80 +1,73 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import "https://deno.land/x/xhr@0.1.0/mod.ts"
 
+// 1. Définition des headers CORS ultra-complets
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
-};
-
-interface ChatRequest {
-  systemPrompt: string;
-  messages: Array<{ role: string; content: string }>;
+  'Access-Control-Allow-Origin': '*', // Ou 'https://www.cyberkit.be' pour plus de sécurité
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 200,
-      headers: corsHeaders,
-    });
+serve(async (req) => {
+  // 2. GESTION DU PREFLIGHT (C'est ce qui bloque actuellement !)
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', {
+      status: 200, // On renvoie bien un status OK
+      headers: corsHeaders
+    })
   }
 
   try {
-    const { systemPrompt, messages }: ChatRequest = await req.json();
+    const { systemPrompt, messages } = await req.json()
+    const apiKey = Deno.env.get('OPENAI_API_KEY')
 
-    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
     if (!apiKey) {
-      throw new Error("ANTHROPIC_API_KEY not configured");
+      throw new Error("La clé API OpenAI n'est pas configurée dans Supabase.")
     }
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
+    // 3. Appel à OpenAI
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 1024,
-        system: systemPrompt,
-        messages: messages,
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages
+        ],
+        temperature: 0.7,
       }),
-    });
+    })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error("Anthropic API error:", {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorData,
-      });
-      throw new Error(`Anthropic API error: ${response.status}`);
+      const errorData = await response.json();
+      console.error('Erreur OpenAI:', errorData);
+      throw new Error("L'IA n'a pas pu répondre.");
     }
 
-    const data = await response.json();
-    const assistantMessage = data.content?.[0]?.text || "Je n'arrive pas à répondre pour le moment.";
+    const data = await response.json()
+    const assistantMessage = data.choices[0].message.content
 
+    // 4. Réponse au client avec les headers CORS
     return new Response(
       JSON.stringify({ message: assistantMessage }),
       {
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-        },
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
-    );
+    )
+
   } catch (error) {
-    console.error("Error in chat-assistant:", error);
+    console.error('Erreur Function:', error.message);
     return new Response(
-      JSON.stringify({ error: "Failed to process chat request" }),
+      JSON.stringify({ error: error.message }),
       {
         status: 500,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-        },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
-    );
+    )
   }
-});
+})
