@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Zap, ArrowRight, Target, Lock, Activity, Award } from 'lucide-react';
+import { Shield, Zap, ArrowRight, Target, Lock, Activity, Award, BookOpen } from 'lucide-react';
 import { supabase, Theme } from '../lib/supabase';
 import { getIconComponent } from '../utils/icons';
 import { getScore } from '../utils/storage';
@@ -20,7 +20,7 @@ export default function Home({ onNavigate }: HomeProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] pb-20">
+    <div className="min-h-screen bg-[#FAFAFA] pb-20 text-left">
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 py-20 relative z-10">
@@ -53,7 +53,7 @@ export default function Home({ onNavigate }: HomeProps) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-16">
-        {/* Score Card - Rappel visuel fort */}
+        {/* Score Card */}
         {score !== null && (
           <div className="mb-16 p-8 bg-slate-900 rounded-3xl shadow-xl text-white flex flex-col md:flex-row items-center justify-between gap-8 transform hover:-translate-y-1 transition-all">
             <div className="flex items-center gap-6">
@@ -76,24 +76,24 @@ export default function Home({ onNavigate }: HomeProps) {
 
         {/* Pourquoi CyberKit ? */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-          <div className="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
-            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4"><Target /></div>
-            <h4 className="font-bold text-slate-900 mb-2">Diagnostic précis</h4>
-            <p className="text-sm text-slate-500">Évaluez vos points faibles en 5 minutes chrono.</p>
+          <div className="p-8 bg-white rounded-2xl border border-slate-100 shadow-sm text-left">
+            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-6"><Target className="w-6 h-6" /></div>
+            <h4 className="font-bold text-slate-900 mb-3">Diagnostic précis</h4>
+            <p className="text-sm text-slate-500 leading-relaxed">Évaluez vos points faibles et identifiez vos priorités en moins de 5 minutes.</p>
           </div>
-          <div className="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
-            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4"><Lock /></div>
-            <h4 className="font-bold text-slate-900 mb-2">Contenus concrets</h4>
-            <p className="text-sm text-slate-500">Des guides pas à pas sans jargon technique.</p>
+          <div className="p-8 bg-white rounded-2xl border border-slate-100 shadow-sm text-left">
+            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-6"><Lock className="w-6 h-6" /></div>
+            <h4 className="font-bold text-slate-900 mb-3">Guides concrets</h4>
+            <p className="text-sm text-slate-500 leading-relaxed">Fiches pratiques et vidéos mémos conçues pour être appliquées immédiatement.</p>
           </div>
-          <div className="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
-            <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-4"><Activity /></div>
-            <h4 className="font-bold text-slate-900 mb-2">Suivi de progrès</h4>
-            <p className="text-sm text-slate-500">Marquez vos ressources lues et voyez votre évolution.</p>
+          <div className="p-8 bg-white rounded-2xl border border-slate-100 shadow-sm text-left">
+            <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-6"><Activity className="w-6 h-6" /></div>
+            <h4 className="font-bold text-slate-900 mb-3">Suivi de progrès</h4>
+            <p className="text-sm text-slate-500 leading-relaxed">Marquez les contenus consultés et voyez votre niveau de protection évoluer.</p>
           </div>
         </div>
 
-        {/* Thématiques avec Icônes Dynamiques */}
+        {/* Thématiques */}
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-10">Par thématique</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -103,7 +103,7 @@ export default function Home({ onNavigate }: HomeProps) {
                 <button
                   key={theme.id}
                   onClick={() => onNavigate('resources', theme.title)}
-                  className="group bg-white p-8 rounded-3xl border border-slate-200 text-left hover:border-[#E8650A] transition-all shadow-sm hover:shadow-lg"
+                  className="group bg-white p-8 rounded-3xl border border-slate-200 text-left hover:border-[#E8650A] transition-all shadow-sm hover:shadow-xl"
                 >
                   <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange-50 transition-colors">
                     <IconComponent className="w-7 h-7 text-slate-400 group-hover:text-[#E8650A]" />
@@ -113,7 +113,7 @@ export default function Home({ onNavigate }: HomeProps) {
                     <ArrowRight className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-[#E8650A]" />
                   </h3>
                   <p className="text-slate-500 text-sm leading-relaxed">
-                    Découvrez nos ressources pour maîtriser ce pilier de votre sécurité.
+                    Accédez à nos outils pour renforcer ce pilier de votre protection numérique.
                   </p>
                 </button>
               );
