@@ -37,24 +37,53 @@ function App() {
       const code = path.split('/').pop() || '';
       setInvitationCode(code);
       setCurrentPage('company-join');
-    } else if (path === '/entreprise') {
+    } else if (path === '/entreprise' || path === '/entreprise/') {
       setCurrentPage('company-plans');
+    } else if (path === '/entreprise/inscription') {
+      setCurrentPage('company-signup');
+    } else if (path === '/entreprise/connexion') {
+      setCurrentPage('company-login');
+    } else if (path === '/entreprise/dashboard') {
+      setCurrentPage('company-dashboard');
+    } else if (path === '/entreprise/membres') {
+      setCurrentPage('company-members');
+    } else if (path === '/entreprise/membre') {
+      setCurrentPage('company-member');
     }
   }, []);
 
   const handleNavigate = (page: Page, filter?: string, contactData?: { subject?: string }) => {
     setCurrentPage(page);
+
     if (page === 'resources' && filter) {
       setResourceFilter(filter);
     } else {
       setResourceFilter(undefined);
     }
+
     if (page === 'resources') {
       setResourcesKey(prev => prev + 1);
     }
+
     if (page === 'contact' && contactData?.subject) {
       setContactSubject(contactData.subject);
+    } else if (page !== 'contact') {
+      setContactSubject('');
     }
+
+    const urlMap: Record<string, string> = {
+      'admin': '/admin',
+      'company-plans': '/entreprise',
+      'company-signup': '/entreprise/inscription',
+      'company-login': '/entreprise/connexion',
+      'company-dashboard': '/entreprise/dashboard',
+      'company-members': '/entreprise/membres',
+      'company-member': '/entreprise/membre',
+      'home': '/'
+    };
+
+    const newPath = urlMap[page] || '/';
+    window.history.pushState({}, '', newPath);
     window.scrollTo(0, 0);
   };
 
@@ -65,7 +94,10 @@ function App() {
       case 'resources': return <Resources key={resourcesKey} initialFilter={resourceFilter} onNavigate={handleNavigate} />;
       case 'favorites': return <Favorites onNavigate={handleNavigate} />;
       case 'contact': return <Contact onNavigate={handleNavigate} initialSubject={contactSubject} />;
-      case 'about': return <About />;
+
+      // PASSAGE DE LA NAVIGATION À LA PAGE ABOUT
+      case 'about': return <About onNavigate={handleNavigate} />;
+
       case 'admin': return <Admin onNavigate={handleNavigate} />;
       case 'legal': return <Legal onNavigate={handleNavigate} />;
       case 'company-plans': return <CompanyPlans onNavigate={handleNavigate} />;
@@ -79,11 +111,17 @@ function App() {
     }
   };
 
-  const hideNavigation = ['admin', 'company-dashboard', 'company-members', 'company-member'].includes(currentPage);
+  const hideNavigation = [
+    'admin', 'legal', 'company-plans', 'company-signup',
+    'company-login', 'company-join', 'company-dashboard', 'company-member'
+  ].includes(currentPage);
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
-      <main>{renderPage()}</main>
+      <main>
+        {renderPage()}
+      </main>
+
       {!hideNavigation && (
         <Navigation currentPage={currentPage} onNavigate={handleNavigate} />
       )}

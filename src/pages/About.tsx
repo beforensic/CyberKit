@@ -1,15 +1,35 @@
 import { Shield, Target, Zap, Award, Users, Presentation, Laptop, MessageSquare } from 'lucide-react';
 
-export default function About() {
+interface AboutProps {
+  onNavigate: (page: any) => void;
+}
+
+export default function About({ onNavigate }: AboutProps) {
   const offerings = [
-    { icon: Users, title: "Coaching individuel", text: "Accompagnement personnalisé pour renforcer vos pratiques numériques." },
-    { icon: Presentation, title: "Sensibilisation", text: "Interventions en entreprise pour former vos collaborateurs." },
-    { icon: Laptop, title: "Webinaires", text: "Sessions interactives en ligne sur les menaces actuelles." },
-    { icon: MessageSquare, title: "Conférences", text: "Présentations dynamiques pour vos événements pros." }
+    {
+      icon: Users,
+      title: "Coaching individuel",
+      text: "Accompagnement personnalisé pour évaluer votre situation et renforcer vos pratiques numériques."
+    },
+    {
+      icon: Presentation,
+      title: "Sensibilisation",
+      text: "Interventions directement dans votre entreprise pour former vos collaborateurs aux bons réflexes."
+    },
+    {
+      icon: Laptop,
+      title: "Webinaires",
+      text: "Sessions interactives en ligne sur les thèmes de cybersécurité qui vous concernent au quotidien."
+    },
+    {
+      icon: MessageSquare,
+      title: "Conférences",
+      text: "Présentations dynamiques adaptées à vos événements professionnels ou associatifs."
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-20 px-4 pb-32">
+    <div className="min-h-screen bg-[#FAFAFA] py-12 md:py-20 px-4 pb-32 text-left">
       <div className="max-w-5xl mx-auto">
 
         {/* Bio Card */}
@@ -18,9 +38,9 @@ export default function About() {
 
           <div className="flex flex-col md:flex-row gap-16 items-center relative z-10">
             <div className="relative shrink-0">
-              <div className="w-56 h-56 rounded-3xl overflow-hidden shadow-2xl border-8 border-white">
+              <div className="w-56 h-56 rounded-3xl overflow-hidden shadow-2xl border-8 border-white bg-slate-100">
                 <img
-                  src="https://bzxzxzmxiqvnhmlcwqre.supabase.co/storage/v1/object/public/resources/Profil-1-beforensic.png"
+                  src="https://fuxpnuqfktmbeidmshov.supabase.co/storage/v1/object/public/resources/Serge-About.png"
                   alt="Serge Houtain"
                   className="w-full h-full object-cover"
                 />
@@ -30,8 +50,8 @@ export default function About() {
               </div>
             </div>
 
-            <div className="text-left">
-              <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 leading-tight">
+            <div className="flex-1">
+              <h1 className="text-3xl md:text-5xl font-black text-slate-900 mb-6 leading-tight">
                 La cybersécurité, c'est avant tout une <span className="text-[#E8650A]">affaire humaine.</span>
               </h1>
               <div className="space-y-6 text-lg text-slate-600 leading-relaxed">
@@ -39,7 +59,7 @@ export default function About() {
                   Je m'appelle Serge Houtain, fondateur de beForensic et créateur de <span className="font-bold text-[#E8650A]">CyberKit</span>.
                 </p>
                 <p>
-                  Ancien enquêteur à la <span className="text-slate-900 font-semibold underline decoration-orange-200">Police Judiciaire Fédérale belge (RCCU)</span> pendant 22 ans, j'ai vu comment les cybercriminels exploitent l'humain plutôt que la machine.
+                  Ancien enquêteur à la <span className="text-slate-900 font-semibold underline decoration-orange-200 underline-offset-4">Police Judiciaire Fédérale belge (RCCU)</span> pendant 22 ans, j'ai vu comment les cybercriminels exploitent l'humain plutôt que la machine.
                 </p>
                 <p>
                   CyberKit est ma réponse : un outil gratuit pour que chaque PME belge puisse monter en compétence sans peur et sans jargon.
@@ -49,28 +69,31 @@ export default function About() {
           </div>
         </div>
 
-        {/* Services */}
+        {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-20">
           {offerings.map((o, i) => (
             <div key={i} className="bg-white p-8 rounded-3xl border-b-4 border-orange-500 shadow-sm hover:shadow-lg transition-all text-center">
               <div className="w-12 h-12 bg-orange-50 text-[#E8650A] rounded-xl flex items-center justify-center mx-auto mb-6">
                 <o.icon className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-900 mb-3">{o.title}</h3>
+              <h3 className="font-bold text-slate-900 mb-3 text-sm md:text-base">{o.title}</h3>
               <p className="text-xs text-slate-500 leading-relaxed">{o.text}</p>
             </div>
           ))}
         </div>
 
-        {/* CTA */}
+        {/* CTA Section - Navigation Interne */}
         <div className="bg-slate-900 rounded-[2.5rem] p-12 text-center text-white shadow-2xl">
           <h2 className="text-3xl font-bold mb-6">Besoin d'un accompagnement sur mesure ?</h2>
           <p className="text-slate-400 mb-10 max-w-2xl mx-auto text-lg">
             Que ce soit pour une conférence, une formation ou un coaching, je vous aide à transformer vos collaborateurs en votre première ligne de défense.
           </p>
-          <a href="/contact" className="inline-block px-10 py-5 bg-[#E8650A] rounded-2xl font-black text-lg hover:bg-orange-600 transition-all shadow-xl">
+          <button
+            onClick={() => onNavigate('contact')}
+            className="px-10 py-5 bg-[#E8650A] rounded-2xl font-black text-lg hover:bg-orange-600 transition-all shadow-xl active:scale-95"
+          >
             Me contacter directement
-          </a>
+          </button>
         </div>
 
       </div>
