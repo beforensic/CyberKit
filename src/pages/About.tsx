@@ -40,7 +40,7 @@ export default function About({ onNavigate }: AboutProps) {
             <div className="relative shrink-0">
               <div className="w-56 h-56 rounded-3xl overflow-hidden shadow-2xl border-8 border-white bg-slate-100">
                 <img
-                  src="https://fuxpnuqfktmbeidmshov.supabase.co/storage/v1/object/public/resources/Serge-About.png"
+                  src="https://bzxzxzmxiqvnhmlcwqre.supabase.co/storage/v1/object/public/resources/Profil-1-beforensic.png"
                   alt="Serge Houtain"
                   className="w-full h-full object-cover"
                 />
