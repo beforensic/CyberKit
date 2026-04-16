@@ -38,7 +38,7 @@ export default function About() {
             <div className="relative shrink-0">
               {/* TA PHOTO ICI */}
               <img
-                src="https://fuxpnuqfktmbeidmshov.supabase.co/storage/v1/object/public/resources/Serge-About.png"
+                src="https://bzxzxzmxiqvnhmlcwqre.supabase.co/storage/v1/object/public/resources/Profil-1-beforensic.png"
                 alt="Serge Houtain"
                 className="w-48 h-48 rounded-2xl object-cover shadow-md border-4 border-white"
               />
