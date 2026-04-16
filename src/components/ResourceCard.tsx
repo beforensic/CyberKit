@@ -55,30 +55,35 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
   };
 
   return (
-    <div className="group bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-full hover:shadow-md hover:border-slate-300 transition-all duration-300 relative">
+    <div className="group bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-full hover:shadow-md hover:border-slate-300 transition-all duration-300 relative overflow-hidden">
 
-      {/* Badge "Essentiel" - Flottant avec marges */}
+      {/* Badge "Essentiel" - Positionné fixement en haut à droite */}
       {resource.is_pinned && (
-        <div className="absolute top-3 right-3 bg-orange-50 text-[#E8650A] px-2 py-1 rounded-lg flex items-center gap-1 z-10 border border-orange-100 shadow-sm">
+        <div className="absolute top-0 right-0 bg-orange-100 text-[#E8650A] px-3 py-1 rounded-bl-xl flex items-center gap-1 z-20 shadow-sm border-l border-b border-orange-200">
           <Star className="w-3 h-3 fill-[#E8650A]" />
-          <span className="text-[9px] font-bold uppercase tracking-wider">Essentiel</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider">Essentiel</span>
         </div>
       )}
 
-      {/* En-tête */}
+      {/* En-tête : Icône à gauche, Actions à droite */}
       <div className="flex items-start justify-between mb-4">
         <div className="p-3 bg-slate-50 rounded-xl text-slate-700 group-hover:bg-slate-100 transition-colors">
           {getIcon()}
         </div>
-        <div className="flex gap-2">
+
+        {/* Container des actions (Favoris / Check) décalé si "Essentiel" est là */}
+        <div className={`flex gap-2 z-10 ${resource.is_pinned ? 'mr-20' : ''} transition-all`}>
           {isCompleted && (
-            <div className="p-2 bg-emerald-50 text-emerald-500 rounded-full">
+            <div className="p-2 bg-emerald-50 text-emerald-500 rounded-full" title="Déjà consulté">
               <Check className="w-5 h-5" />
             </div>
           )}
           <button
             onClick={handleToggleFavorite}
-            className={`p-2 rounded-full transition-all ${isFavorite ? 'bg-red-50 text-red-500' : 'bg-slate-50 text-slate-300 hover:text-red-400'}`}
+            className={`p-2 rounded-full transition-all shadow-sm border ${isFavorite
+                ? 'bg-red-50 border-red-100 text-red-500'
+                : 'bg-white border-slate-100 text-slate-300 hover:text-red-400'
+              }`}
           >
             <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
           </button>
@@ -89,7 +94,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
       {typeName && (
         <div className="mb-3">
           <span
-            className="text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wide"
+            className="text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wide inline-block"
             style={{
               color: typeColor || '#64748B',
               borderColor: `${typeColor}40` || '#E2E8F0',
@@ -101,7 +106,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         </div>
       )}
 
-      {/* Titre & Description */}
+      {/* Corps : Titre & Description */}
       <div className="flex-1">
         <h3 className="text-lg font-semibold text-slate-800 mb-2 line-clamp-2 leading-snug group-hover:text-[#E8650A] transition-colors">
           {resource.title}
@@ -113,12 +118,12 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         )}
       </div>
 
-      {/* Tags */}
+      {/* Tags avec Tooltip */}
       {resource.tags && resource.tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-5">
           {resource.tags.slice(0, 3).map((tag) => (
             <KeywordTooltip key={tag} keyword={tag}>
-              <span className="text-[10px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md cursor-help hover:bg-slate-200 transition-colors">
+              <span className="text-[10px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md cursor-help hover:bg-[#E8650A] hover:text-white transition-all">
                 #{tag}
               </span>
             </KeywordTooltip>
@@ -146,14 +151,13 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         )}
       </button>
 
-      {/* Lien de contact amélioré */}
       {onNavigateToContact && (
         <button
           onClick={(e) => { e.stopPropagation(); onNavigateToContact(); }}
           className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-[11px] text-slate-400 hover:text-[#E8650A] transition-colors font-medium group/contact"
         >
           <MessageCircle className="w-3.5 h-3.5" />
-          <span className="group-hover/contact:underline underline-offset-2">Besoin d'aide sur ce sujet ?</span>
+          <span className="group-hover/contact:underline">Besoin d'aide sur ce sujet ?</span>
         </button>
       )}
     </div>
