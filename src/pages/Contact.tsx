@@ -40,7 +40,7 @@ export default function Contact({ onNavigate, initialSubject = '' }: ContactProp
           const themeInterest = getThemeInterest();
 
           if (savedScore && !subject) {
-            setSubject(`Diagnostic Securicoach - Score : ${savedScore.score}/100`);
+            setSubject(`Diagnostic CyberKit - Score : ${savedScore.score}/100`);
           }
 
           if (themeInterest && !message) {
@@ -227,11 +227,10 @@ export default function Contact({ onNavigate, initialSubject = '' }: ContactProp
     <div className="min-h-screen pb-20" style={{ backgroundColor: '#FAFAFA' }}>
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-[slideIn_0.3s_ease-out] max-w-md ${
-            toast.type === 'success'
-              ? 'bg-primary text-white'
-              : 'bg-red-500 text-white'
-          }`}
+          className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-[slideIn_0.3s_ease-out] max-w-md ${toast.type === 'success'
+            ? 'bg-primary text-white'
+            : 'bg-red-500 text-white'
+            }`}
         >
           {toast.type === 'success' ? (
             <CheckCircle className="w-5 h-5 flex-shrink-0" />
@@ -321,11 +320,10 @@ export default function Contact({ onNavigate, initialSubject = '' }: ContactProp
                   if (errors.name) setErrors({ ...errors, name: '' });
                 }}
                 maxLength={100}
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
-                  errors.name
-                    ? 'border-red-300 focus:border-red-500'
-                    : 'border-gray-200 focus:border-primary'
-                }`}
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${errors.name
+                  ? 'border-red-300 focus:border-red-500'
+                  : 'border-gray-200 focus:border-primary'
+                  }`}
                 placeholder="Jean Dupont"
                 disabled={loading}
               />
@@ -353,11 +351,10 @@ export default function Contact({ onNavigate, initialSubject = '' }: ContactProp
                   if (errors.email) setErrors({ ...errors, email: '' });
                 }}
                 maxLength={150}
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
-                  errors.email
-                    ? 'border-red-300 focus:border-red-500'
-                    : 'border-gray-200 focus:border-primary'
-                }`}
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${errors.email
+                  ? 'border-red-300 focus:border-red-500'
+                  : 'border-gray-200 focus:border-primary'
+                  }`}
                 placeholder="jean.dupont@exemple.com"
                 disabled={loading}
               />
@@ -385,11 +382,10 @@ export default function Contact({ onNavigate, initialSubject = '' }: ContactProp
                   if (errors.subject) setErrors({ ...errors, subject: '' });
                 }}
                 maxLength={150}
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
-                  errors.subject
-                    ? 'border-red-300 focus:border-red-500'
-                    : 'border-gray-200 focus:border-primary'
-                }`}
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${errors.subject
+                  ? 'border-red-300 focus:border-red-500'
+                  : 'border-gray-200 focus:border-primary'
+                  }`}
                 placeholder="Demande d'information"
                 disabled={loading}
               />
@@ -417,12 +413,11 @@ export default function Contact({ onNavigate, initialSubject = '' }: ContactProp
                 }}
                 maxLength={2000}
                 rows={6}
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors resize-none ${
-                  errors.message
-                    ? 'border-red-300 focus:border-red-500'
-                    : 'border-gray-200 focus:border-primary'
-                }`}
-                placeholder="Bonjour, je vous contacte au sujet de SecuriCoach pour..."
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors resize-none ${errors.message
+                  ? 'border-red-300 focus:border-red-500'
+                  : 'border-gray-200 focus:border-primary'
+                  }`}
+                placeholder="Bonjour, je vous contacte au sujet de CyberKit pour..."
                 disabled={loading}
               />
               {errors.message && (
