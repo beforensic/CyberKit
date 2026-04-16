@@ -4,7 +4,6 @@ import {
   Download, Heart, Check, Star, MessageCircle
 } from 'lucide-react';
 import { Resource } from '../lib/supabase';
-import KeywordTooltip from './KeywordTooltip';
 import AudioPlayer from './AudioPlayer';
 import { getFavorites, toggleFavorite } from '../utils/storage';
 import { useProgress } from '../contexts/ProgressContext';
@@ -57,7 +56,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
   return (
     <div className="group bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-full hover:shadow-md hover:border-slate-300 transition-all duration-300 relative overflow-hidden">
 
-      {/* Badge "Essentiel" - Positionné fixement en haut à droite */}
+      {/* Badge "Essentiel" - Positionné en haut à droite */}
       {resource.is_pinned && (
         <div className="absolute top-0 right-0 bg-orange-100 text-[#E8650A] px-3 py-1 rounded-bl-xl flex items-center gap-1 z-20 shadow-sm border-l border-b border-orange-200">
           <Star className="w-3 h-3 fill-[#E8650A]" />
@@ -65,14 +64,14 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         </div>
       )}
 
-      {/* En-tête : Icône à gauche, Actions à droite */}
+      {/* En-tête : Icône à gauche, Favoris à DROITE */}
       <div className="flex items-start justify-between mb-4">
         <div className="p-3 bg-slate-50 rounded-xl text-slate-700 group-hover:bg-slate-100 transition-colors">
           {getIcon()}
         </div>
 
-        {/* Container des actions (Favoris / Check) décalé si "Essentiel" est là */}
-        <div className={`flex gap-2 z-10 ${resource.is_pinned ? 'mr-20' : ''} transition-all`}>
+        {/* Container des actions : décalé vers la gauche si le badge Essentiel est présent */}
+        <div className={`flex gap-2 z-10 transition-all ${resource.is_pinned ? 'mr-24' : ''}`}>
           {isCompleted && (
             <div className="p-2 bg-emerald-50 text-emerald-500 rounded-full" title="Déjà consulté">
               <Check className="w-5 h-5" />
@@ -80,7 +79,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
           )}
           <button
             onClick={handleToggleFavorite}
-            className={`p-2 rounded-full transition-all shadow-sm border ${isFavorite
+            className={`p-2 rounded-full transition-all border shadow-sm ${isFavorite
                 ? 'bg-red-50 border-red-100 text-red-500'
                 : 'bg-white border-slate-100 text-slate-300 hover:text-red-400'
               }`}
@@ -118,15 +117,13 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         )}
       </div>
 
-      {/* Tags avec Tooltip */}
+      {/* Tags - Nettoyés : Plus de Tooltip, plus de curseur d'aide */}
       {resource.tags && resource.tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-5">
           {resource.tags.slice(0, 3).map((tag) => (
-            <KeywordTooltip key={tag} keyword={tag}>
-              <span className="text-[10px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md cursor-help hover:bg-[#E8650A] hover:text-white transition-all">
-                #{tag}
-              </span>
-            </KeywordTooltip>
+            <span key={tag} className="text-[10px] font-medium bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md border border-slate-200/50">
+              #{tag}
+            </span>
           ))}
         </div>
       )}
