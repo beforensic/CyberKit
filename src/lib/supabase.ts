@@ -34,7 +34,7 @@ export interface Resource {
   id: string;
   theme_id: string;
   title: string;
-  description: string;
+  description: string | null;
   type: 'pdf' | 'audio' | 'video' | 'link' | 'image';
   resource_type_id: string;
   url: string;

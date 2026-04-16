@@ -59,7 +59,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
   return (
     <div className="group bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-full hover:shadow-md hover:border-slate-300 transition-all duration-300 relative">
 
-      {/* Badge "Essentiel" - Utilise is_pinned de la DB */}
+      {/* Badge "Essentiel" */}
       {resource.is_pinned && (
         <div className="absolute top-0 right-0 bg-orange-100 text-[#E8650A] px-3 py-1 rounded-bl-xl flex items-center gap-1.5 z-10">
           <Star className="w-3.5 h-3.5 fill-[#E8650A]" />
@@ -87,7 +87,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         </div>
       </div>
 
-      {/* Badge Type Pédagogique */}
+      {/* Badge Type */}
       {typeName && (
         <div className="mb-3">
           <span
@@ -103,7 +103,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         </div>
       )}
 
-      {/* Corps : Titre Semibold (Moins agressif) */}
+      {/* Corps */}
       <div className="flex-1">
         <h3 className="text-lg font-semibold text-slate-800 mb-2 line-clamp-2 leading-snug group-hover:text-[#E8650A] transition-colors">
           {resource.title}
@@ -115,7 +115,7 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         )}
       </div>
 
-      {/* Tags avec Tooltips */}
+      {/* Tags */}
       {resource.tags && resource.tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-5">
           {resource.tags.slice(0, 3).map((tag) => (
@@ -135,7 +135,28 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
         </div>
       )}
 
-      {/* Action principale : Bouton Outline (Design épuré) */}
+      {/* Bouton Principal - Design Outline */}
       <button
         onClick={handleAction}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm border-2 border-[#E8650A] text-[#E8650A] bg-white hover:bg-[#E8650A] hover:text-white transition-all duration-300 shadow-sm active:scale-95"
+      >
+        {resource.type === 'link' ? (
+          <>Consulter le lien <ExternalLink className="w-4 h-4" /></>
+        ) : resource.type === 'audio' ? (
+          <>{showAudioPlayer ? 'Fermer le lecteur' : 'Écouter la ressource'} <Headphones className="w-4 h-4" /></>
+        ) : (
+          <>Télécharger <Download className="w-4 h-4" /></>
+        )}
+      </button>
+
+      {onNavigateToContact && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onNavigateToContact(); }}
+          className="mt-4 text-[11px] text-slate-400 hover:text-[#E8650A] underline underline-offset-4 text-center transition-colors font-medium"
+        >
+          Besoin d'accompagnement sur ce sujet ?
+        </button>
+      )}
+    </div>
+  );
+}
