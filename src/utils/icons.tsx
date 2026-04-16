@@ -5,7 +5,6 @@ export const getIconComponent = (name: string | null | undefined) => {
 
   const cleanName = name.toLowerCase().trim();
 
-  // Mapping ultra-précis basé sur tes catégories réelles
   const map: Record<string, any> = {
     'cadre juridique': LucideIcons.Gavel,
     'confidentialité': LucideIcons.EyeOff,
@@ -19,10 +18,10 @@ export const getIconComponent = (name: string | null | undefined) => {
     'sauvegardes': LucideIcons.Database,
     'systèmes d\'information': LucideIcons.Network,
     'zone expérimentale': LucideIcons.Beaker,
-    // Fallbacks au cas où
-    'video': LucideIcons.PlayCircle,
-    'audio': LucideIcons.Headphones,
-    'guide': LucideIcons.FileText
+    // Aliases
+    'juridique': LucideIcons.Gavel,
+    'reseaux-sociaux': LucideIcons.Share2,
+    'mots-de-passe': LucideIcons.Key,
   };
 
   return map[cleanName] || LucideIcons.Shield;
