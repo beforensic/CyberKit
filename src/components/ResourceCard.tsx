@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { FileText, PlayCircle, Headphones, ExternalLink, Image, Download, Clock, Heart, Check } from 'lucide-react';
+import {
+  FileText, PlayCircle, Headphones, ExternalLink, Image as ImageIcon,
+  Download, Clock, Heart, Check, Star
+} from 'lucide-react';
 import { Resource, supabase } from '../lib/supabase';
 import ResourceError from './ResourceError';
 import KeywordTooltip from './KeywordTooltip';
@@ -8,19 +11,19 @@ import { getFavorites, toggleFavorite } from '../utils/storage';
 import { useProgress } from '../contexts/ProgressContext';
 
 interface ResourceCardProps {
-  resource: Resource;
+  resource: Resource & { isPinned?: boolean };
   typeColor?: string;
   typeName?: string;
   onNavigateToContact?: () => void;
-  onFavoriteChange?: () => void;
 }
 
-export default function ResourceCard({ resource, typeColor, typeName, onNavigateToContact, onFavoriteChange }: ResourceCardProps) {
-  const [showError, setShowError] = useState(false);
-  const [showAudioPlayer, setShowAudioPlayer] = useState(false);
+export default function ResourceCard({ resource, typeColor, typeName, onNavigateToContact }: ResourceCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
-  const [isPulsing, setIsPulsing] = useState(false);
-  const { markAsConsulted, isConsulted } = useProgress();
+  const [showAudioPlayer, setShowAudioPlayer] = useState(false);
+  const { progress } = useProgress();
+
+  // Vérification si la ressource est déjà complétée (progression)
+  const isCompleted = progress.some(p => p.resourceId === resource.id);
 
   useEffect(() => {
     const favorites = getFavorites();
@@ -29,108 +32,130 @@ export default function ResourceCard({ resource, typeColor, typeName, onNavigate
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const newState = toggleFavorite(resource.id);
-    setIsFavorite(newState);
-    setIsPulsing(true);
-    setTimeout(() => setIsPulsing(false), 300);
-    if (onFavoriteChange) onFavoriteChange();
+    const newStatus = toggleFavorite(resource.id);
+    setIsFavorite(newStatus);
   };
 
-  const getResourceStyle = () => {
+  const getIcon = () => {
     switch (resource.type) {
-      case 'pdf':
-        return { borderColor: 'border-l-slate-900', iconColor: 'text-slate-900', icon: FileText, buttonText: 'Télécharger le PDF', buttonBg: 'bg-accent hover:bg-accent-600 text-white' };
-      case 'image':
-        return { borderColor: 'border-l-purple-500', iconColor: 'text-purple-500', icon: Image, buttonText: 'Télécharger', buttonBg: 'bg-purple-500 hover:bg-purple-600 text-white' };
-      case 'video':
-        return { borderColor: 'border-l-sky-500', iconColor: 'text-sky-500', icon: PlayCircle, buttonText: 'Voir la vidéo', buttonBg: 'bg-sky-500 hover:bg-sky-600 text-white' };
-      case 'audio':
-        return { borderColor: 'border-l-slate-400', iconColor: 'text-slate-400', icon: Headphones, buttonText: 'Écouter l\'audio', buttonBg: 'bg-slate-400 hover:bg-slate-500 text-white' };
-      default:
-        return { borderColor: 'border-l-primary', iconColor: 'text-primary', icon: ExternalLink, buttonText: 'Visiter le site', buttonBg: 'bg-accent hover:bg-accent-600 text-white' };
+      case 'video': return <PlayCircle className="w-8 h-8" />;
+      case 'audio': return <Headphones className="w-8 h-8" />;
+      case 'image': return <ImageIcon className="w-8 h-8" />;
+      case 'link': return <ExternalLink className="w-8 h-8" />;
+      default: return <FileText className="w-8 h-8" />;
     }
   };
 
-  const style = getResourceStyle();
-  const Icon = style.icon;
-
-  // Cette fonction enregistre la vue en arrière-plan sans bloquer l'ouverture du lien
-  const trackView = () => {
-    markAsConsulted(resource.id);
-    supabase.from('resource_views').insert({ resource_id: resource.id, resource_type: resource.type }).then();
+  const handleAction = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (resource.type === 'audio') {
+      setShowAudioPlayer(!showAudioPlayer);
+      return;
+    }
+    window.open(resource.url, '_blank');
   };
 
-  const consulted = isConsulted(resource.id);
-
   return (
-    <>
-      {showAudioPlayer && (
-        <AudioPlayer url={resource.url} title={resource.title} onClose={() => setShowAudioPlayer(false)} />
+    <div className="group bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-full hover:shadow-md hover:border-slate-300 transition-all duration-300 relative">
+
+      {/* Badge "Essentiel" (Nouveau style) */}
+      {resource.is_pinned && (
+        <div className="absolute top-0 right-0 bg-orange-100 text-[#E8650A] px-3 py-1 rounded-bl-xl flex items-center gap-1.5 z-10">
+          <Star className="w-3.5 h-3.5 fill-[#E8650A]" />
+          <span className="text-[10px] font-bold uppercase tracking-wider">Essentiel</span>
+        </div>
       )}
 
-      {showError && (
-        <ResourceError resourceTitle={resource.title} onBack={() => setShowError(false)} onContactAdmin={() => { setShowError(false); if (onNavigateToContact) onNavigateToContact(); }} />
-      )}
-
-      <div className={`bg-white rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden relative ${consulted ? 'opacity-85' : ''}`}>
-        <button
-          onClick={handleToggleFavorite}
-          className={`absolute top-4 left-4 z-10 p-2 rounded-full bg-white shadow-md hover:scale-110 transition-all ${isPulsing ? 'animate-pulse' : ''}`}
-        >
-          <Heart className={`w-5 h-5 ${isFavorite ? 'fill-[#E8650A] text-[#E8650A]' : 'text-gray-400'}`} />
-        </button>
-
-        <div className="p-6 pt-14">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs text-slate-600">{resource.theme?.title || ''}</span>
-            {typeColor && typeName && (
-              <span className="px-3 py-1 rounded-full text-white text-xs font-semibold" style={{ backgroundColor: typeColor }}>{typeName}</span>
-            )}
-          </div>
-
-          {resource.type === 'image' && resource.url && (
-            <div className="w-full bg-slate-50 -mx-6 mb-4">
-              <img src={resource.url} alt={resource.title} className="w-full h-auto object-contain" />
+      {/* En-tête : Icône et Favoris */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="p-3 bg-slate-50 rounded-xl text-slate-700 group-hover:bg-slate-100 transition-colors">
+          {getIcon()}
+        </div>
+        <div className="flex gap-2">
+          {isCompleted && (
+            <div className="p-2 bg-emerald-50 text-emerald-500 rounded-full" title="Déjà consulté">
+              <Check className="w-5 h-5" />
             </div>
           )}
-
-          <div className="flex items-start mb-3">
-            <Icon className={`w-8 h-8 ${style.iconColor}`} />
-          </div>
-
-          <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-2">{resource.title}</h3>
-
-          <p className="text-slate-600 text-sm mb-4 line-clamp-3">{resource.description}</p>
-
-          {/* BOUTON DE TÉLÉCHARGEMENT : Changé en lien <a> pour compatibilité Mobile */}
-          {resource.type === 'audio' ? (
-            <button
-              onClick={() => { trackView(); setShowAudioPlayer(true); }}
-              className={`w-full ${style.buttonBg} py-3 rounded-lg font-semibold flex items-center justify-center gap-2`}
-            >
-              <Icon className="w-5 h-5" />
-              <span>{style.buttonText}</span>
-            </button>
-          ) : (
-            <a
-              href={resource.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={trackView}
-              className={`w-full ${style.buttonBg} py-3 rounded-lg font-semibold transition-all active:scale-95 flex items-center justify-center gap-2`}
-            >
-              {resource.type === 'image' ? <Download className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
-              <span>{style.buttonText}</span>
-            </a>
-          )}
+          <button
+            onClick={handleToggleFavorite}
+            className={`p-2 rounded-full transition-all ${isFavorite ? 'bg-red-50 text-red-500' : 'bg-slate-50 text-slate-300 hover:text-red-400'}`}
+          >
+            <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
+          </button>
         </div>
+      </div>
 
-        {consulted && (
-          <div className="absolute bottom-4 left-4 bg-emerald-500 text-white rounded-full p-1.5 shadow-md">
-            <Check className="w-4 h-4" />
-          </div>
+      {/* Badge Type */}
+      {typeName && (
+        <div className="mb-3">
+          <span
+            className="text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wide"
+            style={{
+              color: typeColor || '#64748B',
+              borderColor: `${typeColor}40` || '#E2E8F0',
+              backgroundColor: `${typeColor}10` || '#F8FAFC'
+            }}
+          >
+            {typeName}
+          </span>
+        </div>
+      )}
+
+      {/* Corps : Titre Semibold (Adouci) */}
+      <div className="flex-1">
+        <h3 className="text-lg font-semibold text-slate-800 mb-2 line-clamp-2 leading-snug group-hover:text-[#E8650A] transition-colors">
+          {resource.title}
+        </h3>
+        {resource.description && (
+          <p className="text-sm text-slate-500 line-clamp-3 mb-4 leading-relaxed">
+            {resource.description}
+          </p>
         )}
       </div>
-    </>
+
+      {/* Tags avec Tooltip possible */}
+      {resource.tags && resource.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-5">
+          {resource.tags.slice(0, 3).map((tag) => (
+            <KeywordTooltip key={tag} keyword={tag}>
+              <span className="text-[10px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md cursor-help hover:bg-slate-200 transition-colors">
+                #{tag}
+              </span>
+            </KeywordTooltip>
+          ))}
+        </div>
+      )}
+
+      {/* Lecteur Audio Intégré */}
+      {showAudioPlayer && resource.type === 'audio' && (
+        <div className="mb-4 p-2 bg-slate-50 rounded-lg border border-slate-100">
+          <AudioPlayer url={resource.url} />
+        </div>
+      )}
+
+      {/* Action principale : Bouton Outline */}
+      <button
+        onClick={handleAction}
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm border-2 border-[#E8650A] text-[#E8650A] bg-white hover:bg-[#E8650A] hover:text-white transition-all duration-300 shadow-sm active:scale-95"
+      >
+        {resource.type === 'link' ? (
+          <>Consulter le lien <ExternalLink className="w-4 h-4" /></>
+        ) : resource.type === 'audio' ? (
+          <>{showAudioPlayer ? 'Fermer le lecteur' : 'Écouter la ressource'} <Headphones className="w-4 h-4" /></>
+        ) : (
+          <>Télécharger <Download className="w-4 h-4" /></>
+        )}
+      </button>
+
+      {onNavigateToContact && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onNavigateToContact(); }}
+          className="mt-4 text-[11px] text-slate-400 hover:text-[#E8650A] underline underline-offset-4 text-center transition-colors font-medium"
+        >
+          Besoin d'accompagnement sur ce sujet ?
+        </button>
+      )}
+    </div>
   );
 }
