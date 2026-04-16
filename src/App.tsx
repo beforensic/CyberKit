@@ -31,24 +31,30 @@ function App() {
 
   useEffect(() => {
     const path = window.location.pathname;
-    if (path === '/admin') setCurrentPage('admin');
-    else if (path.startsWith('/entreprise/rejoindre/')) {
-      setInvitationCode(path.split('/').pop() || '');
+    if (path === '/admin') {
+      setCurrentPage('admin');
+    } else if (path.startsWith('/entreprise/rejoindre/')) {
+      const code = path.split('/').pop() || '';
+      setInvitationCode(code);
       setCurrentPage('company-join');
+    } else if (path === '/entreprise') {
+      setCurrentPage('company-plans');
     }
-    else if (path === '/entreprise') setCurrentPage('company-plans');
-    // ... (le reste de ta logique d'URL actuelle est conservé)
   }, []);
 
   const handleNavigate = (page: Page, filter?: string, contactData?: { subject?: string }) => {
     setCurrentPage(page);
-    if (page === 'resources' && filter) setResourceFilter(filter);
-    else setResourceFilter(undefined);
-    if (page === 'resources') setResourcesKey(prev => prev + 1);
-    if (page === 'contact' && contactData?.subject) setContactSubject(contactData.subject);
-
-    const urlMap: Record<string, string> = { 'admin': '/admin', 'home': '/' };
-    window.history.pushState({}, '', urlMap[page] || '/');
+    if (page === 'resources' && filter) {
+      setResourceFilter(filter);
+    } else {
+      setResourceFilter(undefined);
+    }
+    if (page === 'resources') {
+      setResourcesKey(prev => prev + 1);
+    }
+    if (page === 'contact' && contactData?.subject) {
+      setContactSubject(contactData.subject);
+    }
     window.scrollTo(0, 0);
   };
 
@@ -62,17 +68,25 @@ function App() {
       case 'about': return <About />;
       case 'admin': return <Admin onNavigate={handleNavigate} />;
       case 'legal': return <Legal onNavigate={handleNavigate} />;
-      // ... (tes autres cases company)
+      case 'company-plans': return <CompanyPlans onNavigate={handleNavigate} />;
+      case 'company-signup': return <CompanySignup onNavigate={handleNavigate} />;
+      case 'company-login': return <CompanyLogin onNavigate={handleNavigate} />;
+      case 'company-join': return <CompanyJoin invitationCode={invitationCode} onNavigate={handleNavigate} />;
+      case 'company-dashboard': return <CompanyDashboard onNavigate={handleNavigate} />;
+      case 'company-members': return <CompanyMembers onNavigate={handleNavigate} />;
+      case 'company-member': return <CompanyMember onNavigate={handleNavigate} />;
       default: return <Home onNavigate={handleNavigate} />;
     }
   };
 
-  const hideNavigation = ['admin', 'company-dashboard'].includes(currentPage);
+  const hideNavigation = ['admin', 'company-dashboard', 'company-members', 'company-member'].includes(currentPage);
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <main>{renderPage()}</main>
-      {!hideNavigation && <Navigation currentPage={currentPage} onNavigate={handleNavigate} />}
+      {!hideNavigation && (
+        <Navigation currentPage={currentPage} onNavigate={handleNavigate} />
+      )}
     </div>
   );
 }
