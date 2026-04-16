@@ -7,16 +7,15 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // GESTION DU PREFLIGHT (Indispensable pour le navigateur)
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
     const { systemPrompt, messages } = await req.json()
-    const apiKey = Deno.env.get('OPENAI_API_KEY') // On utilise le nom de secret actuel
+    const apiKey = Deno.env.get('OPENAI_API_KEY')
 
-    console.log("Appel d'Anthropic en cours...");
+    console.log("Tentative d'appel à Anthropic (Claude 3.5 Sonnet)...");
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -26,17 +25,19 @@ serve(async (req) => {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
+        // Changement de modèle pour plus de fiabilité
+        model: 'claude-3-5-sonnet-20240620',
         max_tokens: 1024,
         system: systemPrompt,
-        messages: messages.filter((m: any) => m.role !== 'system'),
+        // On s'assure que les messages sont bien formattés
+        messages: messages.filter((m: any) => m.role === 'user' || m.role === 'assistant'),
       }),
     })
 
     const data = await response.json()
 
     if (!response.ok) {
-      console.error("Détails erreur Anthropic:", data);
+      console.error("Erreur détaillée Anthropic:", JSON.stringify(data));
       throw new Error(data.error?.message || "Erreur API Anthropic");
     }
 
@@ -46,7 +47,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Erreur dans la fonction:', error.message);
+    console.error('Erreur finale:', error.message);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
