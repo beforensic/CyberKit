@@ -1,85 +1,60 @@
-import { useState, useEffect, useRef } from 'react';
-import { X, Save, Loader, Upload, CheckCircle2 } from 'lucide-react';
-import { supabase, Resource, Theme, ResourceType } from '../../lib/supabase';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { X, Save, AlertCircle, Link, Type, FileText, LayoutGrid } from 'lucide-react';
 
 interface ResourceFormProps {
-  themes: Theme[];
-  resourceTypes: ResourceType[];
-  resource: Resource | null;
-  onSuccess: () => void;
-  onCancel: () => void;
+  resource?: any;
+  onClose: () => void;
 }
 
-export default function ResourceForm({ themes, resourceTypes, resource, onSuccess, onCancel }: ResourceFormProps) {
+export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [themes, setThemes] = useState<any[]>([]);
 
   const [formData, setFormData] = useState({
     title: '',
+    slug: '',
     description: '',
-    type: 'pdf' as 'pdf' | 'audio' | 'video' | 'link' | 'image',
-    resource_type_id: '',
     url: '',
     theme_id: '',
-    is_pinned: false,
-    tags: ''
+    type: 'article' // par défaut
   });
 
   useEffect(() => {
+    fetchThemes();
     if (resource) {
       setFormData({
         title: resource.title || '',
+        slug: resource.slug || '',
         description: resource.description || '',
-        type: resource.type || 'pdf',
-        resource_type_id: resource.resource_type_id || '',
         url: resource.url || '',
         theme_id: resource.theme_id || '',
-        is_pinned: resource.is_pinned || false,
-        tags: resource.tags ? resource.tags.join(', ') : ''
+        type: resource.type || 'article'
       });
-    } else if (resourceTypes.length > 0) {
-      setFormData(prev => ({ ...prev, resource_type_id: resourceTypes[0].id }));
     }
-  }, [resource, resourceTypes]);
+  }, [resource]);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function fetchThemes() {
+    const { data } = await supabase.from('themes').select('id, title').order('title');
+    setThemes(data || []);
+  }
 
-    setUploading(true);
-    setError(null);
+  const generateSlug = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w ]+/g, '')
+      .replace(/ +/g, '-');
+  };
 
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-      const filePath = fileName;
-
-      const { error: uploadError } = await supabase.storage
-        .from('resources')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('resources')
-        .getPublicUrl(filePath);
-
-      setFormData(prev => ({ ...prev, url: publicUrl }));
-
-      // Détection automatique du type
-      const lowerExt = fileExt?.toLowerCase();
-      if (['png', 'jpg', 'jpeg', 'webp'].includes(lowerExt || '')) setFormData(p => ({ ...p, type: 'image' }));
-      else if (lowerExt === 'pdf') setFormData(p => ({ ...p, type: 'pdf' }));
-      else if (['mp3', 'wav', 'ogg'].includes(lowerExt || '')) setFormData(p => ({ ...p, type: 'audio' }));
-      else if (['mp4', 'mov', 'webm'].includes(lowerExt || '')) setFormData(p => ({ ...p, type: 'video' }));
-
-    } catch (err: any) {
-      setError("Erreur lors du téléversement : " + err.message);
-    } finally {
-      setUploading(false);
-    }
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const title = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      title,
+      slug: resource ? prev.slug : generateSlug(title)
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,29 +62,15 @@ export default function ResourceForm({ themes, resourceTypes, resource, onSucces
     setLoading(true);
     setError(null);
 
-    const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
-
-    const resourceData = {
-      title: formData.title,
-      description: formData.description,
-      type: formData.type,
-      resource_type_id: formData.resource_type_id,
-      url: formData.url,
-      theme_id: formData.theme_id || null,
-      is_pinned: formData.is_pinned,
-      tags: tagsArray,
-      updated_at: new Date().toISOString()
-    };
-
     try {
-      if (resource?.id) {
-        const { error: updateError } = await supabase.from('resources').update(resourceData).eq('id', resource.id);
-        if (updateError) throw updateError;
+      if (resource) {
+        const { error } = await supabase.from('resources').update(formData).eq('id', resource.id);
+        if (error) throw error;
       } else {
-        const { error: insertError } = await supabase.from('resources').insert([resourceData]);
-        if (insertError) throw insertError;
+        const { error } = await supabase.from('resources').insert([formData]);
+        if (error) throw error;
       }
-      onSuccess();
+      onClose();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -118,92 +79,74 @@ export default function ResourceForm({ themes, resourceTypes, resource, onSucces
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200 animate-in fade-in slide-in-from-bottom-4">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold text-slate-900">{resource ? 'Modifier la ressource' : 'Nouvelle ressource'}</h2>
-        <button onClick={onCancel} className="text-slate-400 hover:text-slate-600 transition-colors"><X className="w-6 h-6" /></button>
-      </div>
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <h2 className="text-2xl font-black text-slate-900">
+            {resource ? 'Modifier la ressource' : 'Nouvelle Ressource'}
+          </h2>
+          <button onClick={onClose} className="p-2 hover:bg-white rounded-full transition-colors text-slate-400">
+            <X size={24} />
+          </button>
+        </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-slate-50 p-4 rounded-xl border border-dashed border-slate-300">
-          <label className="block text-sm font-bold text-slate-700 mb-2">Fichier de la ressource</label>
-          <div className="flex gap-3 items-center">
-            <div className="flex-1 relative">
-              <input type="text" readOnly value={formData.url} className="w-full px-4 py-3 border rounded-lg bg-white text-xs text-slate-500 truncate" placeholder="L'URL sera générée après l'upload..." />
-              {formData.url && <CheckCircle2 className="w-4 h-4 text-emerald-500 absolute right-3 top-3.5" />}
+        <form onSubmit={handleSubmit} className="p-8 space-y-5 text-left max-h-[70vh] overflow-y-auto custom-scrollbar">
+          {error && (
+            <div className="p-4 bg-red-50 text-red-600 rounded-2xl flex items-center gap-3 text-sm font-bold">
+              <AlertCircle size={18} /> {error}
             </div>
-            <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="px-6 py-3 bg-slate-900 text-white rounded-lg font-bold hover:bg-slate-800 flex items-center gap-2 transition-all disabled:opacity-50"
-            >
-              {uploading ? <Loader className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-              {formData.url ? 'Remplacer' : 'Téléverser'}
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Titre</label>
+              <div className="relative">
+                <Type className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4" />
+                <input required type="text" value={formData.title} onChange={handleTitleChange} className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Thématique</label>
+              <div className="relative">
+                <LayoutGrid className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4" />
+                <select
+                  required
+                  value={formData.theme_id}
+                  onChange={e => setFormData({ ...formData, theme_id: e.target.value })}
+                  className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-slate-700"
+                >
+                  <option value="">Sélectionner un thème</option>
+                  {themes.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Lien (URL)</label>
+            <div className="relative">
+              <Link className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4" />
+              <input required type="url" value={formData.url} onChange={e => setFormData({ ...formData, url: e.target.value })} className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-blue-600" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Description</label>
+            <div className="relative">
+              <FileText className="absolute left-4 top-6 text-slate-300 w-4 h-4" />
+              <textarea rows={4} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 resize-none" />
+            </div>
+          </div>
+
+          <div className="flex gap-4 pt-4">
+            <button type="button" onClick={onClose} className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold hover:bg-slate-200">Annuler</button>
+            <button type="submit" disabled={loading} className="flex-1 py-4 bg-[#E8650A] text-white rounded-2xl font-bold shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2">
+              {loading ? 'Enregistrement...' : <><Save size={20} /> Enregistrer la ressource</>}
             </button>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Titre</label>
-            <input type="text" required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#E8650A] outline-none transition-all" />
-          </div>
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Thème</label>
-            <select value={formData.theme_id} onChange={e => setFormData({ ...formData, theme_id: e.target.value })} className="w-full px-4 py-3 border rounded-lg bg-white outline-none">
-              <option value="">-- Aucun thème --</option>
-              {themes.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Format (Technique)</label>
-            <select value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value as any })} className="w-full px-4 py-3 border rounded-lg bg-white outline-none">
-              <option value="pdf">PDF</option>
-              <option value="image">Image</option>
-              <option value="video">Vidéo</option>
-              <option value="audio">Audio</option>
-              <option value="link">Lien externe</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Type (Pédagogique)</label>
-            <select required value={formData.resource_type_id} onChange={e => setFormData({ ...formData, resource_type_id: e.target.value })} className="w-full px-4 py-3 border rounded-lg bg-white outline-none border-orange-100">
-              <option value="">-- Sélectionner un type --</option>
-              {resourceTypes.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-bold text-slate-700 mb-2">Description</label>
-          <textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-3 border rounded-lg h-24 outline-none resize-none" placeholder="Décrivez la ressource..." />
-        </div>
-
-        <div>
-          <label className="block text-sm font-bold text-slate-700 mb-2">Tags (séparés par des virgules)</label>
-          <input type="text" value={formData.tags} onChange={e => setFormData({ ...formData, tags: e.target.value })} className="w-full px-4 py-3 border rounded-lg outline-none" placeholder="rgpd, mdp, phishing..." />
-        </div>
-
-        <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100 w-fit">
-          <input type="checkbox" id="is_pinned" checked={formData.is_pinned} onChange={e => setFormData({ ...formData, is_pinned: e.target.checked })} className="w-5 h-5 accent-[#E8650A]" />
-          <label htmlFor="is_pinned" className="text-sm font-bold text-slate-700 cursor-pointer">Mettre en avant (Badge "Essentiel")</label>
-        </div>
-
-        {error && <div className="p-4 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">{error}</div>}
-
-        <div className="flex gap-4 pt-6">
-          <button type="submit" disabled={loading || uploading} className="flex-1 bg-[#E8650A] text-white py-4 rounded-xl font-bold hover:bg-[#d15809] shadow-lg hover:shadow-orange-200 transition-all flex items-center justify-center gap-2">
-            {loading ? <Loader className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-            {resource ? 'Enregistrer les modifications' : 'Créer la ressource'}
-          </button>
-          <button type="button" onClick={onCancel} className="px-8 py-4 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-all">Annuler</button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

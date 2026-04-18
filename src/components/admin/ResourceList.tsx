@@ -1,146 +1,140 @@
-import { Edit2, Trash2, FileText, PlayCircle, Headphones, ExternalLink, Image, Download } from 'lucide-react';
-import { Resource } from '../../lib/supabase';
+import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { Trash2, Edit2, Search, BookOpen, ExternalLink, Filter } from 'lucide-react';
 
 interface ResourceListProps {
-  resources: Resource[];
-  onEdit: (resource: Resource) => void;
-  onDelete: (id: string) => void;
+  onEdit: (resource: any) => void;
 }
 
-export default function ResourceList({ resources, onEdit, onDelete }: ResourceListProps) {
-  const getFileFormatIcon = (type: string | null | undefined) => {
-    switch (type) {
-      case 'pdf':
-        return FileText;
-      case 'video':
-        return PlayCircle;
-      case 'audio':
-        return Headphones;
-      case 'link':
-        return ExternalLink;
-      case 'image':
-        return Image;
-      default:
-        return FileText;
+export default function ResourceList({ onEdit }: ResourceListProps) {
+  const [resources, setResources] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTheme, setSelectedTheme] = useState('all');
+  const [themes, setThemes] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  async function fetchData() {
+    try {
+      setLoading(true);
+      // Récupérer les ressources avec leurs thèmes
+      const { data: resData, error: resError } = await supabase
+        .from('resources')
+        .select('*, theme:themes(title)')
+        .order('created_at', { ascending: false });
+
+      if (resError) throw resError;
+      setResources(resData || []);
+
+      // Récupérer les thèmes pour le filtre
+      const { data: themeData } = await supabase.from('themes').select('id, title');
+      setThemes(themeData || []);
+    } catch (err) {
+      console.error('Erreur chargement ressources:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Voulez-vous vraiment supprimer cette ressource ?')) return;
+    try {
+      const { error } = await supabase.from('resources').delete().eq('id', id);
+      if (error) throw error;
+      setResources(resources.filter(r => r.id !== id));
+    } catch (err: any) {
+      alert("Erreur de suppression : " + err.message);
     }
   };
 
-  const getFileFormatBadge = (type: string | null | undefined) => {
-    const styles: Record<string, string> = {
-      pdf: 'bg-slate-900 text-white',
-      video: 'bg-sky-500 text-white',
-      audio: 'bg-slate-400 text-white',
-      link: 'bg-emerald-500 text-white',
-      image: 'bg-purple-500 text-white'
-    };
-    return styles[type || ''] || 'bg-gray-500 text-white';
-  };
-
-  const getFileFormatLabel = (type: string | null | undefined) => {
-    const labels: Record<string, string> = {
-      pdf: 'PDF',
-      video: 'Vidéo',
-      audio: 'Audio',
-      link: 'Lien',
-      image: 'Image'
-    };
-    return labels[type || ''] || 'N/A';
-  };
+  const filteredResources = resources.filter(r => {
+    const matchesSearch = r.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesTheme = selectedTheme === 'all' || r.theme_id === selectedTheme;
+    return matchesSearch && matchesTheme;
+  });
 
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b-2 border-gray-200">
-            <tr>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Format
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Titre
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Thème
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Tags
-              </th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {resources.map((resource) => {
-              const Icon = getFileFormatIcon(resource.type);
-              return (
-                <tr key={resource.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <div className={`${getFileFormatBadge(resource.type)} p-2 rounded-lg`}>
-                        <Icon className="w-4 h-4" />
+    <div className="p-8">
+      {/* Barre d'outils */}
+      <div className="flex flex-col lg:flex-row gap-4 mb-8">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Rechercher une ressource..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all"
+          />
+        </div>
+        <div className="flex items-center gap-2 bg-slate-50 px-4 rounded-2xl border border-slate-100">
+          <Filter className="w-4 h-4 text-slate-400" />
+          <select
+            value={selectedTheme}
+            onChange={(e) => setSelectedTheme(e.target.value)}
+            className="bg-transparent border-none py-4 text-sm font-bold text-slate-600 focus:ring-0 cursor-pointer"
+          >
+            <option value="all">Toutes les thématiques</option>
+            {themes.map(t => (
+              <option key={t.id} value={t.id}>{t.title}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="py-20 text-center text-slate-400 font-medium">Chargement des ressources...</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-slate-100">
+                <th className="py-4 px-4 text-xs font-black text-slate-400 uppercase tracking-widest">Ressource</th>
+                <th className="py-4 px-4 text-xs font-black text-slate-400 uppercase tracking-widest">Thématique</th>
+                <th className="py-4 px-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {filteredResources.map((res) => (
+                <tr key={res.id} className="group hover:bg-slate-50/50 transition-colors">
+                  <td className="py-5 px-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 shrink-0">
+                        <BookOpen size={20} />
                       </div>
-                      <span className="text-xs font-medium text-gray-600 uppercase">
-                        {getFileFormatLabel(resource.type)}
-                      </span>
+                      <div>
+                        <p className="font-bold text-slate-900">{res.title}</p>
+                        <a href={res.url} target="_blank" rel="noreferrer" className="text-xs text-slate-400 flex items-center gap-1 hover:text-orange-500 transition-colors">
+                          <ExternalLink size={10} /> Voir le lien
+                        </a>
+                      </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
-                      {resource.title}
-                    </div>
-                    {resource.description && (
-                      <div className="text-xs text-gray-500 max-w-xs truncate">
-                        {resource.description}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">
-                      {resource.theme?.title || 'Aucun thème'}
+                  <td className="py-5 px-4">
+                    <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-black uppercase">
+                      {res.theme?.title || 'Non classé'}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1 max-w-xs">
-                      {resource.tags?.slice(0, 2).map((tag) => (
-                        <span key={tag} className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
-                          {tag}
-                        </span>
-                      ))}
-                      {resource.tags && resource.tags.length > 2 && (
-                        <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
-                          +{resource.tags.length - 2}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => onEdit(resource)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="Éditer"
-                      >
-                        <Edit2 className="w-4 h-4" />
+                  <td className="py-5 px-4 text-right">
+                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => onEdit(res)} className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all">
+                        <Edit2 size={18} />
                       </button>
-                      <button
-                        onClick={() => onDelete(resource.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Supprimer"
-                      >
-                        <Trash2 className="w-4 h-4" />
+                      <button onClick={() => handleDelete(res.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      {resources.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">Aucune ressource disponible</p>
+              ))}
+            </tbody>
+          </table>
+          {filteredResources.length === 0 && (
+            <div className="py-20 text-center text-slate-400">Aucune ressource ne correspond à votre recherche.</div>
+          )}
         </div>
       )}
     </div>
