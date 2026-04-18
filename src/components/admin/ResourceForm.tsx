@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
-import { X, Save, AlertCircle, Link, Type, FileText, LayoutGrid } from 'lucide-react';
+import { X, Save, AlertCircle, Link, Type, FileText, LayoutGrid, Upload, File, Loader2 } from 'lucide-react';
 
 interface ResourceFormProps {
   resource?: any;
@@ -9,8 +9,10 @@ interface ResourceFormProps {
 
 export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [themes, setThemes] = useState<any[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -18,7 +20,7 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
     description: '',
     url: '',
     theme_id: '',
-    type: 'article' // par défaut
+    type: 'article'
   });
 
   useEffect(() => {
@@ -48,13 +50,39 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
       .replace(/ +/g, '-');
   };
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const title = e.target.value;
-    setFormData(prev => ({
-      ...prev,
-      title,
-      slug: resource ? prev.slug : generateSlug(title)
-    }));
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      setError(null);
+
+      // Créer un nom de fichier unique pour éviter les écrasements
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      // 1. Uploader sur Supabase Storage
+      const { error: uploadError, data } = await supabase.storage
+        .from('resource-files')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // 2. Récupérer l'URL publique
+      const { data: { publicUrl } } = supabase.storage
+        .from('resource-files')
+        .getPublicUrl(filePath);
+
+      // 3. Mettre à jour le formulaire avec l'URL générée
+      setFormData(prev => ({ ...prev, url: publicUrl }));
+
+    } catch (err: any) {
+      setError("Erreur d'upload : " + err.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -90,7 +118,7 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-5 text-left max-h-[70vh] overflow-y-auto custom-scrollbar">
+        <form onSubmit={handleSubmit} className="p-8 space-y-5 text-left max-h-[75vh] overflow-y-auto">
           {error && (
             <div className="p-4 bg-red-50 text-red-600 rounded-2xl flex items-center gap-3 text-sm font-bold">
               <AlertCircle size={18} /> {error}
@@ -100,48 +128,71 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Titre</label>
-              <div className="relative">
-                <Type className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4" />
-                <input required type="text" value={formData.title} onChange={handleTitleChange} className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold" />
-              </div>
+              <input required type="text" value={formData.title} onChange={(e) => {
+                const title = e.target.value;
+                setFormData({ ...formData, title, slug: resource ? formData.slug : generateSlug(title) });
+              }} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold" />
             </div>
 
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Thématique</label>
-              <div className="relative">
-                <LayoutGrid className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4" />
-                <select
-                  required
-                  value={formData.theme_id}
-                  onChange={e => setFormData({ ...formData, theme_id: e.target.value })}
-                  className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-slate-700"
+              <select required value={formData.theme_id} onChange={e => setFormData({ ...formData, theme_id: e.target.value })} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold">
+                <option value="">Choisir un thème</option>
+                {themes.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest text-left block">
+              Fichier ou Lien de la ressource
+            </label>
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Link className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4" />
+                  <input
+                    required
+                    type="url"
+                    placeholder="https://..."
+                    value={formData.url}
+                    onChange={e => setFormData({ ...formData, url: e.target.value })}
+                    className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-blue-600"
+                  />
+                </div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  accept=".pdf,.jpg,.png,.mp3,.mp4"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="px-6 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-50"
                 >
-                  <option value="">Sélectionner un thème</option>
-                  {themes.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
-                </select>
+                  {uploading ? <Loader2 className="animate-spin" size={20} /> : <Upload size={20} />}
+                  <span className="hidden md:inline">Importer</span>
+                </button>
               </div>
+              {formData.url.includes('supabase.co') && (
+                <p className="text-[10px] text-green-600 font-bold flex items-center gap-1 ml-2">
+                  <File size={12} /> Fichier hébergé avec succès sur CyberKit
+                </p>
+              )}
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Lien (URL)</label>
-            <div className="relative">
-              <Link className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4" />
-              <input required type="url" value={formData.url} onChange={e => setFormData({ ...formData, url: e.target.value })} className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium text-blue-600" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Description</label>
-            <div className="relative">
-              <FileText className="absolute left-4 top-6 text-slate-300 w-4 h-4" />
-              <textarea rows={4} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 resize-none" />
-            </div>
+            <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Description courte</label>
+            <textarea rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 resize-none" />
           </div>
 
           <div className="flex gap-4 pt-4">
-            <button type="button" onClick={onClose} className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold hover:bg-slate-200">Annuler</button>
-            <button type="submit" disabled={loading} className="flex-1 py-4 bg-[#E8650A] text-white rounded-2xl font-bold shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2">
+            <button type="button" onClick={onClose} className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold hover:bg-slate-200 transition-all">Annuler</button>
+            <button type="submit" disabled={loading || uploading} className="flex-1 py-4 bg-[#E8650A] text-white rounded-2xl font-bold shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2">
               {loading ? 'Enregistrement...' : <><Save size={20} /> Enregistrer la ressource</>}
             </button>
           </div>
