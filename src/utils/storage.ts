@@ -29,7 +29,7 @@ export const getFavorites = (): string[] => {
     const stored = localStorage.getItem(FAVORITES_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
-    console.error('Erreur favorites:', error);
+    console.error('Erreur lecture favoris:', error);
     return [];
   }
 };
@@ -57,18 +57,17 @@ export const toggleFavorite = (resourceId: string): boolean => {
   }
 };
 
+export const clearAllFavorites = () => {
+  localStorage.removeItem(FAVORITES_KEY);
+  window.dispatchEvent(new Event('favoritesUpdated'));
+};
+
 // --- GESTION DES INTÉRÊTS (THÉMATIQUES) ---
 
-/**
- * Enregistre quel thème l'utilisateur a consulté
- */
 export const saveThemeInterest = (theme: string) => {
   localStorage.setItem(INTEREST_KEY, theme);
 };
 
-/**
- * Récupère le dernier thème consulté (utilisé par la page Contact)
- */
 export const getThemeInterest = (): string | null => {
   return localStorage.getItem(INTEREST_KEY);
 };
