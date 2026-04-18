@@ -7,7 +7,7 @@ interface Question {
   id: string;
   text: string;
   points: number;
-  theme_id: string;
+  theme_id?: string;
   theme?: { title: string };
 }
 
@@ -30,21 +30,28 @@ export default function Quiz({ onNavigate }: QuizProps) {
   async function fetchQuestions() {
     try {
       setLoading(true);
+      setError(null);
+
       const { data, error: supabaseError } = await supabase
         .from('questions')
-        .select('*, theme:themes(title)')
-        .order('created_at');
+        .select(`
+          id,
+          text,
+          points,
+          theme:themes (title)
+        `)
+        .order('created_at', { ascending: true });
 
       if (supabaseError) throw supabaseError;
 
       if (!data || data.length === 0) {
-        setError("Aucune question n'a été trouvée dans la base de données.");
+        setError("La table des questions est vide. Ajoutez du contenu via l'administration.");
       } else {
         setQuestions(data);
       }
-    } catch (err) {
-      console.error('Erreur chargement questions:', err);
-      setError("Impossible de charger le diagnostic. Vérifiez votre connexion.");
+    } catch (err: any) {
+      console.error('Erreur Quiz:', err);
+      setError("Erreur de connexion à la base de données. Vérifiez vos tables Supabase.");
     } finally {
       setLoading(false);
     }
@@ -57,30 +64,18 @@ export default function Quiz({ onNavigate }: QuizProps) {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      calculateAndShowResults();
+      const totalPoints = questions.reduce((acc, q) => acc + (q.points || 0), 0);
+      const userPoints = questions.reduce((acc, q) => {
+        return answers[q.id] ? acc + (q.points || 0) : acc;
+      }, 0);
+
+      const score = totalPoints > 0 ? Math.round((userPoints / totalPoints) * 100) : 0;
+      saveScore(score);
+      setShowResults(true);
+      window.scrollTo(0, 0);
     }
   };
 
-  const calculateAndShowResults = () => {
-    const totalPoints = questions.reduce((acc, q) => acc + (q.points || 0), 0);
-    const userPoints = questions.reduce((acc, q) => {
-      return answers[q.id] ? acc + (q.points || 0) : acc;
-    }, 0);
-
-    const finalScore = totalPoints > 0 ? Math.round((userPoints / totalPoints) * 100) : 0;
-    saveScore(finalScore);
-    setShowResults(true);
-    window.scrollTo(0, 0);
-  };
-
-  const resetQuiz = () => {
-    setAnswers({});
-    setCurrentIndex(0);
-    setShowResults(false);
-    setError(null);
-  };
-
-  // 1. Écran de chargement
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -89,15 +84,14 @@ export default function Quiz({ onNavigate }: QuizProps) {
     );
   }
 
-  // 2. Écran d'erreur (évite la page blanche)
-  if (error || questions.length === 0) {
+  if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] px-4">
-        <div className="text-center max-w-md">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-slate-900 mb-2">Oups !</h2>
-          <p className="text-slate-500 mb-6">{error || "Le diagnostic est momentanément indisponible."}</p>
-          <button onClick={() => onNavigate('home')} className="px-6 py-3 bg-[#E8650A] text-white rounded-xl font-bold">
+      <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] px-4 text-left">
+        <div className="max-w-md bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-100">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-6" />
+          <h2 className="text-2xl font-black text-slate-900 mb-4">Diagnostic indisponible</h2>
+          <p className="text-slate-500 mb-8">{error}</p>
+          <button onClick={() => onNavigate('home')} className="w-full py-4 bg-[#E8650A] text-white rounded-2xl font-bold">
             Retour à l'accueil
           </button>
         </div>
@@ -105,49 +99,26 @@ export default function Quiz({ onNavigate }: QuizProps) {
     );
   }
 
-  // 3. Écran des résultats
   if (showResults) {
     const totalPoints = questions.reduce((acc, q) => acc + (q.points || 0), 0);
     const userPoints = questions.reduce((acc, q) => (answers[q.id] ? acc + (q.points || 0) : acc), 0);
     const score = totalPoints > 0 ? Math.round((userPoints / totalPoints) * 100) : 0;
 
-    const weakThemes = Array.from(new Set(
-      questions
-        .filter(q => !answers[q.id])
-        .map(q => q.theme?.title)
-        .filter(Boolean)
-    )).slice(0, 3);
-
     return (
-      <div className="min-h-screen bg-[#FAFAFA] py-12 px-4 pb-32">
+      <div className="min-h-screen bg-[#FAFAFA] py-12 px-4 pb-32 text-left">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100">
             <div className="bg-slate-900 p-10 text-center text-white">
               <Trophy className="w-16 h-16 text-orange-400 mx-auto mb-4" />
-              <h2 className="text-3xl font-black mb-2">Résultat</h2>
-              <p className="text-slate-400">Indice de maturité numérique</p>
+              <h2 className="text-3xl font-black mb-2">Résultat : {score}%</h2>
+              <p className="text-slate-400">Diagnostic de sécurité terminé</p>
             </div>
             <div className="p-10">
-              <div className="flex justify-center mb-10">
-                <div className="relative flex items-center justify-center">
-                  <svg className="w-48 h-48">
-                    <circle className="text-slate-100" strokeWidth="12" stroke="currentColor" fill="transparent" r="80" cx="96" cy="96" />
-                    <circle className="text-[#E8650A]" strokeWidth="12" strokeDasharray={2 * Math.PI * 80} strokeDashoffset={2 * Math.PI * 80 * (1 - score / 100)} strokeLinecap="round" stroke="currentColor" fill="transparent" r="80" cx="96" cy="96" />
-                  </svg>
-                  <span className="absolute text-5xl font-black text-slate-900">{score}%</span>
-                </div>
-              </div>
-              <div className="space-y-4 mb-10">
-                <h3 className="font-bold text-slate-900 flex items-center gap-2">Priorités :</h3>
-                {weakThemes.map((theme, i) => (
-                  <button key={i} onClick={() => onNavigate('resources', theme)} className="w-full flex items-center justify-between p-4 bg-orange-50 rounded-2xl text-left hover:bg-orange-100 transition-all">
-                    <span className="font-bold text-slate-800">{theme}</span>
-                    <ArrowRight className="w-4 h-4 text-[#E8650A]" />
-                  </button>
-                ))}
-              </div>
-              <button onClick={() => onNavigate('resources')} className="w-full py-4 bg-[#E8650A] text-white rounded-2xl font-bold flex items-center justify-center gap-2">
+              <button onClick={() => onNavigate('resources')} className="w-full py-4 bg-[#E8650A] text-white rounded-2xl font-bold flex items-center justify-center gap-2 mb-4 shadow-lg shadow-orange-500/20 transition-transform hover:scale-[1.02]">
                 <BookOpen className="w-5 h-5" /> Bibliothèque de ressources
+              </button>
+              <button onClick={() => { setAnswers({}); setCurrentIndex(0); setShowResults(false); }} className="w-full text-slate-400 font-bold py-2">
+                <RefreshCw className="w-4 h-4 inline mr-2" /> Recommencer le test
               </button>
             </div>
           </div>
@@ -156,36 +127,35 @@ export default function Quiz({ onNavigate }: QuizProps) {
     );
   }
 
-  // 4. Écran de la question en cours
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-12 px-4 pb-32">
-      <div className="max-w-2xl mx-auto text-left">
+    <div className="min-h-screen bg-[#FAFAFA] py-12 px-4 pb-32 text-left">
+      <div className="max-w-2xl mx-auto">
         <div className="mb-8">
-          <button onClick={() => onNavigate('home')} className="text-slate-400 flex items-center gap-2 mb-6 font-medium">
+          <button onClick={() => onNavigate('home')} className="text-slate-400 flex items-center gap-2 mb-6 font-medium transition-colors hover:text-slate-600">
             <ChevronLeft className="w-4 h-4" /> Accueil
           </button>
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-black text-[#E8650A]">QUESTION {currentIndex + 1} / {questions.length}</span>
+          <div className="h-2 bg-slate-200 rounded-full overflow-hidden mb-4">
+            <div className="h-full bg-[#E8650A] transition-all duration-500" style={{ width: `${progress}%` }}></div>
           </div>
-          <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-            <div className="h-full bg-[#E8650A] transition-all" style={{ width: `${progress}%` }}></div>
-          </div>
+          <span className="text-xs font-black text-[#E8650A] uppercase tracking-widest">Question {currentIndex + 1} / {questions.length}</span>
         </div>
 
-        <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-slate-100">
-          <span className="inline-block px-4 py-1 bg-slate-100 text-slate-500 rounded-full text-xs font-bold mb-6">
-            {currentQuestion.theme?.title || 'Cyber-Sérénité'}
+        <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-slate-100 relative">
+          <span className="inline-block px-4 py-1.5 bg-slate-100 text-slate-500 rounded-full text-[10px] font-black mb-6 uppercase">
+            {currentQuestion.theme?.title || 'Sensibilisation'}
           </span>
-          <h2 className="text-2xl font-bold text-slate-900 mb-12">{currentQuestion.text}</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-12 leading-tight">
+            {currentQuestion.text}
+          </h2>
           <div className="grid grid-cols-1 gap-4">
-            <button onClick={() => handleAnswer(true)} className="flex items-center justify-between p-6 bg-white border-2 border-slate-100 rounded-3xl hover:border-[#E8650A] transition-all font-bold text-slate-700">
-              Oui, tout à fait <ChevronRight />
+            <button onClick={() => handleAnswer(true)} className="group flex items-center justify-between p-6 bg-white border-2 border-slate-100 rounded-3xl hover:border-[#E8650A] hover:bg-orange-50 transition-all font-bold text-slate-700">
+              Oui, c'est fait <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-[#E8650A]" />
             </button>
-            <button onClick={() => handleAnswer(false)} className="flex items-center justify-between p-6 bg-white border-2 border-slate-100 rounded-3xl hover:border-red-500 transition-all font-bold text-slate-700">
-              Non, pas encore <ChevronRight />
+            <button onClick={() => handleAnswer(false)} className="group flex items-center justify-between p-6 bg-white border-2 border-slate-100 rounded-3xl hover:border-red-500 hover:bg-red-50 transition-all font-bold text-slate-700">
+              Non, pas encore <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-red-500" />
             </button>
           </div>
         </div>
