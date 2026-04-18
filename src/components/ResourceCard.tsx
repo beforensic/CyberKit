@@ -1,84 +1,104 @@
-import { useState, useEffect } from 'react';
-import { FileText, PlayCircle, Headphones, ExternalLink, Image as ImageIcon, Download, Heart, Check, Star, MessageCircle } from 'lucide-react';
+import { BookOpen, Download, ExternalLink, FileText, Headphones, Image as ImageIcon, MessageCircle } from 'lucide-react';
 import { Resource } from '../lib/supabase';
-import AudioPlayer from './AudioPlayer';
-import { getFavorites, toggleFavorite } from '../utils/storage';
-import { useProgress } from '../contexts/ProgressContext';
+import { toggleFavorite, getFavorites } from '../utils/storage';
+import { useState, useEffect } from 'react';
 
 interface ResourceCardProps {
-  resource: Resource;
-  typeColor?: string;
-  typeName?: string;
-  onNavigateToContact?: () => void;
+  resource: Resource & { theme?: { title: string } };
+  onNavigate: (page: any, data?: any) => void;
 }
 
-export default function ResourceCard({ resource, typeColor, typeName, onNavigateToContact }: ResourceCardProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [showAudioPlayer, setShowAudioPlayer] = useState(false);
+// Dictionnaire pour traduire les types techniques en labels propres
+const TYPE_LABELS: Record<string, string> = {
+  guide: 'Guide',
+  memo: 'Mémo',
+  infographie: 'Infographie',
+  podcast: 'Podcast',
+  image: 'Image',
+  link: 'Lien externe'
+};
 
-  const progressContext = useProgress();
-  const progress = progressContext?.progress || [];
-  const isCompleted = progress.some(p => p.resourceId === resource.id);
+export default function ResourceCard({ resource, onNavigate }: ResourceCardProps) {
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    setIsFavorite(getFavorites().includes(resource.id));
+    const favorites = getFavorites();
+    setIsFavorite(favorites.includes(resource.id));
   }, [resource.id]);
 
-  const getIcon = () => {
-    switch (resource.type) {
-      case 'video': return <PlayCircle className="w-8 h-8" />;
-      case 'audio': return <Headphones className="w-8 h-8" />;
-      case 'image': return <ImageIcon className="w-8 h-8" />;
-      case 'link': return <ExternalLink className="w-8 h-8" />;
-      default: return <FileText className="w-8 h-8" />;
-    }
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newState = toggleFavorite(resource.id);
+    setIsFavorite(newState);
   };
 
-  const handleAction = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (resource.type === 'audio') {
-      setShowAudioPlayer(!showAudioPlayer);
-      return;
+  // Sélection de l'icône selon le type
+  const getIcon = () => {
+    switch (resource.type) {
+      case 'podcast': return <Headphones className="w-6 h-6" />;
+      case 'infographie': return <ImageIcon className="w-6 h-6" />;
+      case 'memo': return <FileText className="w-6 h-6" />;
+      case 'link': return <ExternalLink className="w-6 h-6" />;
+      default: return <BookOpen className="w-6 h-6" />;
     }
-    window.open(resource.url, '_blank');
   };
 
   return (
-    <div className="group bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-full hover:shadow-md transition-all relative overflow-hidden text-left">
-      {resource.is_pinned && (
-        <div className="absolute top-0 right-0 bg-orange-100 text-[#E8650A] px-3 py-1 rounded-bl-xl flex items-center gap-1 z-20 border-l border-b border-orange-200">
-          <Star className="w-3 h-3 fill-[#E8650A]" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Essentiel</span>
+    <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 transition-all group relative flex flex-col h-full text-left">
+      {/* En-tête de la carte */}
+      <div className="flex justify-between items-start mb-6">
+        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-orange-50 group-hover:text-[#E8650A] transition-colors">
+          {getIcon()}
         </div>
-      )}
-
-      <div className="flex items-start justify-between mb-4">
-        <div className="p-3 bg-slate-50 rounded-xl text-slate-700">{getIcon()}</div>
-        <div className={`flex gap-2 z-10 ${resource.is_pinned ? 'mr-24' : ''}`}>
-          {isCompleted && <div className="p-2 bg-emerald-50 text-emerald-500 rounded-full"><Check className="w-5 h-5" /></div>}
-          <button
-            onClick={(e) => { e.stopPropagation(); setIsFavorite(toggleFavorite(resource.id)); }}
-            className={`p-2 rounded-full border shadow-sm ${isFavorite ? 'bg-red-50 border-red-100 text-red-500' : 'bg-white border-slate-100 text-slate-300'}`}
-          >
-            <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-          </button>
-        </div>
+        <button
+          onClick={handleToggleFavorite}
+          className={`p-2 rounded-full transition-colors ${isFavorite ? 'text-red-500 bg-red-50' : 'text-slate-200 hover:text-red-500 hover:bg-red-50'}`}
+        >
+          <svg className={`w-6 h-6 ${isFavorite ? 'fill-current' : 'fill-none'}`} stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.364-1.364a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
       </div>
 
       <div className="flex-1">
-        <h3 className="text-lg font-semibold text-slate-800 mb-2 leading-snug group-hover:text-[#E8650A] transition-colors line-clamp-2">{resource.title}</h3>
-        {resource.description && <p className="text-sm text-slate-500 line-clamp-3 mb-4">{resource.description}</p>}
+        {/* Affichage du TYPE et du THÈME */}
+        <div className="flex items-center gap-2 mb-4">
+          <span className="px-3 py-1 bg-orange-50 text-[#E8650A] rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-100">
+            {TYPE_LABELS[resource.type || ''] || 'Ressource'}
+          </span>
+          {resource.theme?.title && (
+            <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+              • {resource.theme.title}
+            </span>
+          )}
+        </div>
+
+        <h3 className="text-xl font-bold text-slate-900 mb-3 leading-tight group-hover:text-[#E8650A] transition-colors">
+          {resource.title}
+        </h3>
+        <p className="text-slate-500 text-sm leading-relaxed mb-8 line-clamp-3">
+          {resource.description}
+        </p>
       </div>
 
-      <button onClick={handleAction} className="w-full py-3 px-4 rounded-xl font-bold text-sm border-2 border-[#E8650A] text-[#E8650A] bg-white hover:bg-[#E8650A] hover:text-white transition-all shadow-sm">
-        {resource.type === 'link' ? 'Consulter le lien' : 'Télécharger'}
-      </button>
+      <div className="space-y-4 mt-auto">
+        <a
+          href={resource.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-4 bg-white border-2 border-[#E8650A] text-[#E8650A] rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-[#E8650A] hover:text-white transition-all shadow-sm"
+        >
+          {resource.type === 'link' ? <ExternalLink size={18} /> : <Download size={18} />}
+          {resource.type === 'link' ? 'Consulter' : 'Télécharger'}
+        </a>
 
-      {onNavigateToContact && (
-        <button onClick={(e) => { e.stopPropagation(); onNavigateToContact(); }} className="mt-4 pt-4 border-t border-slate-100 text-[11px] text-slate-400 hover:text-[#E8650A] text-center font-medium">
-          <MessageCircle className="w-3.5 h-3.5 inline mr-1" /> Besoin d'aide sur ce sujet ?
+        <button
+          onClick={() => onNavigate('contact', { subject: `Question sur : ${resource.title}` })}
+          className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-slate-600 transition-colors text-xs font-medium"
+        >
+          <MessageCircle size={14} /> Besoin d'aide sur ce sujet ?
         </button>
-      )}
+      </div>
     </div>
   );
 }
