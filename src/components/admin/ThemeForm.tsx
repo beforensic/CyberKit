@@ -1,170 +1,150 @@
-import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
-import { supabase, Theme } from '../../lib/supabase';
-import { getIconComponent } from '../../utils/icons';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { X, Save, AlertCircle } from 'lucide-react';
 
 interface ThemeFormProps {
-  theme: Theme | null;
-  onSuccess: () => void;
-  onCancel: () => void;
+  theme?: any;
+  onClose: () => void;
 }
 
-const AVAILABLE_ICONS = [
-  'Gavel', 'EyeOff', 'Info', 'Landmark', 'Brain',
-  'ShieldAlert', 'Key', 'Share2', 'HardDrive', 'Network',
-  'Globe', 'Shield', 'Lock', 'FileText', 'Settings',
-  'Database', 'Cloud', 'AlertTriangle', 'CheckCircle', 'Users'
-];
+export default function ThemeForm({ theme, onClose }: ThemeFormProps) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-export default function ThemeForm({ theme, onSuccess, onCancel }: ThemeFormProps) {
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
     slug: '',
-    icon_name: 'Info'
+    description: ''
   });
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (theme) {
       setFormData({
-        title: theme.title,
-        description: theme.description,
-        slug: theme.slug,
-        icon_name: theme.icon_name || 'Info'
+        title: theme.title || '',
+        slug: theme.slug || '',
+        description: theme.description || ''
       });
     }
   }, [theme]);
 
+  // Génération automatique du slug (ex: "Sécurité Info" -> "securite-info")
+  const generateSlug = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Enlever accents
+      .replace(/[^\w ]+/g, '')
+      .replace(/ +/g, '-');
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const title = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      title,
+      slug: theme ? prev.slug : generateSlug(title) // On ne change le slug que si c'est une création
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
+    setLoading(true);
+    setError(null);
 
     try {
       if (theme) {
+        // Mise à jour
         const { error } = await supabase
           .from('themes')
           .update(formData)
           .eq('id', theme.id);
-
         if (error) throw error;
-        alert('Thème modifié avec succès');
       } else {
+        // Création
         const { error } = await supabase
           .from('themes')
           .insert([formData]);
-
         if (error) throw error;
-        alert('Thème créé avec succès');
       }
-
-      onSuccess();
-    } catch (error) {
-      console.error('Error saving theme:', error);
-      alert('Erreur lors de la sauvegarde');
+      onClose();
+    } catch (err: any) {
+      setError(err.message);
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900">
-          {theme ? 'Modifier le thème' : 'Nouveau thème'}
-        </h2>
-        <button
-          onClick={onCancel}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <X className="w-5 h-5 text-gray-500" />
-        </button>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Titre *
-          </label>
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
-            required
-          />
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <h2 className="text-2xl font-black text-slate-900">
+            {theme ? 'Modifier le thème' : 'Nouveau Thème'}
+          </h2>
+          <button onClick={onClose} className="p-2 hover:bg-white rounded-full transition-colors text-slate-400">
+            <X size={24} />
+          </button>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Description
-          </label>
-          <textarea
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
-            rows={3}
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="p-8 space-y-6 text-left">
+          {error && (
+            <div className="p-4 bg-red-50 text-red-600 rounded-2xl flex items-center gap-3 font-medium text-sm">
+              <AlertCircle size={18} /> {error}
+            </div>
+          )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Slug *
-          </label>
-          <input
-            type="text"
-            value={formData.slug}
-            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-            className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Icône
-          </label>
-          <div className="grid grid-cols-5 gap-2">
-            {AVAILABLE_ICONS.map((iconName) => {
-              const IconComponent = getIconComponent(iconName);
-              return (
-                <button
-                  key={iconName}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, icon_name: iconName })}
-                  className={`p-3 border-2 rounded-lg flex items-center justify-center transition-all ${
-                    formData.icon_name === iconName
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <IconComponent className="w-5 h-5 text-gray-700" />
-                </button>
-              );
-            })}
+          <div className="space-y-2">
+            <label className="text-xs font-black text-slate-400 uppercase ml-1 tracking-widest">Titre du Thème</label>
+            <input
+              required
+              type="text"
+              value={formData.title}
+              onChange={handleTitleChange}
+              className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all font-bold text-slate-700"
+              placeholder="Ex: Protection des données"
+            />
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Icône sélectionnée: {formData.icon_name}
-          </p>
-        </div>
 
-        <div className="flex gap-3 pt-4">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
-          >
-            {submitting ? 'Enregistrement...' : theme ? 'Mettre à jour' : 'Créer'}
-          </button>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-          >
-            Annuler
-          </button>
-        </div>
-      </form>
+          <div className="space-y-2">
+            <label className="text-xs font-black text-slate-400 uppercase ml-1 tracking-widest">Slug (URL)</label>
+            <input
+              required
+              type="text"
+              value={formData.slug}
+              onChange={e => setFormData({ ...formData, slug: e.target.value })}
+              className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all font-mono text-xs text-orange-600"
+              placeholder="protection-donnees"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-black text-slate-400 uppercase ml-1 tracking-widest">Description</label>
+            <textarea
+              rows={3}
+              value={formData.description}
+              onChange={e => setFormData({ ...formData, description: e.target.value })}
+              className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all resize-none text-slate-600"
+              placeholder="Décrivez l'objectif de cette thématique..."
+            />
+          </div>
+
+          <div className="flex gap-4 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 py-4 bg-[#E8650A] text-white rounded-2xl font-bold hover:bg-orange-600 shadow-lg shadow-orange-500/20 transition-all flex items-center justify-center gap-2"
+            >
+              {loading ? 'Enregistrement...' : <><Save size={20} /> Enregistrer</>}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
