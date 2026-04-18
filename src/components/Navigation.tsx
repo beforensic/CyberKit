@@ -1,4 +1,4 @@
-import { Home, ClipboardList, BookOpen, User, Mail, Star } from 'lucide-react';
+import { Home, ClipboardList, BookOpen, User, Mail, Star, Lock } from 'lucide-react';
 
 interface NavigationProps {
   currentPage: string;
@@ -11,8 +11,9 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
     { id: 'quiz', label: 'Diagnostic', icon: ClipboardList },
     { id: 'resources', label: 'Ressources', icon: BookOpen },
     { id: 'favorites', label: 'Favoris', icon: Star },
-    { id: 'about', label: 'À propos', icon: User },
     { id: 'contact', label: 'Contact', icon: Mail },
+    // Lien Admin ajouté pour ton accès
+    { id: 'admin', label: 'Admin', icon: Lock },
   ];
 
   return (
@@ -32,9 +33,9 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
                 }`}
             >
               <div className={`p-1 rounded-xl transition-colors ${isActive ? 'bg-orange-50' : ''}`}>
-                <Icon className={`w-6 h-6 ${isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'}`} />
+                <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'}`} />
               </div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'opacity-100' : 'opacity-70'}`}>
+              <span className={`text-[9px] font-black uppercase tracking-wider ${isActive ? 'opacity-100' : 'opacity-70'}`}>
                 {item.label}
               </span>
             </button>
