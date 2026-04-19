@@ -100,16 +100,6 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
 
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center shrink-0 border border-slate-100">
-                  <Phone className="w-6 h-6 text-[#E8650A]" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900">Téléphone</h3>
-                  <p className="text-slate-600">+32 (0) 470 53 43 00</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center shrink-0 border border-slate-100">
                   <MapPin className="w-6 h-6 text-[#E8650A]" />
                 </div>
                 <div>

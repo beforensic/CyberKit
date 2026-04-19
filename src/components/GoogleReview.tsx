@@ -1,55 +1,39 @@
-import { Star } from 'lucide-react';
+import React from 'react';
+import { Star, CheckCircle } from 'lucide-react';
 
-interface GoogleReviewProps {
-  variant?: 'banner' | 'card';
-}
-
-export default function GoogleReview({ variant = 'card' }: GoogleReviewProps) {
-  if (variant === 'banner') {
-    return (
-      <div className="px-6 py-8 bg-white border-t border-slate-200">
-        <div className="max-w-md mx-auto text-center">
-          <div className="flex items-center justify-center gap-1 mb-3">
+export default function GoogleReview() {
+  return (
+    <div className="bg-slate-800/30 backdrop-blur-md border border-slate-700/50 rounded-[2.5rem] p-8 md:p-12">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="flex-1 text-center md:text-left">
+          <div className="flex items-center justify-center md:justify-start gap-1 text-yellow-500 mb-4">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+              <Star key={i} size={20} fill="currentColor" />
             ))}
           </div>
-          <p className="text-sm text-slate-600 mb-4">
-            Rejoignez nos utilisateurs satisfaits et partagez votre expérience
+          <h3 className="text-2xl font-black text-white mb-4">
+            CyberKit est noté 5/5 sur Google
+          </h3>
+          <p className="text-slate-400 leading-relaxed max-w-xl">
+            Rejoignez les entrepreneurs belges qui sécurisent déjà leur activité avec nos outils.
+            Votre avis nous aide à rendre la cybersécurité accessible à tous.
           </p>
+        </div>
+
+        <div className="flex flex-col items-center gap-4">
           <a
-            href="https://www.google.com/search?hl=fr-BE&gl=be&q=beForensic,+Rue+Andr%C3%A9+Masquelier+35,+7000+Mons&ludocid=5704346060213982022&lsig=AB86z5VMUktlwZ-vtx0WlGadPLWz#lrd=0x8b257f26da49395:0x4f29e884d2f41346,3"
+            href="https://g.page/r/YOUR_GOOGLE_REVIEW_LINK/review"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-6 py-3 bg-primary hover:bg-primary-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
+            className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black hover:bg-slate-100 transition-all shadow-xl flex items-center gap-2"
           >
-            Laisser un avis Google
+            Laisser un avis <CheckCircle className="text-emerald-500" />
           </a>
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+            Propulsé par Google Reviews
+          </p>
         </div>
       </div>
-    );
-  }
-
-  return (
-    <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
-      <div className="flex items-center gap-1 mb-3">
-        {[...Array(5)].map((_, i) => (
-          <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-        ))}
-      </div>
-      <h3 className="font-bold text-slate-900 mb-2">Votre avis compte</h3>
-      <p className="text-sm text-slate-600 mb-4">
-        Aidez-nous à améliorer SecuriCoach en partageant votre expérience
-      </p>
-      <a
-  
-        href="https://www.google.com/search?hl=fr-BE&gl=be&q=beForensic,+Rue+Andr%C3%A9+Masquelier+35,+7000+Mons&ludocid=5704346060213982022&lsig=AB86z5VMUktlwZ-vtx0WlGadPLWz#lrd=0x8b257f26da49395:0x4f29e884d2f41346,3"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-block w-full text-center px-4 py-2 bg-primary hover:bg-primary-600 text-white text-sm font-semibold rounded-xl transition-colors"
-      >
-        Laisser un avis Google
-      </a>
     </div>
   );
 }
