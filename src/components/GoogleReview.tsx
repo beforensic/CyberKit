@@ -22,7 +22,7 @@ export default function GoogleReview() {
 
         <div className="flex flex-col items-center gap-4">
           <a
-            href="https://g.page/r/YOUR_GOOGLE_REVIEW_LINK/reviewhttps://www.google.com/search?q=beforensic+mons&oq=beforensic+mons&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIKCAEQABgIGA0YHjIKCAIQABgIGA0YHjIHCAMQABjvBTIHCAQQABjvBTIHCAUQABjvBTIGCAYQRRg8MgYIBxBFGDzSAQg2OTQ1ajBqN6gCALACAA&sourceid=chrome&ie=UTF-8"
+            href="https://www.google.com/search?hl=fr-BE&gl=be&q=beForensic,+Rue+Andr%C3%A9+Masquelier+35,+7000+Mons&ludocid=5704346060213982022&lsig=AB86z5VMUktlwZ-vtx0WlGadPLWz#lrd=0x8b257f26da49395:0x4f29e884d2f41346,3"
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black hover:bg-slate-100 transition-all shadow-xl flex items-center gap-2"
