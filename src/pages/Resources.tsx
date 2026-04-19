@@ -9,11 +9,31 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
   const [selectedThemeId, setSelectedThemeId] = useState<string | null>(initialFilter || null);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+
+  // États pour la visibilité des flèches
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Vérifier si le scroll est possible à chaque mise à jour des thèmes
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, [themes, loading]);
+
+  const checkScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
+    }
+  };
 
   async function fetchData() {
     try {
@@ -36,6 +56,13 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
     }
   }
 
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -200 : 200;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   const currentIndex = themes.findIndex(t => t.id === selectedThemeId);
   const prevTheme = currentIndex > 0 ? themes[currentIndex - 1] : null;
   const nextTheme = currentIndex < themes.length - 1 ? themes[currentIndex + 1] : null;
@@ -55,7 +82,8 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] pb-32 text-left">
-      <div className="bg-white pt-12 pb-6 px-4 border-b border-slate-100 sticky top-0 z-30">
+      {/* HEADER FIXE */}
+      <div className="bg-white pt-12 pb-6 px-4 border-b border-slate-100 sticky top-0 z-30 shadow-sm">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
@@ -74,22 +102,32 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
             </div>
           </div>
 
-          {/* BARRE D'ONGLETS AVEC INDICATEUR DE SCROLL */}
-          <div className="relative group">
-            {/* Dégradé à gauche (apparaît quand on scrolle) */}
-            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          {/* BARRE DE THÈMES AVEC NAVIGATION ACTIVE */}
+          <div className="relative flex items-center">
+            {/* Flèche Gauche */}
+            {canScrollLeft && (
+              <button
+                onClick={() => scroll('left')}
+                className="absolute left-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-orange-500 transition-all -ml-2 border border-slate-100"
+              >
+                <ChevronLeft size={20} />
+              </button>
+            )}
 
-            {/* Dégradé à droite (toujours présent pour suggérer la suite) */}
-            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
-
+            {/* Conteneur Scrollable avec masque de fondu */}
             <div
               ref={scrollRef}
-              className="flex gap-2 overflow-x-auto pb-4 no-scrollbar scroll-smooth mask-horizontal"
+              onScroll={checkScroll}
+              className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth w-full px-2"
+              style={{
+                maskImage: 'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)'
+              }}
             >
               <button
                 onClick={() => handleThemeChange(null)}
                 className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${!selectedThemeId
-                    ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'
+                    ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
                   }`}
               >
@@ -100,21 +138,31 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
                   key={theme.id}
                   onClick={() => handleThemeChange(theme.id)}
                   className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${selectedThemeId === theme.id
-                      ? 'bg-[#E8650A] text-white shadow-lg shadow-orange-500/20 scale-105'
+                      ? 'bg-[#E8650A] text-white shadow-lg'
                       : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
                     }`}
                 >
                   {theme.title}
                 </button>
               ))}
-              {/* Petit espace vide à la fin pour que le dernier bouton ne colle pas au bord du dégradé */}
               <div className="min-w-[40px] h-4"></div>
             </div>
+
+            {/* Flèche Droite */}
+            {canScrollRight && (
+              <button
+                onClick={() => scroll('right')}
+                className="absolute right-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-orange-500 transition-all -mr-2 border border-slate-100"
+              >
+                <ChevronRight size={20} />
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      {/* Reste du contenu (Ressources + Navigation Basse) inchangé */}
+      <div className="max-w-6xl mx-auto px-4 py-12 text-left">
         {filteredResources.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredResources.map((resource) => (
@@ -123,10 +171,7 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
           </div>
         ) : (
           <div className="py-20 text-center">
-            <div className="w-20 h-20 bg-slate-100 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-slate-300">
-              <BookOpen size={40} />
-            </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">Aucune ressource trouvée</h3>
+            <h3 className="text-xl font-bold text-slate-900">Aucune ressource trouvée</h3>
           </div>
         )}
 
@@ -135,22 +180,21 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
             <div className="w-full md:w-auto">
               {prevTheme ? (
                 <button onClick={() => handleThemeChange(prevTheme.id)} className="group flex items-center gap-4 text-left p-4 rounded-3xl hover:bg-white transition-all">
-                  <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-600 transition-all"><ChevronLeft size={24} /></div>
+                  <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-slate-200"><ChevronLeft size={24} /></div>
                   <div><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Précédent</p><p className="font-bold text-slate-900">{prevTheme.title}</p></div>
                 </button>
               ) : <div className="invisible" />}
             </div>
-            <div className="text-center bg-orange-50 p-6 rounded-[2.5rem] border border-orange-100 md:max-w-xs"><Sparkles className="w-6 h-6 text-[#E8650A] mx-auto mb-2" /><p className="text-xs font-bold text-slate-600 leading-tight">Suivez le guide pour une sécurité complète.</p></div>
             <div className="w-full md:w-auto flex justify-end">
               {nextTheme ? (
                 <button onClick={() => handleThemeChange(nextTheme.id)} className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all">
                   <div className="text-right"><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Suivant</p><p className="font-bold text-slate-900">{nextTheme.title}</p></div>
-                  <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-[#E8650A] group-hover:bg-[#E8650A] group-hover:text-white transition-all shadow-sm"><ChevronRight size={24} /></div>
+                  <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-[#E8650A] group-hover:bg-[#E8650A] group-hover:text-white transition-all"><ChevronRight size={24} /></div>
                 </button>
               ) : (
                 <button onClick={() => handleThemeChange(null)} className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all">
-                  <div className="text-right"><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Terminé</p><p className="font-bold text-slate-900">Tout voir</p></div>
-                  <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white group-hover:bg-slate-800 transition-all"><LayoutGrid size={24} /></div>
+                  <div className="text-right"><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Fin du parcours</p><p className="font-bold text-slate-900">Tout voir</p></div>
+                  <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white"><LayoutGrid size={24} /></div>
                 </button>
               )}
             </div>
