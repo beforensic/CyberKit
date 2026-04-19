@@ -18,27 +18,24 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
   async function fetchData() {
     try {
       setLoading(true);
-      // 1. Charger les thèmes triés par sort_order
       const { data: themeData } = await supabase
         .from('themes')
         .select('*')
         .order('sort_order', { ascending: true });
       setThemes(themeData || []);
 
-      // 2. Charger toutes les ressources avec leurs thèmes
       const { data: resData } = await supabase
         .from('resources')
         .select('*, theme:themes(title)')
         .order('created_at', { ascending: false });
       setResources(resData || []);
     } catch (err) {
-      console.error('Erreur chargement ressources:', err);
+      console.error('Erreur:', err);
     } finally {
       setLoading(false);
     }
   }
 
-  // Logique de navigation Suivant / Précédent
   const currentIndex = themes.findIndex(t => t.id === selectedThemeId);
   const prevTheme = currentIndex > 0 ? themes[currentIndex - 1] : null;
   const nextTheme = currentIndex < themes.length - 1 ? themes[currentIndex + 1] : null;
@@ -58,7 +55,6 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] pb-32 text-left">
-      {/* HEADER & RECHERCHE */}
       <div className="bg-white pt-12 pb-6 px-4 border-b border-slate-100 sticky top-0 z-30">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
@@ -70,7 +66,7 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Rechercher un guide, un mémo..."
+                placeholder="Rechercher..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium"
@@ -78,15 +74,21 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
             </div>
           </div>
 
-          {/* BARRE D'ONGLETS (TABS) */}
-          <div className="relative">
+          {/* BARRE D'ONGLETS AVEC INDICATEUR DE SCROLL */}
+          <div className="relative group">
+            {/* Dégradé à gauche (apparaît quand on scrolle) */}
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+            {/* Dégradé à droite (toujours présent pour suggérer la suite) */}
+            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+
             <div
               ref={scrollRef}
-              className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth"
+              className="flex gap-2 overflow-x-auto pb-4 no-scrollbar scroll-smooth mask-horizontal"
             >
               <button
                 onClick={() => handleThemeChange(null)}
-                className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all ${!selectedThemeId
+                className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${!selectedThemeId
                     ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'
                     : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
                   }`}
@@ -97,7 +99,7 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
                 <button
                   key={theme.id}
                   onClick={() => handleThemeChange(theme.id)}
-                  className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all ${selectedThemeId === theme.id
+                  className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${selectedThemeId === theme.id
                       ? 'bg-[#E8650A] text-white shadow-lg shadow-orange-500/20 scale-105'
                       : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
                     }`}
@@ -105,12 +107,13 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
                   {theme.title}
                 </button>
               ))}
+              {/* Petit espace vide à la fin pour que le dernier bouton ne colle pas au bord du dégradé */}
+              <div className="min-w-[40px] h-4"></div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* LISTE DES RESSOURCES */}
       <div className="max-w-6xl mx-auto px-4 py-12">
         {filteredResources.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -124,65 +127,30 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
               <BookOpen size={40} />
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">Aucune ressource trouvée</h3>
-            <p className="text-slate-500">Essayez de modifier votre recherche ou votre thématique.</p>
           </div>
         )}
 
-        {/* NAVIGATION BASSE (SUIVANT / PRÉCÉDENT) */}
         {selectedThemeId && (
           <div className="mt-20 pt-12 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="w-full md:w-auto">
               {prevTheme ? (
-                <button
-                  onClick={() => handleThemeChange(prevTheme.id)}
-                  className="group flex items-center gap-4 text-left p-4 rounded-3xl hover:bg-white transition-all"
-                >
-                  <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-600 transition-all">
-                    <ChevronLeft size={24} />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Sujet précédent</p>
-                    <p className="font-bold text-slate-900">{prevTheme.title}</p>
-                  </div>
+                <button onClick={() => handleThemeChange(prevTheme.id)} className="group flex items-center gap-4 text-left p-4 rounded-3xl hover:bg-white transition-all">
+                  <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-600 transition-all"><ChevronLeft size={24} /></div>
+                  <div><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Précédent</p><p className="font-bold text-slate-900">{prevTheme.title}</p></div>
                 </button>
-              ) : (
-                <div className="invisible" />
-              )}
+              ) : <div className="invisible" />}
             </div>
-
-            <div className="text-center bg-orange-50 p-6 rounded-[2.5rem] border border-orange-100 md:max-w-xs">
-              <Sparkles className="w-6 h-6 text-[#E8650A] mx-auto mb-2" />
-              <p className="text-xs font-bold text-slate-600 leading-tight">
-                Continuez votre parcours pour une protection complète.
-              </p>
-            </div>
-
+            <div className="text-center bg-orange-50 p-6 rounded-[2.5rem] border border-orange-100 md:max-w-xs"><Sparkles className="w-6 h-6 text-[#E8650A] mx-auto mb-2" /><p className="text-xs font-bold text-slate-600 leading-tight">Suivez le guide pour une sécurité complète.</p></div>
             <div className="w-full md:w-auto flex justify-end">
               {nextTheme ? (
-                <button
-                  onClick={() => handleThemeChange(nextTheme.id)}
-                  className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all"
-                >
-                  <div className="text-right">
-                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Sujet suivant</p>
-                    <p className="font-bold text-slate-900">{nextTheme.title}</p>
-                  </div>
-                  <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-[#E8650A] group-hover:bg-[#E8650A] group-hover:text-white transition-all shadow-sm">
-                    <ChevronRight size={24} />
-                  </div>
+                <button onClick={() => handleThemeChange(nextTheme.id)} className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all">
+                  <div className="text-right"><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Suivant</p><p className="font-bold text-slate-900">{nextTheme.title}</p></div>
+                  <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-[#E8650A] group-hover:bg-[#E8650A] group-hover:text-white transition-all shadow-sm"><ChevronRight size={24} /></div>
                 </button>
               ) : (
-                <button
-                  onClick={() => handleThemeChange(null)}
-                  className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all"
-                >
-                  <div className="text-right">
-                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Fin du parcours</p>
-                    <p className="font-bold text-slate-900">Voir tout</p>
-                  </div>
-                  <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white group-hover:bg-slate-800 transition-all">
-                    <LayoutGrid size={24} />
-                  </div>
+                <button onClick={() => handleThemeChange(null)} className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all">
+                  <div className="text-right"><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Terminé</p><p className="font-bold text-slate-900">Tout voir</p></div>
+                  <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white group-hover:bg-slate-800 transition-all"><LayoutGrid size={24} /></div>
                 </button>
               )}
             </div>
