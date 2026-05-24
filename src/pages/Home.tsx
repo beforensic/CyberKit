@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Shield, Zap, ArrowRight, Target, Lock, Activity, Sparkles, CheckCircle, ChevronRight } from 'lucide-react';
 import { supabase, Theme } from '../lib/supabase';
 import { getIconComponent } from '../utils/icons';
 import { getScore } from '../utils/storage';
 import GoogleReview from '../components/GoogleReview';
 
-interface HomeProps {
-  onNavigate: (page: any, filter?: string) => void;
-}
-
-export default function Home({ onNavigate }: HomeProps) {
+export default function Home() {
+  const navigate = useNavigate();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [score, setScore] = useState<number | null>(null);
 
@@ -52,14 +50,14 @@ export default function Home({ onNavigate }: HomeProps) {
 
           <div className="flex flex-wrap gap-5">
             <button
-              onClick={() => onNavigate('quiz')}
+              onClick={() => navigate('/quiz')}
               className="px-8 py-4 bg-gradient-to-r from-brand-orange to-brand-orange-400 text-white rounded-2xl font-bold text-lg hover:shadow-[0_0_30px] hover:shadow-brand-orange/30 transition-all flex items-center gap-3 group"
             >
               {score !== null ? 'Mettre à jour mon score' : 'Lancer mon diagnostic'}
               <ChevronRight className="group-hover:translate-x-1 transition-transform" />
             </button>
             <button
-              onClick={() => onNavigate('resources')}
+              onClick={() => navigate('/resources')}
               className="px-8 py-4 bg-slate-800/40 border border-slate-700 text-slate-200 rounded-2xl font-bold text-lg hover:bg-slate-800/60 transition-all backdrop-blur-sm"
             >
               Explorer les outils
@@ -110,7 +108,7 @@ export default function Home({ onNavigate }: HomeProps) {
             return (
               <button
                 key={theme.id}
-                onClick={() => onNavigate('resources', theme.title)}
+                onClick={() => navigate(`/resources?theme=${encodeURIComponent(theme.title)}`)}
                 className="bg-slate-800/20 backdrop-blur-sm p-6 rounded-[2rem] border border-slate-700/30 text-left hover:border-brand-orange/50 hover:bg-slate-800/40 transition-all group flex items-center gap-5"
               >
                 <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-500 group-hover:text-brand-orange-400 transition-colors shrink-0">

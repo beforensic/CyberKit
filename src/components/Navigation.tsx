@@ -1,32 +1,34 @@
-import { Home, ClipboardList, BookOpen, User, Mail, Star, Lock } from 'lucide-react';
+import { Home, ClipboardList, BookOpen, Mail, Star, Lock } from 'lucide-react';
+import { NavLink, useLocation } from 'react-router-dom';
 
-interface NavigationProps {
-  currentPage: string;
-  onNavigate: (page: any) => void;
-}
+const navItems = [
+  { path: '/', label: 'Accueil', icon: Home, end: true },
+  { path: '/quiz', label: 'Diagnostic', icon: ClipboardList, end: false },
+  { path: '/resources', label: 'Ressources', icon: BookOpen, end: false },
+  { path: '/favorites', label: 'Favoris', icon: Star, end: false },
+  { path: '/contact', label: 'Contact', icon: Mail, end: false },
+  { path: '/admin', label: 'Admin', icon: Lock, end: false },
+];
 
-export default function Navigation({ currentPage, onNavigate }: NavigationProps) {
-  const navItems = [
-    { id: 'home', label: 'Accueil', icon: Home },
-    { id: 'quiz', label: 'Diagnostic', icon: ClipboardList },
-    { id: 'resources', label: 'Ressources', icon: BookOpen },
-    { id: 'favorites', label: 'Favoris', icon: Star },
-    { id: 'contact', label: 'Contact', icon: Mail },
-    // Lien Admin ajouté pour ton accès
-    { id: 'admin', label: 'Admin', icon: Lock },
-  ];
+export default function Navigation() {
+  const { pathname } = useLocation();
+
+  const isQuizActive = pathname === '/quiz' || pathname.startsWith('/quiz/');
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-4 py-2 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
       <div className="max-w-md mx-auto flex justify-between items-center">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = currentPage === item.id;
+          const isActive = item.path === '/quiz' ? isQuizActive : (
+            item.end ? pathname === item.path : pathname.startsWith(item.path)
+          );
 
           return (
-            <button
-              key={item.id}
-              onClick={() => onNavigate(item.id)}
+            <NavLink
+              key={item.path}
+              to={item.path}
+              end={item.end}
               className={`flex flex-col items-center gap-1 p-2 transition-all ${isActive
                   ? 'text-brand-orange'
                   : 'text-slate-400 hover:text-slate-600'
@@ -38,7 +40,7 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
               <span className={`text-[9px] font-black uppercase tracking-wider ${isActive ? 'opacity-100' : 'opacity-70'}`}>
                 {item.label}
               </span>
-            </button>
+            </NavLink>
           );
         })}
       </div>

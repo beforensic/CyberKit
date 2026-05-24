@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Shield, ChevronLeft, User, Building2, Briefcase, ArrowRight, HelpCircle } from 'lucide-react';
+import { saveQuizResults } from '../utils/quizResults';
 
-export default function Quiz({ onNavigate }: { onNavigate: (page: any, data?: any) => void }) {
+export default function Quiz() {
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState<any[]>([]);
   const [profile, setProfile] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
@@ -43,7 +46,9 @@ export default function Quiz({ onNavigate }: { onNavigate: (page: any, data?: an
       const totalScore = Object.values(newAnswers).reduce((a, b) => a + b, 0);
       const maxScore = questions.length * 5;
       const finalPercentage = Math.round((totalScore / maxScore) * 100);
-      onNavigate('results', { score: finalPercentage, answers: newAnswers, profile });
+      const resultData = { score: finalPercentage, answers: newAnswers, profile: profile! };
+      saveQuizResults(resultData);
+      navigate('/quiz/resultats', { state: resultData });
     }
   };
 

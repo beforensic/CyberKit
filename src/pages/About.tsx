@@ -1,10 +1,8 @@
 import { Shield, Target, Zap, Award, Users, Presentation, Laptop, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-interface AboutProps {
-  onNavigate: (page: any) => void;
-}
-
-export default function About({ onNavigate }: AboutProps) {
+export default function About() {
+  const navigate = useNavigate();
   const offerings = [
     {
       icon: Users,
@@ -89,7 +87,7 @@ export default function About({ onNavigate }: AboutProps) {
             Que ce soit pour une conférence, une formation ou un coaching, je vous aide à transformer vos collaborateurs en votre première ligne de défense.
           </p>
           <button
-            onClick={() => onNavigate('contact')}
+            onClick={() => navigate('/contact')}
             className="px-10 py-5 bg-brand-orange rounded-2xl font-black text-lg hover:bg-brand-orange-600 transition-all shadow-xl active:scale-95"
           >
             Me contacter directement

@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, MapPin, Send, CheckCircle, AlertCircle, Phone, Home, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getScore, getThemeInterest } from '../utils/storage';
 import GoogleReview from '../components/GoogleReview';
 
-interface ContactProps {
-  onNavigate: (page: any) => void;
-  initialSubject?: string;
-}
-
-export default function Contact({ onNavigate, initialSubject }: ContactProps) {
+export default function Contact() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialSubject = searchParams.get('subject') || '';
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -65,7 +64,7 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
             Merci de votre confiance. Serge Houtain reviendra vers vous personnellement dans les plus brefs délais.
           </p>
           <button
-            onClick={() => onNavigate('home')}
+            onClick={() => navigate('/')}
             className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all"
           >
             Retour à l'accueil

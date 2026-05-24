@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import {
   LayoutDashboard, BookOpen, Settings, Plus,
@@ -15,7 +16,8 @@ import KeywordManager from '../components/admin/KeywordManager'; // Corrigé (au
 import StatisticsPanel from '../components/admin/StatisticsPanel';
 import ChatbotAnalytics from '../components/admin/ChatbotAnalytics';
 
-export default function Admin({ onNavigate }: { onNavigate: (page: any) => void }) {
+export default function Admin() {
+  const navigate = useNavigate();
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'stats' | 'resources' | 'questions' | 'themes' | 'keywords' | 'chatbot'>('stats');
@@ -59,7 +61,7 @@ export default function Admin({ onNavigate }: { onNavigate: (page: any) => void 
             <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-4 bg-slate-50 border-none rounded-2xl" />
             <input type="password" placeholder="Mot de passe" value={password} onChange={e => setPassword(e.target.value)} className="w-full p-4 bg-slate-50 border-none rounded-2xl" />
             <button className="w-full py-4 bg-brand-orange text-white rounded-2xl font-bold shadow-lg shadow-brand-orange/20">Se connecter</button>
-            <button type="button" onClick={() => onNavigate('home')} className="w-full text-slate-400 text-sm font-bold pt-2">Retour au site</button>
+            <button type="button" onClick={() => navigate('/')} className="w-full text-slate-400 text-sm font-bold pt-2">Retour au site</button>
           </form>
         </div>
       </div>
@@ -84,7 +86,7 @@ export default function Admin({ onNavigate }: { onNavigate: (page: any) => void 
           </nav>
         </div>
         <div className="mt-auto p-8 border-t border-slate-800">
-          <button onClick={() => onNavigate('home')} className="flex items-center gap-3 text-slate-400 hover:text-white mb-4 w-full px-4 font-bold transition-colors">
+          <button onClick={() => navigate('/')} className="flex items-center gap-3 text-slate-400 hover:text-white mb-4 w-full px-4 font-bold transition-colors">
             <ChevronLeft size={20} /> Site public
           </button>
           <button onClick={() => supabase.auth.signOut()} className="flex items-center gap-3 text-red-400 hover:text-red-300 w-full px-4 font-bold transition-colors">

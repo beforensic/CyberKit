@@ -1,21 +1,18 @@
 import { ChevronLeft, Building2, Mail, ShieldCheck, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-interface LegalProps {
-  onNavigate: (page: 'home' | 'quiz' | 'resources' | 'admin' | 'contact' | 'legal') => void;
-}
-
-export default function Legal({ onNavigate }: LegalProps) {
+export default function Legal() {
   return (
     <div className="page-light pb-20">
       <div className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
         <div className="px-6 py-4">
-          <button
-            onClick={() => onNavigate('home')}
+          <Link
+            to="/"
             className="flex items-center gap-2 text-brand-orange hover:text-brand-orange-600 font-semibold transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             Retour
-          </button>
+          </Link>
           <h1 className="text-2xl font-bold text-slate-900 mt-3 flex items-center gap-2">
             <ShieldCheck className="w-7 h-7 text-brand-orange" />
             Mentions Légales

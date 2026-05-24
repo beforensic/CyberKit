@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { BookOpen, Search, ChevronRight, ChevronLeft, LayoutGrid, Sparkles } from 'lucide-react';
 import ResourceCard from '../components/ResourceCard';
 
-export default function Resources({ onNavigate, initialFilter }: { onNavigate: (page: any) => void, initialFilter?: string }) {
+export default function Resources() {
+  const [searchParams] = useSearchParams();
+  const themeParam = searchParams.get('theme');
   const [resources, setResources] = useState<any[]>([]);
   const [themes, setThemes] = useState<any[]>([]);
-  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(initialFilter || null);
+  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -19,6 +22,13 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (themeParam && themes.length > 0) {
+      const matched = themes.find((t) => t.title === themeParam);
+      if (matched) setSelectedThemeId(matched.id);
+    }
+  }, [themeParam, themes]);
 
   // Vérifier si le scroll est possible à chaque mise à jour des thèmes
   useEffect(() => {
@@ -166,7 +176,7 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
         {filteredResources.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredResources.map((resource) => (
-              <ResourceCard key={resource.id} resource={resource} onNavigate={onNavigate} />
+              <ResourceCard key={resource.id} resource={resource} />
             ))}
           </div>
         ) : (

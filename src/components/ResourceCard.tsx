@@ -1,11 +1,11 @@
 import { BookOpen, Download, ExternalLink, FileText, Headphones, Image as ImageIcon, MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Resource } from '../lib/supabase';
 import { toggleFavorite, getFavorites } from '../utils/storage';
 import { useState, useEffect } from 'react';
 
 interface ResourceCardProps {
   resource: Resource & { theme?: { title: string } };
-  onNavigate: (page: any, data?: any) => void;
 }
 
 // Dictionnaire pour traduire les types techniques en labels propres
@@ -18,7 +18,8 @@ const TYPE_LABELS: Record<string, string> = {
   link: 'Lien externe'
 };
 
-export default function ResourceCard({ resource, onNavigate }: ResourceCardProps) {
+export default function ResourceCard({ resource }: ResourceCardProps) {
+  const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
@@ -93,7 +94,7 @@ export default function ResourceCard({ resource, onNavigate }: ResourceCardProps
         </a>
 
         <button
-          onClick={() => onNavigate('contact', { subject: `Question sur : ${resource.title}` })}
+          onClick={() => navigate(`/contact?subject=${encodeURIComponent(`Question sur : ${resource.title}`)}`)}
           className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-slate-600 transition-colors text-xs font-medium"
         >
           <MessageCircle size={14} /> Besoin d'aide sur ce sujet ?
