@@ -71,7 +71,7 @@ export const generatePDF = (data: ExportData): void => {
   };
 
   // En-tête
-  addWrappedText('SecuriCoach', 24, true, [30, 64, 175], 10);
+  addWrappedText('CyberKit', 24, true, [232, 101, 10], 10);
 
   addWrappedText('Rapport de diagnostic cybersécurité', 12, false, [100, 100, 100], 7);
 
@@ -172,14 +172,14 @@ export const generatePDF = (data: ExportData): void => {
   doc.addPage();
   yPosition = margin;
 
-  addWrappedText('Document généré par SecuriCoach — beForensic', 10, true, [100, 100, 100], 6);
+  addWrappedText('Document généré par CyberKit — beForensic', 10, true, [100, 100, 100], 6);
 
-  addWrappedText('securicoach.be', 10, false, [100, 100, 100], 6);
+  addWrappedText('beforensic.be', 10, false, [100, 100, 100], 6);
   yPosition += 2;
 
   const confidentialText = 'Ce rapport est confidentiel et destiné à usage personnel.';
   addWrappedText(confidentialText, 9, false, [100, 100, 100], 5);
 
-  const fileName = `SecuriCoach-Diagnostic-${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}.pdf`;
+  const fileName = `CyberKit-Diagnostic-${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}.pdf`;
   doc.save(fileName);
 };

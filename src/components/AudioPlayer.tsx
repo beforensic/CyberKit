@@ -8,7 +8,7 @@ interface AudioPlayerProps {
 
 export default function AudioPlayer({ url, title, onClose }: AudioPlayerProps) {
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ backgroundColor: '#1B3A5C' }}>
+    <div className="fixed inset-0 z-50 flex flex-col bg-surface-dark">
       <button
         onClick={onClose}
         className="absolute top-6 left-6 flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-all backdrop-blur-sm"
@@ -19,8 +19,8 @@ export default function AudioPlayer({ url, title, onClose }: AudioPlayerProps) {
 
       <div className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">SecuriCoach</h1>
-          <div className="w-24 h-1 bg-white/30 mx-auto"></div>
+          <h1 className="text-4xl font-bold text-white mb-4">CyberKit</h1>
+          <div className="w-24 h-1 bg-brand-orange mx-auto"></div>
         </div>
 
         <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 max-w-2xl w-full shadow-2xl">
