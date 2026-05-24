@@ -44,10 +44,10 @@ export default function ResourceCard({ resource, onNavigate }: ResourceCardProps
   };
 
   return (
-    <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 transition-all group relative flex flex-col h-full text-left">
+    <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-brand-orange/5 transition-all group relative flex flex-col h-full text-left">
       {/* En-tête de la carte */}
       <div className="flex justify-between items-start mb-6">
-        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-orange-50 group-hover:text-[#E8650A] transition-colors">
+        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-brand-orange-50 group-hover:text-brand-orange transition-colors">
           {getIcon()}
         </div>
         <button
@@ -63,7 +63,7 @@ export default function ResourceCard({ resource, onNavigate }: ResourceCardProps
       <div className="flex-1">
         {/* Affichage du TYPE et du THÈME */}
         <div className="flex items-center gap-2 mb-4">
-          <span className="px-3 py-1 bg-orange-50 text-[#E8650A] rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-100">
+          <span className="px-3 py-1 bg-brand-orange-50 text-brand-orange rounded-full text-[10px] font-black uppercase tracking-widest border border-brand-orange-100">
             {TYPE_LABELS[resource.type || ''] || 'Ressource'}
           </span>
           {resource.theme?.title && (
@@ -73,7 +73,7 @@ export default function ResourceCard({ resource, onNavigate }: ResourceCardProps
           )}
         </div>
 
-        <h3 className="text-xl font-bold text-slate-900 mb-3 leading-tight group-hover:text-[#E8650A] transition-colors">
+        <h3 className="text-xl font-bold text-slate-900 mb-3 leading-tight group-hover:text-brand-orange transition-colors">
           {resource.title}
         </h3>
         <p className="text-slate-500 text-sm leading-relaxed mb-8 line-clamp-3">
@@ -86,7 +86,7 @@ export default function ResourceCard({ resource, onNavigate }: ResourceCardProps
           href={resource.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full py-4 bg-white border-2 border-[#E8650A] text-[#E8650A] rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-[#E8650A] hover:text-white transition-all shadow-sm"
+          className="w-full py-4 bg-white border-2 border-brand-orange text-brand-orange rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-brand-orange hover:text-white transition-all shadow-sm"
         >
           {resource.type === 'link' ? <ExternalLink size={18} /> : <Download size={18} />}
           {resource.type === 'link' ? 'Consulter' : 'Télécharger'}

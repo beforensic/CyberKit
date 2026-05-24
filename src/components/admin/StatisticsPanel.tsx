@@ -423,8 +423,8 @@ export default function StatisticsPanel() {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="bg-orange-100 p-3 rounded-lg">
-            <Search className="w-6 h-6 text-orange-600" />
+          <div className="bg-brand-orange-100 p-3 rounded-lg">
+            <Search className="w-6 h-6 text-brand-orange-600" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">Statistiques des recherches</h2>
@@ -436,14 +436,14 @@ export default function StatisticsPanel() {
           <div className="space-y-3">
             {searchStats.topSearches.map((search, index) => (
               <div key={index} className="flex items-center gap-3">
-                <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-bold text-orange-600">{index + 1}</span>
+                <div className="flex-shrink-0 w-8 h-8 bg-brand-orange-100 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-bold text-brand-orange-600">{index + 1}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900">{search.query}</p>
                 </div>
                 <div className="flex-shrink-0 flex items-center gap-2">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-orange-100 text-orange-700">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-brand-orange-100 text-brand-orange-700">
                     {search.count} recherche{search.count > 1 ? 's' : ''}
                   </span>
                   {search.averageResults === 0 ? (

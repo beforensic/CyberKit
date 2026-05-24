@@ -56,7 +56,7 @@ export default function Favorites({ onNavigate }: FavoritesProps) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#E8650A]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-orange"></div>
       </div>
     );
   }
@@ -103,7 +103,7 @@ export default function Favorites({ onNavigate }: FavoritesProps) {
             </p>
             <button
               onClick={() => onNavigate('resources')}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#E8650A] text-white rounded-2xl font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-brand-orange text-white rounded-2xl font-bold hover:bg-brand-orange-600 transition-all shadow-lg shadow-brand-orange/20"
             >
               <BookOpen className="w-5 h-5" /> Découvrir les ressources
             </button>

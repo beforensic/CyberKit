@@ -49,7 +49,7 @@ export default function Quiz({ onNavigate }: { onNavigate: (page: any, data?: an
 
   if (loading) return (
     <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-orange-500"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange"></div>
     </div>
   );
 
@@ -58,7 +58,7 @@ export default function Quiz({ onNavigate }: { onNavigate: (page: any, data?: an
     return (
       <div className="min-h-screen bg-[#0F172A] text-slate-300 py-16 px-6 relative text-left">
         <div className="max-w-4xl mx-auto relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-widest mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange-400 text-[10px] font-bold uppercase tracking-widest mb-6">
             <Shield size={14} /> Diagnostic Personnalisé
           </div>
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
@@ -77,14 +77,14 @@ export default function Quiz({ onNavigate }: { onNavigate: (page: any, data?: an
               <button
                 key={item.id}
                 onClick={() => setProfile(item.id)}
-                className="bg-slate-800/40 backdrop-blur-md border border-slate-700 p-8 rounded-3xl text-left hover:border-orange-500 transition-all group"
+                className="bg-slate-800/40 backdrop-blur-md border border-slate-700 p-8 rounded-3xl text-left hover:border-brand-orange transition-all group"
               >
-                <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-orange-500 mb-6 transition-colors">
+                <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-brand-orange mb-6 transition-colors">
                   <item.icon size={24} />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">{item.label}</h3>
                 <p className="text-sm text-slate-500 mb-6 leading-relaxed">{item.desc}</p>
-                <div className="flex items-center gap-2 text-orange-500 font-bold text-xs uppercase tracking-widest">
+                <div className="flex items-center gap-2 text-brand-orange font-bold text-xs uppercase tracking-widest">
                   Choisir <ArrowRight size={14} />
                 </div>
               </button>
@@ -107,11 +107,11 @@ export default function Quiz({ onNavigate }: { onNavigate: (page: any, data?: an
         <div className="mb-10">
           <div className="flex justify-between items-end mb-3 text-[10px] font-bold uppercase tracking-widest">
             <span className="text-slate-500">Question {currentStep + 1} sur {questions.length}</span>
-            <span className="text-orange-500">{Math.round(progress)}%</span>
+            <span className="text-brand-orange">{Math.round(progress)}%</span>
           </div>
           <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
             <div
-              className="h-full bg-orange-500 transition-all duration-500"
+              className="h-full bg-brand-orange transition-all duration-500"
               style={{ width: `${progress}%` }}
             ></div>
           </div>
@@ -121,7 +121,7 @@ export default function Quiz({ onNavigate }: { onNavigate: (page: any, data?: an
         <div className="bg-slate-800/20 backdrop-blur-md border border-slate-700/50 rounded-[2.5rem] p-8 md:p-12 shadow-xl">
 
           <div className="flex items-center gap-2 mb-8">
-            <div className="px-3 py-1 bg-white/5 rounded-md border border-white/10 text-[10px] font-bold text-orange-400 uppercase tracking-widest">
+            <div className="px-3 py-1 bg-white/5 rounded-md border border-white/10 text-[10px] font-bold text-brand-orange-400 uppercase tracking-widest">
               {currentQuestion?.themes?.title || 'Thème'}
             </div>
           </div>
@@ -141,7 +141,7 @@ export default function Quiz({ onNavigate }: { onNavigate: (page: any, data?: an
               <button
                 key={opt.val}
                 onClick={() => handleAnswer(opt.val)}
-                className="w-full p-5 bg-slate-800/40 border border-slate-700/50 rounded-2xl text-left transition-all hover:bg-orange-500 hover:border-orange-500 flex items-center justify-between group"
+                className="w-full p-5 bg-slate-800/40 border border-slate-700/50 rounded-2xl text-left transition-all hover:bg-brand-orange hover:border-brand-orange flex items-center justify-between group"
               >
                 <span className="font-medium text-slate-300 group-hover:text-white transition-colors">
                   {opt.label}

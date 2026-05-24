@@ -78,7 +78,7 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-orange-500"></div></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange"></div></div>;
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] pb-32 text-left">
@@ -97,7 +97,7 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
                 placeholder="Rechercher..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium"
+                className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 font-medium"
               />
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
             {canScrollLeft && (
               <button
                 onClick={() => scroll('left')}
-                className="absolute left-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-orange-500 transition-all -ml-2 border border-slate-100"
+                className="absolute left-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-brand-orange transition-all -ml-2 border border-slate-100"
               >
                 <ChevronLeft size={20} />
               </button>
@@ -138,7 +138,7 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
                   key={theme.id}
                   onClick={() => handleThemeChange(theme.id)}
                   className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${selectedThemeId === theme.id
-                      ? 'bg-[#E8650A] text-white shadow-lg'
+                      ? 'bg-brand-orange text-white shadow-lg'
                       : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
                     }`}
                 >
@@ -152,7 +152,7 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
             {canScrollRight && (
               <button
                 onClick={() => scroll('right')}
-                className="absolute right-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-orange-500 transition-all -mr-2 border border-slate-100"
+                className="absolute right-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-brand-orange transition-all -mr-2 border border-slate-100"
               >
                 <ChevronRight size={20} />
               </button>
@@ -189,7 +189,7 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
               {nextTheme ? (
                 <button onClick={() => handleThemeChange(nextTheme.id)} className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all">
                   <div className="text-right"><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Suivant</p><p className="font-bold text-slate-900">{nextTheme.title}</p></div>
-                  <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-[#E8650A] group-hover:bg-[#E8650A] group-hover:text-white transition-all"><ChevronRight size={24} /></div>
+                  <div className="w-12 h-12 bg-brand-orange-50 rounded-2xl flex items-center justify-center text-brand-orange group-hover:bg-brand-orange group-hover:text-white transition-all"><ChevronRight size={24} /></div>
                 </button>
               ) : (
                 <button onClick={() => handleThemeChange(null)} className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all">

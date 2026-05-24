@@ -77,7 +77,7 @@ export default function ResourceList({ onEdit }: ResourceListProps) {
             placeholder="Rechercher une ressource..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium"
+            className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 font-medium"
           />
         </div>
         <select
@@ -118,7 +118,7 @@ export default function ResourceList({ onEdit }: ResourceListProps) {
                     </div>
                   </td>
                   <td className="py-5 px-4">
-                    <span className="px-3 py-1 bg-orange-50 text-[#E8650A] rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-100">
+                    <span className="px-3 py-1 bg-brand-orange-50 text-brand-orange rounded-full text-[10px] font-black uppercase tracking-widest border border-brand-orange-100">
                       {/* On affiche le label propre ou la valeur brute par défaut */}
                       {TYPE_LABELS[res.type] || res.type || 'Guide'}
                     </span>
@@ -127,7 +127,7 @@ export default function ResourceList({ onEdit }: ResourceListProps) {
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => onEdit(res)}
-                        className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all"
+                        className="p-2 text-slate-400 hover:text-brand-orange-600 hover:bg-brand-orange-50 rounded-xl transition-all"
                       >
                         <Edit2 size={18} />
                       </button>

@@ -6,7 +6,7 @@
 :root {
   --bg-deep: #020617;
   --bg-card: rgba(15, 23, 42, 0.6);
-  --accent-orange: #f97316;
+  --brand-orange: #E8650A;
   --accent-rose: #e11d48;
 }
 
@@ -51,11 +51,11 @@
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-orange-500 via-orange-400 to-rose-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-orange via-brand-orange-400 to-rose-500;
   }
 
   .btn-glow:hover {
-    box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+    box-shadow: 0 0 20px rgb(232 101 10 / 0.4);
     @apply scale-[1.02];
   }
 

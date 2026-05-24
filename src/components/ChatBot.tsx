@@ -186,8 +186,7 @@ IMPORTANT : Si la question est juridique, ajoute : "Ces informations sont donné
     <>
       <button
         onClick={handleOpen}
-        className="fixed z-50 flex items-center gap-3 rounded-full shadow-lg text-white font-bold px-6 py-4 hover:scale-105 transition-all"
-        style={{ backgroundColor: '#E8650A', bottom: '100px', right: '24px' }}
+        className="fixed z-50 flex items-center gap-3 rounded-full shadow-lg text-white font-bold px-6 py-4 hover:scale-105 transition-all bg-brand-orange bottom-[100px] right-6"
       >
         <MessageCircle className="w-6 h-6" />
         <span className="hidden sm:inline">Aide Cyber</span>
@@ -195,7 +194,7 @@ IMPORTANT : Si la question est juridique, ajoute : "Ces informations sont donné
 
       {isOpen && (
         <div className="fixed inset-0 md:inset-auto md:bottom-24 md:right-6 md:w-[400px] md:h-[600px] bg-white shadow-2xl z-[60] flex flex-col md:rounded-3xl overflow-hidden border border-slate-200">
-          <div className="p-5 flex items-center justify-between text-white" style={{ backgroundColor: '#E8650A' }}>
+          <div className="p-5 flex items-center justify-between text-white bg-brand-orange">
             <div>
               <h2 className="font-bold">Assistant CyberKit</h2>
               <p className="text-xs opacity-90">Expert en sensibilisation</p>
@@ -206,10 +205,10 @@ IMPORTANT : Si la question est juridique, ajoute : "Ces informations sont donné
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${m.role === 'user' ? 'bg-[#E8650A] text-white rounded-tr-none' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'}`}>
+                <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${m.role === 'user' ? 'bg-brand-orange text-white rounded-tr-none' : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'}`}>
                   {parseMessage(m.content).map((part, pi) => (
                     part.type === 'resource' ? (
-                      <button key={pi} onClick={() => handleResourceClick(part.id)} className="block mt-2 p-2 bg-orange-50 text-[#E8650A] rounded-lg border border-orange-100 font-bold hover:bg-orange-100 transition-colors">
+                      <button key={pi} onClick={() => handleResourceClick(part.id)} className="block mt-2 p-2 bg-brand-orange-50 text-brand-orange rounded-lg border border-brand-orange-100 font-bold hover:bg-brand-orange-100 transition-colors">
                         Voir la ressource suggérée
                       </button>
                     ) : <span key={pi}>{part.content}</span>
@@ -229,9 +228,9 @@ IMPORTANT : Si la question est juridique, ajoute : "Ces informations sont donné
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Posez votre question..."
-              className="flex-1 text-sm p-3 bg-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-orange-500/20"
+              className="flex-1 text-sm p-3 bg-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-brand-orange/20"
             />
-            <button onClick={handleSend} disabled={isLoading || !input.trim()} className="p-3 bg-[#E8650A] text-white rounded-xl disabled:opacity-50">
+            <button onClick={handleSend} disabled={isLoading || !input.trim()} className="p-3 bg-brand-orange text-white rounded-xl disabled:opacity-50">
               {isLoading ? <Loader2 className="animate-spin w-5 h-5" /> : <Send className="w-5 h-5" />}
             </button>
           </div>

@@ -28,11 +28,11 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
               key={item.id}
               onClick={() => onNavigate(item.id)}
               className={`flex flex-col items-center gap-1 p-2 transition-all ${isActive
-                  ? 'text-[#E8650A]'
+                  ? 'text-brand-orange'
                   : 'text-slate-400 hover:text-slate-600'
                 }`}
             >
-              <div className={`p-1 rounded-xl transition-colors ${isActive ? 'bg-orange-50' : ''}`}>
+              <div className={`p-1 rounded-xl transition-colors ${isActive ? 'bg-brand-orange-50' : ''}`}>
                 <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'}`} />
               </div>
               <span className={`text-[9px] font-black uppercase tracking-wider ${isActive ? 'opacity-100' : 'opacity-70'}`}>

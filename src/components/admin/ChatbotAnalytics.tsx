@@ -167,12 +167,12 @@ export default function ChatbotAnalytics() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
+      <div className="bg-gradient-to-r from-brand-orange to-brand-orange-600 rounded-2xl p-6 text-white">
         <div className="flex items-center gap-3 mb-2">
           <MessageCircle className="w-8 h-8" />
           <h2 className="text-2xl font-bold">Statistiques du Chatbot</h2>
         </div>
-        <p className="text-orange-100">
+        <p className="text-brand-orange-100">
           Analyse des conversations et des ressources recommandées
         </p>
       </div>
@@ -185,7 +185,7 @@ export default function ChatbotAnalytics() {
               onClick={() => setPeriod('7')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 period === '7'
-                  ? 'bg-orange-500 text-white'
+                  ? 'bg-brand-orange text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -195,7 +195,7 @@ export default function ChatbotAnalytics() {
               onClick={() => setPeriod('30')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 period === '30'
-                  ? 'bg-orange-500 text-white'
+                  ? 'bg-brand-orange text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -205,7 +205,7 @@ export default function ChatbotAnalytics() {
               onClick={() => setPeriod('all')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 period === 'all'
-                  ? 'bg-orange-500 text-white'
+                  ? 'bg-brand-orange text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -248,13 +248,13 @@ export default function ChatbotAnalytics() {
           <div>
             <button
               onClick={() => setSelectedSession(null)}
-              className="mb-4 text-orange-600 hover:text-orange-700 font-medium"
+              className="mb-4 text-brand-orange-600 hover:text-brand-orange-700 font-medium"
             >
               ← Retour à la liste
             </button>
             <div className="space-y-4">
               {getSessionLogs(selectedSession).map((log, index) => (
-                <div key={log.id} className="border-l-4 border-orange-500 pl-4">
+                <div key={log.id} className="border-l-4 border-brand-orange pl-4">
                   <div className="text-xs text-gray-500 mb-1">
                     {new Date(log.created_at).toLocaleString('fr-FR')}
                   </div>
@@ -309,7 +309,7 @@ export default function ChatbotAnalytics() {
                           <td className="px-4 py-3 text-sm">
                             <button
                               onClick={() => setSelectedSession(log.session_id)}
-                              className="text-orange-600 hover:text-orange-700 font-medium"
+                              className="text-brand-orange-600 hover:text-brand-orange-700 font-medium"
                             >
                               Voir conversation
                             </button>
@@ -358,7 +358,7 @@ export default function ChatbotAnalytics() {
           <div className="space-y-3">
             {topResources.map((resource, index) => (
               <div key={resource.id} className="flex items-center gap-4">
-                <div className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                <div className="flex-shrink-0 w-8 h-8 bg-brand-orange text-white rounded-full flex items-center justify-center font-bold text-sm">
                   {index + 1}
                 </div>
                 <div className="flex-1">
@@ -368,7 +368,7 @@ export default function ChatbotAnalytics() {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-orange-500 h-2 rounded-full transition-all duration-300"
+                      className="bg-brand-orange h-2 rounded-full transition-all duration-300"
                       style={{ width: `${(resource.count / maxCount) * 100}%` }}
                     />
                   </div>
