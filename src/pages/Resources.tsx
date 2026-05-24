@@ -1,31 +1,30 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, ChevronRight, ChevronLeft, LayoutGrid } from 'lucide-react';
 import ResourceCard from '../components/ResourceCard';
 import { useThemes } from '../hooks/useThemes';
 import { useResources } from '../hooks/useResources';
+import { resolveThemeFromParam, themeToSearchParam } from '../utils/themeNavigation';
 
 export default function Resources() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const themeParam = searchParams.get('theme');
   const { themes, loading: themesLoading } = useThemes();
   const { resources, loading: resourcesLoading } = useResources();
-  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const loading = themesLoading || resourcesLoading;
+
+  const selectedTheme = useMemo(
+    () => resolveThemeFromParam(themeParam, themes),
+    [themeParam, themes]
+  );
+  const selectedThemeId = selectedTheme?.id ?? null;
 
   // États pour la visibilité des flèches
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (themeParam && themes.length > 0) {
-      const matched = themes.find((t) => t.title === themeParam);
-      if (matched) setSelectedThemeId(matched.id);
-    }
-  }, [themeParam, themes]);
 
   useEffect(() => {
     checkScroll();
@@ -59,7 +58,14 @@ export default function Resources() {
   });
 
   const handleThemeChange = (id: string | null) => {
-    setSelectedThemeId(id);
+    if (id) {
+      const theme = themes.find((t) => t.id === id);
+      if (theme) {
+        setSearchParams({ theme: themeToSearchParam(theme) }, { replace: true });
+      }
+    } else {
+      setSearchParams({}, { replace: true });
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
