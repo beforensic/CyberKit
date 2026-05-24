@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { BookOpen, Search, ChevronRight, ChevronLeft, LayoutGrid, Sparkles } from 'lucide-react';
+import { Search, ChevronRight, ChevronLeft, LayoutGrid } from 'lucide-react';
 import ResourceCard from '../components/ResourceCard';
+import { useThemes } from '../hooks/useThemes';
+import { useResources } from '../hooks/useResources';
 
 export default function Resources() {
   const [searchParams] = useSearchParams();
   const themeParam = searchParams.get('theme');
-  const [resources, setResources] = useState<any[]>([]);
-  const [themes, setThemes] = useState<any[]>([]);
+  const { themes, loading: themesLoading } = useThemes();
+  const { resources, loading: resourcesLoading } = useResources();
   const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
+  const loading = themesLoading || resourcesLoading;
 
   // États pour la visibilité des flèches
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -20,17 +21,12 @@ export default function Resources() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  useEffect(() => {
     if (themeParam && themes.length > 0) {
       const matched = themes.find((t) => t.title === themeParam);
       if (matched) setSelectedThemeId(matched.id);
     }
   }, [themeParam, themes]);
 
-  // Vérifier si le scroll est possible à chaque mise à jour des thèmes
   useEffect(() => {
     checkScroll();
     window.addEventListener('resize', checkScroll);
@@ -44,27 +40,6 @@ export default function Resources() {
       setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
     }
   };
-
-  async function fetchData() {
-    try {
-      setLoading(true);
-      const { data: themeData } = await supabase
-        .from('themes')
-        .select('*')
-        .order('sort_order', { ascending: true });
-      setThemes(themeData || []);
-
-      const { data: resData } = await supabase
-        .from('resources')
-        .select('*, theme:themes(title)')
-        .order('created_at', { ascending: false });
-      setResources(resData || []);
-    } catch (err) {
-      console.error('Erreur:', err);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {

@@ -1,23 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Zap, ArrowRight, Target, Lock, Activity, Sparkles, CheckCircle, ChevronRight } from 'lucide-react';
-import { supabase, Theme } from '../lib/supabase';
+import { ArrowRight, Target, Lock, Activity, Sparkles, CheckCircle, ChevronRight } from 'lucide-react';
 import { getIconComponent } from '../utils/icons';
 import { getScore } from '../utils/storage';
+import { useThemes } from '../hooks/useThemes';
 import GoogleReview from '../components/GoogleReview';
 
 export default function Home() {
   const navigate = useNavigate();
-  const [themes, setThemes] = useState<Theme[]>([]);
+  const { themes } = useThemes();
   const [score, setScore] = useState<number | null>(null);
 
   useEffect(() => {
-    // Récupération des thèmes avec l'ordre de tri
-    supabase.from('themes').select('*').order('sort_order', { ascending: true }).then(({ data }) => {
-      setThemes(data || []);
-    });
-
-    // Récupération du score local
     const savedScore = getScore();
     if (savedScore !== null) setScore(savedScore);
   }, []);
