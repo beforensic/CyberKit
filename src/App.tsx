@@ -12,6 +12,9 @@ import Favorites from './pages/Favorites';
 // Définition des pages disponibles (uniquement public et admin)
 type Page = 'home' | 'quiz' | 'resources' | 'contact' | 'about' | 'admin' | 'legal' | 'favorites';
 
+// Pages au parcours immersif (accueil + diagnostic)
+const DARK_SURFACE_PAGES: Page[] = ['home', 'quiz'];
+
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [resourceFilter, setResourceFilter] = useState<string | undefined>(undefined);
@@ -82,9 +85,10 @@ function App() {
 
   // Masquer la barre de navigation sur les pages de gestion
   const hideNavigation = ['admin', 'legal'].includes(currentPage);
+  const isDarkSurface = DARK_SURFACE_PAGES.includes(currentPage);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkSurface ? 'bg-surface-dark text-slate-300' : 'bg-surface-light text-slate-900'}`}>
       <main>
         {renderPage()}
       </main>

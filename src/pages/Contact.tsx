@@ -76,7 +76,7 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-12 px-4 pb-32 text-left">
+    <div className="page-light py-12 px-4 pb-32 text-left">
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 

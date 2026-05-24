@@ -29,7 +29,7 @@ export default function About({ onNavigate }: AboutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-12 md:py-20 px-4 pb-32 text-left">
+    <div className="page-light py-12 md:py-20 px-4 pb-32 text-left">
       <div className="max-w-5xl mx-auto">
 
         {/* Bio Card */}

@@ -4,6 +4,11 @@ export default {
   theme: {
     extend: {
       colors: {
+        surface: {
+          dark: '#0F172A',
+          light: '#FAFAFA',
+          deep: '#020617',
+        },
         'brand-orange': {
           DEFAULT: '#E8650A',
           50: '#FEF3EC',

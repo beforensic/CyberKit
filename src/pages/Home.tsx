@@ -25,7 +25,7 @@ export default function Home({ onNavigate }: HomeProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-slate-300 pb-20 text-left overflow-hidden">
+    <div className="page-dark pb-20 text-left overflow-hidden">
 
       {/* --- HALOS DE LUMIÈRE DE FOND (L'effet vaporeux Stenow) --- */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">

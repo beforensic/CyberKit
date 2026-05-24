@@ -48,7 +48,7 @@ export default function Quiz({ onNavigate }: { onNavigate: (page: any, data?: an
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
+    <div className="page-dark flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange"></div>
     </div>
   );
@@ -56,7 +56,7 @@ export default function Quiz({ onNavigate }: { onNavigate: (page: any, data?: an
   // --- ÉTAPE 1 : CHOIX DU PROFIL ---
   if (!profile) {
     return (
-      <div className="min-h-screen bg-[#0F172A] text-slate-300 py-16 px-6 relative text-left">
+      <div className="page-dark py-16 px-6 relative text-left">
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange-400 text-[10px] font-bold uppercase tracking-widest mb-6">
             <Shield size={14} /> Diagnostic Personnalisé
@@ -100,7 +100,7 @@ export default function Quiz({ onNavigate }: { onNavigate: (page: any, data?: an
   const progress = ((currentStep + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-slate-300 pb-20 relative text-left">
+    <div className="page-dark pb-20 relative text-left">
       <div className="max-w-3xl mx-auto px-6 pt-16 relative z-10">
 
         {/* Progression discrète */}

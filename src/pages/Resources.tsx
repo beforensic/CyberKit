@@ -81,7 +81,7 @@ export default function Resources({ onNavigate, initialFilter }: { onNavigate: (
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange"></div></div>;
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] pb-32 text-left">
+    <div className="page-light pb-32 text-left">
       {/* HEADER FIXE */}
       <div className="bg-white pt-12 pb-6 px-4 border-b border-slate-100 sticky top-0 z-30 shadow-sm">
         <div className="max-w-6xl mx-auto">

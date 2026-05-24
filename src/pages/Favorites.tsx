@@ -62,7 +62,7 @@ export default function Favorites({ onNavigate }: FavoritesProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-12 px-4 pb-32 text-left">
+    <div className="page-light py-12 px-4 pb-32 text-left">
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
           <div>
