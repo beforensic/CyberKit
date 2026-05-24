@@ -4,21 +4,27 @@ import { Search, ChevronRight, ChevronLeft, LayoutGrid } from 'lucide-react';
 import ResourceCard from '../components/ResourceCard';
 import { useThemes } from '../hooks/useThemes';
 import { useResources } from '../hooks/useResources';
-import { resolveThemeFromParam, themeToSearchParam } from '../utils/themeNavigation';
+import { resolveThemeFromParam, resourceBelongsToTheme } from '../utils/themeNavigation';
 
 export default function Resources() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const themeIdParam = searchParams.get('themeId');
   const themeParam = searchParams.get('theme');
+  const activeThemeParam = themeIdParam ?? themeParam;
   const { themes, loading: themesLoading } = useThemes();
   const { resources, loading: resourcesLoading } = useResources();
   const [searchTerm, setSearchTerm] = useState('');
   const loading = themesLoading || resourcesLoading;
 
   const selectedTheme = useMemo(
-    () => resolveThemeFromParam(themeParam, themes),
-    [themeParam, themes]
+    () => resolveThemeFromParam(activeThemeParam, themes),
+    [activeThemeParam, themes]
   );
   const selectedThemeId = selectedTheme?.id ?? null;
+
+  useEffect(() => {
+    setSearchTerm('');
+  }, [activeThemeParam]);
 
   // États pour la visibilité des flèches
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -53,16 +59,13 @@ export default function Resources() {
 
   const filteredResources = resources.filter(res => {
     const matchesSearch = res.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTheme = !selectedThemeId || res.theme_id === selectedThemeId;
+    const matchesTheme = resourceBelongsToTheme(res, selectedTheme);
     return matchesSearch && matchesTheme;
   });
 
   const handleThemeChange = (id: string | null) => {
     if (id) {
-      const theme = themes.find((t) => t.id === id);
-      if (theme) {
-        setSearchParams({ theme: themeToSearchParam(theme) }, { replace: true });
-      }
+      setSearchParams({ themeId: id }, { replace: true });
     } else {
       setSearchParams({}, { replace: true });
     }
