@@ -10,10 +10,12 @@ import Contact from './pages/Contact';
 import About from './pages/About';
 import Admin from './pages/Admin';
 import Legal from './pages/Legal';
+import TarteaucitronInit from './components/TarteaucitronInit';
 
 function App() {
   return (
     <BrowserRouter>
+      <TarteaucitronInit />
       <ScrollToTop />
       <Routes>
         <Route element={<AppLayout />}>

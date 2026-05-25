@@ -101,6 +101,20 @@
   }
 }
 
+/* tarteaucitron — au-dessus de la navigation fixe (z-50) */
+#tarteaucitronRoot,
+#tarteaucitronAlertBig,
+#tarteaucitronManager,
+#tarteaucitronIcon {
+  z-index: 10000 !important;
+}
+
+#tarteaucitronIcon {
+  left: 1rem !important;
+  right: auto !important;
+  bottom: 5.5rem !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

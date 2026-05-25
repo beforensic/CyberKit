@@ -117,7 +117,13 @@ export default function Legal() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-brand-orange font-bold">✓</span>
-                  <span><strong>Aucun cookie de tracking</strong> n'est utilisé pour vous suivre</span>
+                  <span>
+                    <strong>Aucun cookie publicitaire</strong> n'est activé par défaut ; vous pouvez{' '}
+                    <a href="#tarteaucitron" className="text-brand-orange hover:text-brand-orange-600 hover:underline">
+                      gérer vos préférences cookies
+                    </a>{' '}
+                    à tout moment via l'icône cookies (coin supérieur gauche)
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-brand-orange font-bold">✓</span>
@@ -129,6 +135,22 @@ export default function Legal() {
                 </li>
               </ul>
             </div>
+
+            <h3 className="font-bold text-slate-900 text-lg pt-4">Gestion du consentement (cookies)</h3>
+            <p>
+              Lors de votre première visite, un bandeau vous permet d'accepter ou de refuser les services
+              optionnels. Un cookie de préférences (<strong>tarteaucitron</strong>, durée 6 mois) mémorise
+              votre choix. La solution utilisée est{' '}
+              <a
+                href="https://tarteaucitron.io/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-orange hover:text-brand-orange-600 hover:underline"
+              >
+                tarteaucitron.js
+              </a>
+              , hébergée sur nos propres serveurs (aucun transfert vers un CMP tiers payant).
+            </p>
 
             <h3 className="font-bold text-slate-900 text-lg pt-4">Stockage local uniquement</h3>
             <p>
