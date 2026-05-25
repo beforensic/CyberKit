@@ -68,7 +68,7 @@ export default function Home() {
             {[
               { icon: Target, title: "Diagnostic", text: "Faites le point sur vos risques en quelques minutes.", color: "text-brand-orange-400" },
               { icon: Lock, title: "Apprentissage", text: "Des fiches pratiques et mémos vidéo accessibles.", color: "text-blue-400" },
-              { icon: Activity, title: "Progression", text: "Suivez l'évolution de votre score de sécurité.", color: "text-emerald-400" }
+              { icon: Activity, title: "Progression", text: "Suivez l'évolution de votre score de sécurité.", color: "text-brand-orange-400" }
             ].map((step, i) => (
               <div key={i} className="bg-slate-800/30 backdrop-blur-md border border-slate-700/50 p-8 rounded-[2rem] flex flex-col gap-5">
                 <div className={`w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center ${step.color}`}>
@@ -91,7 +91,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-black text-white">Thématiques clés</h2>
             <p className="text-slate-500 mt-2">Cliquez sur un domaine pour renforcer votre protection.</p>
           </div>
-          <div className="flex items-center gap-2 text-emerald-400 font-bold bg-emerald-500/5 border border-emerald-500/10 px-4 py-2 rounded-xl text-xs">
+          <div className="flex items-center gap-2 text-brand-orange-400 font-bold bg-brand-orange/5 border border-brand-orange/10 px-4 py-2 rounded-xl text-xs">
             <CheckCircle className="w-4 h-4" /> +50 ressources gratuites à disposition
           </div>
         </div>

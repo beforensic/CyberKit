@@ -49,13 +49,13 @@ export default function QuizResults() {
     score < 50 ? 'text-red-400' :
     score < 70 ? 'text-orange-400' :
     score < 90 ? 'text-blue-400' :
-    'text-emerald-400';
+    'text-brand-orange-400';
 
   const ringColor =
     score < 50 ? 'border-red-400' :
     score < 70 ? 'border-orange-400' :
     score < 90 ? 'border-blue-400' :
-    'border-emerald-400';
+    'border-brand-orange-400';
 
   return (
     <div className="page-dark pb-24 relative text-left">

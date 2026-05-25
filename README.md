@@ -1,6 +1,6 @@
 # CyberKit
 
-Outil **100 % gratuit** de sensibilisation à la cybersécurité pour indépendants et TPE belges : diagnostic, bibliothèque de ressources et assistant pédagogique. Aucun abonnement in-app — l’accompagnement payant (formation, coaching, audit) passe par [beForensic](https://beforensic.be) via la page Contact.
+Outil **100 % gratuit** de sensibilisation à la cybersécurité pour indépendants et TPE belges : diagnostic, bibliothèque de ressources et infobulles IA sur les mots-clés. Aucun abonnement in-app — l’accompagnement payant (formation, coaching, audit) passe par [beForensic](https://beforensic.be) via la page Contact.
 
 Projet initialement démarré avec **Bolt** (`bolt-vite-react-ts`), puis hébergé sur **Vercel** (équipe Beforensic) avec **Supabase** en backend.
 
@@ -67,22 +67,28 @@ Après la migration `20260525120000_harden_rls_single_admin.sql`, le CMS n’acc
 - Espace entreprise multi-utilisateurs (`companies`, invitations)
 - Paiements Stripe / abonnements in-app
 
-Sur Supabase Dashboard → **Edge Functions**, supprimer la fonction obsolète **`generate-diagnostic-report`** (remplacée par `generate-analysis` + le front). Fonctions attendues : `chat-assistant`, `generate-analysis`, et éventuellement `explain-keyword` / `send-contact-email` si vous les déployez.
+Sur Supabase Dashboard → **Edge Functions**, supprimer les fonctions obsolètes **`chat-assistant`** et **`generate-diagnostic-report`** si elles sont encore listées.
 
-Edge Functions attendues : `chat-assistant`, `generate-analysis`, `explain-keyword` (infobulles sur les tags des ressources).
+Edge Functions actives :
+
+| Fonction | Rôle |
+|----------|------|
+| `submit-contact` | Formulaire contact (anti-spam, rate limit) |
+| `generate-analysis` | Analyse IA des résultats quiz |
+| `explain-keyword` | Infobulles sur les tags ressources |
+
+Déploiement (project-ref `bzxzxzmxiqvnhmlcwqre`) :
 
 ```bash
+npx supabase@2.101.0 db push --yes
+npx supabase@2.101.0 functions deploy submit-contact --project-ref bzxzxzmxiqvnhmlcwqre
 npx supabase@2.101.0 functions deploy generate-analysis --project-ref bzxzxzmxiqvnhmlcwqre
 npx supabase@2.101.0 functions deploy explain-keyword --project-ref bzxzxzmxiqvnhmlcwqre
 ```
 
+Secrets Edge Functions : `ANTHROPIC_API_KEY` (obligatoire pour l’IA). `SUPABASE_SERVICE_ROLE_KEY` est injecté automatiquement par Supabase pour `submit-contact` et le rate limiting.
+
 L’accès admin reste sur `/admin` (non listé dans la navigation publique).
-
-Puis :
-
-```bash
-npx supabase@2.101.0 db push --yes
-```
 
 ## Licence
 

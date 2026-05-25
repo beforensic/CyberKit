@@ -27,7 +27,7 @@ export default function GoogleReview() {
             rel="noopener noreferrer"
             className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black hover:bg-slate-100 transition-all shadow-xl flex items-center gap-2"
           >
-            Laisser un avis <CheckCircle className="text-emerald-500" />
+            Laisser un avis <CheckCircle className="text-brand-orange" />
           </a>
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
             Propulsé par Google Reviews

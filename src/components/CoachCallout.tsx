@@ -52,14 +52,14 @@ export default function CoachCallout() {
   };
 
   return (
-    <div className="bg-white border-2 border-emerald-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow mb-6">
+    <div className="bg-white border-2 border-brand-orange/20 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow mb-6">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-5 flex items-center justify-between gap-3 hover:bg-emerald-50 transition-colors"
+        className="w-full p-5 flex items-center justify-between gap-3 hover:bg-brand-orange/5 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-            <Info className="w-5 h-5 text-emerald-600" />
+          <div className="flex-shrink-0 w-10 h-10 bg-brand-orange/10 rounded-full flex items-center justify-center">
+            <Info className="w-5 h-5 text-brand-orange" />
           </div>
           <div className="text-left">
             <h3 className="font-bold text-slate-900 text-base">
@@ -72,18 +72,18 @@ export default function CoachCallout() {
         </div>
         <div className="flex-shrink-0">
           {isOpen ? (
-            <ChevronUp className="w-5 h-5 text-emerald-600" />
+            <ChevronUp className="w-5 h-5 text-brand-orange" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-emerald-600" />
+            <ChevronDown className="w-5 h-5 text-brand-orange" />
           )}
         </div>
       </button>
 
       {isOpen && (
-        <div className="px-5 pb-5 border-t border-emerald-100 bg-gradient-to-b from-emerald-50/30 to-white">
+        <div className="px-5 pb-5 border-t border-brand-orange/20 bg-gradient-to-b from-brand-orange/5 to-white">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader className="w-6 h-6 text-emerald-600 animate-spin" />
+              <Loader className="w-6 h-6 text-brand-orange animate-spin" />
             </div>
           ) : (
             <div className="pt-4 space-y-4">

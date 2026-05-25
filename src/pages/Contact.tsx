@@ -1,26 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Mail, MapPin, Send, CheckCircle, AlertCircle, Phone, Home, User } from 'lucide-react';
+import { Mail, MapPin, Send, CheckCircle, AlertCircle, User, Home } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getScore, getThemeInterest } from '../utils/storage';
 import GoogleReview from '../components/GoogleReview';
+
+const MIN_SUBMIT_DELAY_MS = 3000;
 
 export default function Contact() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialSubject = searchParams.get('subject') || '';
+  const formLoadedAt = useRef(Date.now());
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     subject: initialSubject || '',
-    message: ''
+    message: '',
+    website: '',
   });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Si aucun sujet n'est fourni, on essaie de deviner basé sur le score ou l'intérêt
     if (!initialSubject) {
       const score = getScore();
       const theme = getThemeInterest();
@@ -37,12 +40,32 @@ export default function Contact() {
     setLoading(true);
     setError(null);
 
+    if (Date.now() - formLoadedAt.current < MIN_SUBMIT_DELAY_MS) {
+      setError('Veuillez patienter quelques secondes avant d\'envoyer.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const { error: submitError } = await supabase
-        .from('contact_messages')
-        .insert([formData]);
+      const score = getScore();
+      const theme = getThemeInterest();
+
+      const { data, error: submitError } = await supabase.functions.invoke('submit-contact', {
+        body: {
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          website: formData.website,
+          formLoadedAt: formLoadedAt.current,
+          quiz_score: score,
+          theme_interest: theme,
+        },
+      });
 
       if (submitError) throw submitError;
+      if (data?.error) throw new Error(data.error);
+
       setSubmitted(true);
     } catch (err) {
       console.error('Erreur envoi message:', err);
@@ -56,8 +79,8 @@ export default function Contact() {
     return (
       <div className="min-h-screen bg-white py-20 px-4">
         <div className="max-w-md mx-auto text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+          <div className="w-20 h-20 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-8">
+            <CheckCircle className="w-10 h-10 text-brand-orange" />
           </div>
           <h2 className="text-3xl font-black text-slate-900 mb-4">Message envoyé !</h2>
           <p className="text-slate-600 mb-10 leading-relaxed">
@@ -79,7 +102,6 @@ export default function Contact() {
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
-          {/* Infos de contact */}
           <div>
             <h1 className="text-4xl font-black text-slate-900 mb-6">Contactez-nous</h1>
             <p className="text-lg text-slate-600 mb-12 leading-relaxed">
@@ -117,15 +139,25 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Formulaire */}
           <div className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-xl border border-slate-100">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="relative space-y-6">
               {error && (
                 <div className="p-4 bg-red-50 text-red-600 rounded-2xl flex items-center gap-3">
                   <AlertCircle className="w-5 h-5" />
                   <p className="text-sm font-medium">{error}</p>
                 </div>
               )}
+
+              <input
+                type="text"
+                name="website"
+                value={formData.website}
+                onChange={e => setFormData({ ...formData, website: e.target.value })}
+                tabIndex={-1}
+                autoComplete="off"
+                className="absolute opacity-0 pointer-events-none h-0 w-0 overflow-hidden"
+                aria-hidden="true"
+              />
 
               <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">

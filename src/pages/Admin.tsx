@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import {
   LayoutDashboard, BookOpen, Settings, Plus,
   LogOut, ChevronLeft, Shield, Filter, Tag,
-  ClipboardList, BarChart3, MessageSquare
+  ClipboardList, BarChart3
 } from 'lucide-react';
 
 // IMPORTATION BASÉE SUR TON ARBORESCENCE RÉELLE
@@ -14,13 +14,11 @@ import QuestionList from '../components/admin/QuestionList'; // Celui que nous v
 import ThemeList from '../components/admin/ThemeList';
 import KeywordManager from '../components/admin/KeywordManager'; // Corrigé (au lieu de TagList)
 import StatisticsPanel from '../components/admin/StatisticsPanel';
-import ChatbotAnalytics from '../components/admin/ChatbotAnalytics';
-
 export default function Admin() {
   const navigate = useNavigate();
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'stats' | 'resources' | 'questions' | 'themes' | 'keywords' | 'chatbot'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'resources' | 'questions' | 'themes' | 'keywords'>('stats');
   const [showResourceForm, setShowResourceForm] = useState(false);
   const [editingResource, setEditingResource] = useState<any>(null);
   const [email, setEmail] = useState('');
@@ -82,7 +80,6 @@ export default function Admin() {
             <NavItem active={activeTab === 'questions'} onClick={() => setActiveTab('questions')} icon={<ClipboardList size={20} />} label="Diagnostic" />
             <NavItem active={activeTab === 'themes'} onClick={() => setActiveTab('themes')} icon={<Filter size={20} />} label="Thématiques" />
             <NavItem active={activeTab === 'keywords'} onClick={() => setActiveTab('keywords')} icon={<Tag size={20} />} label="Mots-clés" />
-            <NavItem active={activeTab === 'chatbot'} onClick={() => setActiveTab('chatbot')} icon={<MessageSquare size={20} />} label="Chatbot" />
           </nav>
         </div>
         <div className="mt-auto p-8 border-t border-slate-800">
@@ -117,7 +114,6 @@ export default function Admin() {
             {activeTab === 'questions' && <QuestionList />}
             {activeTab === 'themes' && <ThemeList />}
             {activeTab === 'keywords' && <KeywordManager />}
-            {activeTab === 'chatbot' && <ChatbotAnalytics />}
           </div>
         </div>
       </div>
