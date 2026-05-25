@@ -1,4 +1,5 @@
-import { BookOpen, Download, ExternalLink, FileText, Headphones, Image as ImageIcon, MessageCircle, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Download, ExternalLink, Eye, FileText, Headphones, Image as ImageIcon, MessageCircle, CheckCircle2 } from 'lucide-react';
+import ResourcePreviewModal from './ResourcePreviewModal';
 import { useNavigate } from 'react-router-dom';
 import { Resource } from '../lib/supabase';
 import { toggleFavorite, getFavorites } from '../utils/storage';
@@ -24,7 +25,13 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
   const navigate = useNavigate();
   const { markAsConsulted, isConsulted } = useProgress();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const consulted = isConsulted(resource.id);
+
+  const openPreview = () => {
+    markAsConsulted(resource.id);
+    setPreviewOpen(true);
+  };
 
   useEffect(() => {
     const favorites = getFavorites();
@@ -96,9 +103,15 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
           )}
         </div>
 
-        <h3 className="text-xl font-bold text-slate-900 mb-3 leading-tight group-hover:text-brand-orange transition-colors">
-          {resource.title}
-        </h3>
+        <button
+          type="button"
+          onClick={openPreview}
+          className="focus-ring text-left w-full mb-3 rounded-lg -mx-1 px-1"
+        >
+          <h3 className="text-xl font-bold text-slate-900 leading-tight group-hover:text-brand-orange transition-colors">
+            {resource.title}
+          </h3>
+        </button>
         <p className="text-slate-500 text-sm leading-relaxed mb-4 line-clamp-3">
           {resource.description}
         </p>
@@ -116,7 +129,15 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
         )}
       </div>
 
-      <div className="space-y-4 mt-auto">
+      <div className="space-y-3 mt-auto">
+        <button
+          type="button"
+          onClick={openPreview}
+          className="focus-ring w-full py-3.5 bg-slate-50 text-slate-700 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-100 border border-slate-200 transition-all text-sm"
+        >
+          <Eye size={18} aria-hidden="true" />
+          Aperçu
+        </button>
         <a
           href={resource.url}
           target="_blank"
@@ -137,6 +158,13 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
           <MessageCircle size={14} aria-hidden="true" /> Besoin d'aide sur ce sujet ?
         </button>
       </div>
+
+      <ResourcePreviewModal
+        resource={resource}
+        isOpen={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        onDownload={() => markAsConsulted(resource.id)}
+      />
     </div>
   );
 }
