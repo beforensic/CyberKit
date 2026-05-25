@@ -141,10 +141,10 @@ export default function Contact() {
 
             <div className="mt-12 p-8 bg-slate-900 rounded-[2rem] text-white">
               <h3 className="font-bold text-xl mb-4">Serge Houtain</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-6">
+              <p className="text-slate-400 text-sm leading-relaxed">
                 Expert en cybercriminalité et fondateur de beForensic. Ma mission : rendre la sécurité numérique accessible à tous les indépendants belges.
               </p>
-              <GoogleReview />
+              <GoogleReview variant="compact" />
             </div>
           </div>
 
