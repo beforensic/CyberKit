@@ -69,11 +69,14 @@ Après la migration `20260525120000_harden_rls_single_admin.sql`, le CMS n’acc
 
 Sur Supabase Dashboard → **Edge Functions**, supprimer la fonction obsolète **`generate-diagnostic-report`** (remplacée par `generate-analysis` + le front). Fonctions attendues : `chat-assistant`, `generate-analysis`, et éventuellement `explain-keyword` / `send-contact-email` si vous les déployez.
 
-Redéployer `generate-analysis` après modification du code :
+Edge Functions attendues : `chat-assistant`, `generate-analysis`, `explain-keyword` (infobulles sur les tags des ressources).
 
 ```bash
 npx supabase@2.101.0 functions deploy generate-analysis --project-ref bzxzxzmxiqvnhmlcwqre
+npx supabase@2.101.0 functions deploy explain-keyword --project-ref bzxzxzmxiqvnhmlcwqre
 ```
+
+L’accès admin reste sur `/admin` (non listé dans la navigation publique).
 
 Puis :
 

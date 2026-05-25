@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Shield, ArrowRight, BookOpen, Mail, RotateCcw } from 'lucide-react';
+import { Shield, ArrowRight, BookOpen, RotateCcw } from 'lucide-react';
 import AIAnalysis from '../components/AIAnalysis';
+import ContactCtaBanner from '../components/ContactCtaBanner';
 import { saveScore } from '../utils/storage';
 import {
   getQuizResults,
@@ -84,7 +85,16 @@ export default function QuizResults() {
           profileName={profileLabel}
         />
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="mt-12">
+          <ContactCtaBanner
+            variant="dark"
+            subject={`Besoin d'accompagnement (Score: ${score}%)`}
+            title="Aller plus loin que le diagnostic ?"
+            description={`Votre score est de ${score} %. Un échange personnalisé avec beForensic peut vous aider à prioriser les actions concrètes pour votre activité.`}
+          />
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button
             type="button"
             onClick={() => navigate('/resources')}
@@ -92,15 +102,6 @@ export default function QuizResults() {
           >
             <BookOpen size={20} className="text-brand-orange" />
             Voir les ressources
-            <ArrowRight size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate(`/contact?subject=${encodeURIComponent(`Besoin d'accompagnement (Score: ${score}%)`)}`)}
-            className="flex items-center justify-center gap-3 p-6 bg-slate-800/40 border border-slate-700 rounded-2xl text-white font-bold hover:border-brand-orange transition-all"
-          >
-            <Mail size={20} className="text-brand-orange" />
-            Être accompagné
             <ArrowRight size={16} />
           </button>
           <button

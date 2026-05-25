@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Loader } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface KeywordTooltipProps {
   keyword: string;
@@ -58,22 +59,14 @@ export default function KeywordTooltip({ keyword, children }: KeywordTooltipProp
     setError(false);
 
     try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/explain-keyword`;
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ keyword }),
+      const { data, error } = await supabase.functions.invoke('explain-keyword', {
+        body: { keyword },
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch explanation');
-      }
+      if (error) throw error;
+      if (!data?.explanation) throw new Error('Empty explanation');
 
-      const data = await response.json();
-      const sanitizedExplanation = data.explanation;
+      const sanitizedExplanation = data.explanation as string;
 
       explanationCache.set(keyword, sanitizedExplanation);
       setExplanation(sanitizedExplanation);

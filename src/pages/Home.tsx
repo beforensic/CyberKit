@@ -5,6 +5,7 @@ import { getIconComponent } from '../utils/icons';
 import { getScore } from '../utils/storage';
 import { useThemes } from '../hooks/useThemes';
 import GoogleReview from '../components/GoogleReview';
+import ContactCtaBanner from '../components/ContactCtaBanner';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -124,8 +125,12 @@ export default function Home() {
           })}
         </div>
 
+        <div className="mt-20 mb-16">
+          <ContactCtaBanner variant="dark" />
+        </div>
+
         {/* --- SECTION GOOGLE REVIEWS --- */}
-        <div className="mt-32 pt-16 border-t border-slate-800">
+        <div className="pt-16 border-t border-slate-800">
           <GoogleReview />
         </div>
       </div>

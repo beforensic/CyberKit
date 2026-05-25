@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Resource } from '../lib/supabase';
 import { toggleFavorite, getFavorites } from '../utils/storage';
 import { useState, useEffect } from 'react';
+import KeywordTooltip from './KeywordTooltip';
 
 interface ResourceCardProps {
   resource: Resource & { theme?: { title: string } };
@@ -77,9 +78,21 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
         <h3 className="text-xl font-bold text-slate-900 mb-3 leading-tight group-hover:text-brand-orange transition-colors">
           {resource.title}
         </h3>
-        <p className="text-slate-500 text-sm leading-relaxed mb-8 line-clamp-3">
+        <p className="text-slate-500 text-sm leading-relaxed mb-4 line-clamp-3">
           {resource.description}
         </p>
+
+        {resource.tags && resource.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {resource.tags.slice(0, 4).map((tag) => (
+              <KeywordTooltip key={tag} keyword={tag}>
+                <span className="px-2.5 py-1 bg-slate-50 text-slate-600 rounded-lg text-[10px] font-bold uppercase tracking-wide border border-slate-200 cursor-help hover:border-brand-orange/40 hover:text-brand-orange transition-colors">
+                  {tag}
+                </span>
+              </KeywordTooltip>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="space-y-4 mt-auto">

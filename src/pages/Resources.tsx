@@ -5,6 +5,7 @@ import ResourceCard from '../components/ResourceCard';
 import { useThemes } from '../hooks/useThemes';
 import { useResources } from '../hooks/useResources';
 import { resolveThemeId, resourceMatchesThemeId } from '../utils/themeNavigation';
+import ContactCtaBanner from '../components/ContactCtaBanner';
 
 type ResourcesLocationState = { themeId?: string } | null;
 
@@ -105,7 +106,15 @@ export default function Resources() {
 
   return (
     <div className="page-light pb-32 text-left">
-      <div className="bg-white pt-12 pb-6 px-4 border-b border-slate-100 sticky top-0 z-30 shadow-sm">
+      <div className="max-w-6xl mx-auto px-4 pt-6">
+        <ContactCtaBanner
+          variant="light"
+          compact
+          title="Une question ou un besoin d'accompagnement ?"
+        />
+      </div>
+
+      <div className="bg-white pt-8 pb-6 px-4 border-b border-slate-100 sticky top-0 z-30 shadow-sm">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
