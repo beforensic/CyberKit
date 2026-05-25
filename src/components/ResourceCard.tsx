@@ -67,7 +67,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-card p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-brand-orange/5 transition-all group relative flex flex-col h-full text-left overflow-hidden">
+    <div className="bg-white rounded-card p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-brand-orange/5 transition-all group relative flex flex-col h-full text-left">
       <div className={`flex justify-end ${showThumbnail ? 'absolute top-6 right-6 z-10' : 'mb-6'}`}>
         <button
           type="button"
