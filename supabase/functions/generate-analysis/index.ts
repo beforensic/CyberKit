@@ -5,6 +5,7 @@ import {
   requireSupabaseJwt,
 } from "../_shared/aiAccess.ts";
 import { getCorsHeaders, handleCorsPreflight } from "../_shared/cors.ts";
+import { GENERATE_ANALYSIS_SYSTEM_PROMPT } from "../_shared/aiPrompts.ts";
 
 interface AnalysisRequest {
   profile: string;
@@ -71,23 +72,20 @@ Deno.serve(async (req: Request) => {
       throw new Error("ANTHROPIC_API_KEY not configured");
     }
 
-    const systemPrompt =
-      "Tu es CyberKit, un assistant de cybersécurité bienveillant et pédagogue qui s'adresse à des indépendants et PME belges non-technophiles. Tu t'exprimes en français, avec un ton chaleureux, encourageant et non-technique. Tu ne dois jamais utiliser de jargon informatique sans l'expliquer. Tu ne dois jamais faire peur inutilement. Tu dois toujours terminer sur une note positive et encourageante. IMPORTANT: Tu ne dois jamais utiliser de formatage Markdown dans tes réponses (pas de #, **, *, _, etc.). Écris uniquement en prose fluide, en un seul paragraphe continu, sans titres ni listes.";
-
     const weakPointsList = weakPoints
       .map((point, index) => `${index + 1}. ${point}`)
       .join("\n");
 
-    const userMessage = `L'utilisateur est un(e) ${profile} qui vient d'obtenir un score de ${score}/100 au diagnostic cybersécurité (niveau: ${level}).
-Ses 3 points faibles identifiés sont:
+    const userMessage = `L'utilisateur est un(e) ${profile} qui vient d'obtenir un score de ${score}/100 au diagnostic cybersécurité (niveau : ${level}).
+Ses points faibles identifiés sont :
 ${weakPointsList}
-Génère une analyse personnalisée de 3 à 4 phrases maximum qui:
+Rédigez une analyse personnalisée de 3 à 4 phrases maximum qui :
 - reconnaît son niveau actuel sans le juger
-- explique brièvement pourquoi ces points faibles sont importants pour son profil spécifique
-- l'encourage à commencer par les 3 priorités identifiées
-- termine sur une note positive et motivante
-Ne répète pas les recommandations déjà affichées.
-Sois concis, chaleureux et humain.`;
+- explique brièvement pourquoi ces points faibles sont importants pour son profil
+- l'encourage à commencer par les priorités identifiées
+- se termine sur une note positive et motivante
+Ne répétez pas les recommandations déjà affichées.
+Vouvoyez l'utilisateur (« vous », « votre »). Soyez concis, chaleureux et humain.`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -99,7 +97,7 @@ Sois concis, chaleureux et humain.`;
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 512,
-        system: systemPrompt,
+        system: GENERATE_ANALYSIS_SYSTEM_PROMPT,
         messages: [{ role: "user", content: userMessage }],
       }),
     });

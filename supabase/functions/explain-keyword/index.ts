@@ -5,6 +5,7 @@ import {
   requireSupabaseJwt,
 } from "../_shared/aiAccess.ts";
 import { getCorsHeaders, handleCorsPreflight } from "../_shared/cors.ts";
+import { EXPLAIN_KEYWORD_SYSTEM_PROMPT } from "../_shared/aiPrompts.ts";
 
 Deno.serve(async (req: Request) => {
   const preflight = handleCorsPreflight(req);
@@ -57,11 +58,8 @@ Deno.serve(async (req: Request) => {
       throw new Error("ANTHROPIC_API_KEY not configured");
     }
 
-    const systemPrompt =
-      "Tu es CyberKit, un assistant de cybersécurité pédagogue qui s'adresse à des indépendants et PME belges non-technophiles. Tu t'exprimes en français, avec un ton simple et chaleureux. Tu ne dois jamais utiliser de jargon sans l'expliquer. Tu ne dois jamais utiliser de formatage Markdown (pas de #, **, *, _, etc.). Écris uniquement en texte brut.";
-
     const userMessage =
-      `Explique le terme de cybersécurité '${trimmed}' en 2 phrases maximum, en langage simple et accessible à un non-technicien belge. Sois concis et pratique.`;
+      `Expliquez le terme de cybersécurité « ${trimmed} » en 2 phrases maximum, en langage simple et accessible à un non-technicien belge. Soyez concis et pratique. Vouvoyez l'utilisateur.`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -73,7 +71,7 @@ Deno.serve(async (req: Request) => {
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 200,
-        system: systemPrompt,
+        system: EXPLAIN_KEYWORD_SYSTEM_PROMPT,
         messages: [{ role: "user", content: userMessage }],
       }),
     });

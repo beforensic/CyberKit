@@ -8,7 +8,14 @@ interface KeywordTooltipProps {
   children: React.ReactNode;
 }
 
+/** Incrémenter si les consignes IA changent (ex. passage au vouvoiement). */
+const EXPLANATION_CACHE_VERSION = 'v2-formal';
+
 const explanationCache = new Map<string, string>();
+
+function cacheKey(keyword: string) {
+  return `${EXPLANATION_CACHE_VERSION}:${keyword}`;
+}
 
 const TOOLTIP_MAX_WIDTH = 400;
 const TOOLTIP_MAX_HEIGHT = 280;
@@ -96,8 +103,9 @@ export default function KeywordTooltip({ keyword, children }: KeywordTooltipProp
   }, [showTooltip, explanation, loading, error, updatePosition]);
 
   const fetchExplanation = async () => {
-    if (explanationCache.has(keyword)) {
-      setExplanation(explanationCache.get(keyword)!);
+    const key = cacheKey(keyword);
+    if (explanationCache.has(key)) {
+      setExplanation(explanationCache.get(key)!);
       return;
     }
 
@@ -114,7 +122,7 @@ export default function KeywordTooltip({ keyword, children }: KeywordTooltipProp
 
       const sanitizedExplanation = data.explanation as string;
 
-      explanationCache.set(keyword, sanitizedExplanation);
+      explanationCache.set(key, sanitizedExplanation);
       setExplanation(sanitizedExplanation);
     } catch (err) {
       console.error('Error fetching explanation:', err);
