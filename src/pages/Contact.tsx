@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Mail, MapPin, Send, CheckCircle, AlertCircle, User, Home } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getScore, getThemeInterest } from '../utils/storage';
@@ -19,6 +19,7 @@ export default function Contact() {
     message: '',
     website: '',
   });
+  const [gdprConsent, setGdprConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +47,12 @@ export default function Contact() {
       return;
     }
 
+    if (!gdprConsent) {
+      setError('Vous devez accepter le traitement de vos données pour envoyer le message.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const score = getScore();
       const theme = getThemeInterest();
@@ -60,6 +67,7 @@ export default function Contact() {
           formLoadedAt: formLoadedAt.current,
           quiz_score: score,
           theme_interest: theme,
+          gdprConsent: true,
         },
       });
 
@@ -220,11 +228,47 @@ export default function Contact() {
                 />
               </div>
 
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <label
+                  htmlFor="contact-gdpr-consent"
+                  className="flex items-start gap-3 cursor-pointer"
+                >
+                  <input
+                    id="contact-gdpr-consent"
+                    type="checkbox"
+                    required
+                    checked={gdprConsent}
+                    onChange={e => setGdprConsent(e.target.checked)}
+                    className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 text-brand-orange focus:ring-brand-orange/30"
+                  />
+                  <span className="text-sm text-slate-700 leading-relaxed">
+                    J'accepte que beForensic traite mes données personnelles (nom, adresse e-mail et
+                    contenu du message) pour répondre à ma demande de contact, conformément à la{' '}
+                    <Link
+                      to="/legal#protection-donnees"
+                      className="text-brand-orange font-semibold hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      politique de confidentialité
+                    </Link>
+                    . Je peux exercer mes droits (accès, rectification, suppression) en écrivant à{' '}
+                    <a
+                      href="mailto:contact@beforensic.be"
+                      className="text-brand-orange font-semibold hover:underline"
+                    >
+                      contact@beforensic.be
+                    </a>
+                    .
+                  </span>
+                </label>
+              </div>
+
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !gdprConsent}
                 aria-busy={loading}
-                className="focus-ring w-full py-5 bg-brand-orange text-white rounded-2xl font-bold text-lg hover:bg-brand-orange-600 transition-all flex items-center justify-center gap-3 shadow-lg shadow-brand-orange/20 disabled:opacity-50"
+                className="focus-ring w-full py-5 bg-brand-orange text-white rounded-2xl font-bold text-lg hover:bg-brand-orange-600 transition-all flex items-center justify-center gap-3 shadow-lg shadow-brand-orange/20 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Envoi...' : (
                   <>

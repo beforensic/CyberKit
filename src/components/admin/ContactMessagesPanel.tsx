@@ -15,6 +15,8 @@ export interface ContactMessage {
   theme_interest: string | null;
   created_at: string;
   archived_at: string | null;
+  gdpr_consent_at: string | null;
+  gdpr_consent_version: string | null;
   status: 'new' | 'read' | 'replied';
 }
 
@@ -41,7 +43,17 @@ function normalizeMessage(row: Record<string, unknown>): ContactMessage {
     : 'new';
   const archivedAt =
     typeof row.archived_at === 'string' ? row.archived_at : null;
-  return { ...row, status, archived_at: archivedAt } as ContactMessage;
+  const gdprConsentAt =
+    typeof row.gdpr_consent_at === 'string' ? row.gdpr_consent_at : null;
+  const gdprConsentVersion =
+    typeof row.gdpr_consent_version === 'string' ? row.gdpr_consent_version : null;
+  return {
+    ...row,
+    status,
+    archived_at: archivedAt,
+    gdpr_consent_at: gdprConsentAt,
+    gdpr_consent_version: gdprConsentVersion,
+  } as ContactMessage;
 }
 
 function formatDate(iso: string) {
@@ -505,6 +517,16 @@ export default function ContactMessagesPanel({
                   </div>
                 )}
               </div>
+
+              {selected.gdpr_consent_at && (
+                <p className="text-xs text-slate-500 mb-4">
+                  Consentement RGPD enregistré le {formatDate(selected.gdpr_consent_at)}
+                  {selected.gdpr_consent_version
+                    ? ` (politique ${selected.gdpr_consent_version})`
+                    : ''}
+                  .
+                </p>
+              )}
 
               <div className="bg-white border border-slate-200 rounded-2xl p-6">
                 <p className="text-[10px] font-bold uppercase text-slate-400 mb-3 flex items-center gap-2">

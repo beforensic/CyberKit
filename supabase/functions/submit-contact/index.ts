@@ -8,6 +8,7 @@ import {
 import { sendContactNotification } from "../_shared/resend.ts";
 
 const MIN_FORM_DELAY_MS = 3000;
+const GDPR_CONSENT_VERSION = "2026-03";
 const MAX_NAME = 120;
 const MAX_EMAIL = 254;
 const MAX_SUBJECT = 200;
@@ -22,6 +23,7 @@ interface ContactPayload {
   formLoadedAt?: number;
   quiz_score?: number | null;
   theme_interest?: string | null;
+  gdprConsent?: boolean;
 }
 
 Deno.serve(async (req: Request) => {
@@ -67,6 +69,15 @@ Deno.serve(async (req: Request) => {
     const subject = body.subject?.trim() ?? "";
     const message = body.message?.trim() ?? "";
 
+    if (body.gdprConsent !== true) {
+      return new Response(
+        JSON.stringify({
+          error: "Vous devez accepter le traitement de vos données pour envoyer le message.",
+        }),
+        { status: 400, headers: { ...cors, "Content-Type": "application/json" } },
+      );
+    }
+
     if (
       !name || !email || !subject || !message ||
       name.length > MAX_NAME ||
@@ -104,6 +115,8 @@ Deno.serve(async (req: Request) => {
       subject,
       message,
       status: "new",
+      gdpr_consent_at: new Date().toISOString(),
+      gdpr_consent_version: GDPR_CONSENT_VERSION,
     };
 
     if (typeof body.quiz_score === "number" && Number.isFinite(body.quiz_score)) {

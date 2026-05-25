@@ -93,7 +93,10 @@ export default function Legal() {
           </div>
         </section>
 
-        <section className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+        <section
+          id="protection-donnees"
+          className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 scroll-mt-24"
+        >
           <div className="flex items-center gap-3 mb-6">
             <ShieldCheck className="w-6 h-6 text-brand-orange" />
             <h2 className="text-2xl font-bold text-slate-900">Protection des Données (RGPD)</h2>
@@ -146,6 +149,17 @@ export default function Legal() {
             <p>
               Certaines ressources référencées peuvent pointer vers des sites web tiers.
               Nous vous invitons à consulter leurs politiques de confidentialité respectives.
+            </p>
+
+            <h3 className="font-bold text-slate-900 text-lg pt-6">Formulaire de contact</h3>
+            <p>
+              Si vous nous écrivez via le formulaire de contact, nous traitons uniquement les données
+              que vous y indiquez (nom, adresse e-mail, sujet et message), ainsi que, le cas échéant,
+              le contexte de votre diagnostic CyberKit (score et thème d'intérêt). Le traitement a
+              pour finalité de répondre à votre demande. La base légale est votre consentement,
+              recueilli via la case à cocher obligatoire avant l'envoi. Les messages sont conservés
+              le temps nécessaire au traitement de votre demande, puis peuvent être archivés ou
+              supprimés par l'administrateur.
             </p>
 
             <h3 className="font-bold text-slate-900 text-lg pt-6">Sous-traitants</h3>
