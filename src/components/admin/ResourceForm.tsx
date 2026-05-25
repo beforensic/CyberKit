@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Resource, ResourceKind, ThemeSummary, supabase } from '../../lib/supabase';
 import { X, Save, AlertCircle, Link, Upload, Loader2, ListFilter } from 'lucide-react';
+import { formatAppError } from '../../utils/errors';
+import {
+  resolveResourceTypeId,
+  toDbResourceType,
+  toResourceFormPayload,
+} from '../../utils/resourceAdmin';
 
 interface ResourceFormProps {
   resource?: Resource | null;
@@ -15,17 +21,6 @@ type ResourceFormData = {
   theme_id: string;
   type: ResourceKind;
 };
-
-function toResourcePayload(data: ResourceFormData) {
-  const description = data.description.trim();
-  return {
-    title: data.title.trim(),
-    description: description.length > 0 ? description : null,
-    url: data.url.trim(),
-    theme_id: data.theme_id,
-    type: data.type,
-  };
-}
 
 const RESOURCE_TYPES: { id: ResourceKind; label: string }[] = [
   { id: 'guide', label: 'Guide' },
@@ -81,7 +76,7 @@ export default function ResourceForm({ resource, onClose, onSaved }: ResourceFor
       const { data: { publicUrl } } = supabase.storage.from('resources').getPublicUrl(fileName);
       setFormData(prev => ({ ...prev, url: publicUrl }));
     } catch (err: unknown) {
-      setError("Erreur d'upload : " + (err instanceof Error ? err.message : 'Erreur inconnue'));
+      setError("Erreur d'upload : " + formatAppError(err));
     } finally {
       setUploading(false);
     }
@@ -91,31 +86,50 @@ export default function ResourceForm({ resource, onClose, onSaved }: ResourceFor
     e.preventDefault();
     setLoading(true);
     try {
-      const payload = toResourcePayload(formData);
+      const basePayload = toResourceFormPayload(formData);
 
       if (resource) {
+        // Ne pas renvoyer `type` à l'update : valeurs pédagogiques (ex. infographie)
+        // peuvent être invalides pour l'enum Postgres et faire échouer toute la sauvegarde.
         const { data, error } = await supabase
           .from('resources')
-          .update(payload)
+          .update(basePayload)
           .eq('id', resource.id)
-          .select('id')
-          .single();
+          .select('id');
+
         if (error) throw error;
-        if (!data) throw new Error('La ressource n\'a pas pu être mise à jour.');
+        if (!data?.length) {
+          throw new Error(
+            'Mise à jour refusée. Vérifiez que votre compte a le rôle admin (métadonnées JWT).'
+          );
+        }
       } else {
+        const resourceTypeId = await resolveResourceTypeId(formData.type);
+        if (!resourceTypeId) {
+          throw new Error('Type de ressource introuvable en base. Contactez le support.');
+        }
+
         const { data, error } = await supabase
           .from('resources')
-          .insert([payload])
-          .select('id')
-          .single();
+          .insert([
+            {
+              ...basePayload,
+              type: toDbResourceType(formData.type),
+              resource_type_id: resourceTypeId,
+            },
+          ])
+          .select('id');
+
         if (error) throw error;
-        if (!data) throw new Error('La ressource n\'a pas pu être créée.');
+        if (!data?.length) {
+          throw new Error('La ressource n\'a pas pu être créée.');
+        }
       }
 
       await onSaved?.();
       onClose();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      setError(formatAppError(err));
     } finally {
       setLoading(false);
     }
