@@ -13,6 +13,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { Resource, ResourceKind } from '../lib/supabase';
 import KeywordTooltip from './KeywordTooltip';
+import ResourcePreviewMedia from './ResourcePreviewMedia';
 
 const TYPE_LABELS: Record<string, string> = {
   guide: 'Guide',
@@ -150,6 +151,8 @@ export default function ResourcePreviewModal({
         </div>
 
         <div className="p-6 sm:p-8 overflow-y-auto flex-1 text-left">
+          <ResourcePreviewMedia resource={resource} variant="modal" />
+
           <p id={descId} className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line">
             {description || (
               <span className="text-slate-400 italic">

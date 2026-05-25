@@ -70,6 +70,7 @@ export interface Resource {
   type: ResourceKind;
   resource_type_id: string;
   url: string;
+  preview_image_url?: string | null;
   tags: string[];
   duration?: number | null;
   created_at: string;

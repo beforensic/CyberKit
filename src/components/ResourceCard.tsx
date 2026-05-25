@@ -1,5 +1,6 @@
 import { BookOpen, Download, ExternalLink, Eye, FileText, Headphones, Image as ImageIcon, MessageCircle, CheckCircle2 } from 'lucide-react';
 import ResourcePreviewModal from './ResourcePreviewModal';
+import ResourcePreviewMedia, { hasCardThumbnail } from './ResourcePreviewMedia';
 import { useNavigate } from 'react-router-dom';
 import { Resource } from '../lib/supabase';
 import { toggleFavorite, getFavorites } from '../utils/storage';
@@ -27,6 +28,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const consulted = isConsulted(resource.id);
+  const showThumbnail = hasCardThumbnail(resource);
 
   const openPreview = () => {
     markAsConsulted(resource.id);
@@ -65,24 +67,36 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-card p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-brand-orange/5 transition-all group relative flex flex-col h-full text-left">
-      {/* En-tête de la carte */}
-      <div className="flex justify-between items-start mb-6">
-        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-brand-orange-50 group-hover:text-brand-orange transition-colors">
-          {getIcon()}
-        </div>
+    <div className="bg-white rounded-card p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-brand-orange/5 transition-all group relative flex flex-col h-full text-left overflow-hidden">
+      <div className={`flex justify-end ${showThumbnail ? 'absolute top-6 right-6 z-10' : 'mb-6'}`}>
         <button
           type="button"
           onClick={handleToggleFavorite}
           aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
           aria-pressed={isFavorite}
-          className={`focus-ring p-2 rounded-full transition-colors ${isFavorite ? 'text-red-500 bg-red-50' : 'text-slate-200 hover:text-red-500 hover:bg-red-50'}`}
+          className={`focus-ring p-2 rounded-full transition-colors shadow-sm ${
+            showThumbnail
+              ? 'bg-white/90 backdrop-blur-sm ' + (isFavorite ? 'text-red-500' : 'text-slate-400 hover:text-red-500')
+              : isFavorite
+                ? 'text-red-500 bg-red-50'
+                : 'text-slate-200 hover:text-red-500 hover:bg-red-50'
+          }`}
         >
           <svg aria-hidden="true" className={`w-6 h-6 ${isFavorite ? 'fill-current' : 'fill-none'}`} stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.364-1.364a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
       </div>
+
+      {showThumbnail ? (
+        <button type="button" onClick={openPreview} className="focus-ring w-full text-left -mt-2 mb-4">
+          <ResourcePreviewMedia resource={resource} variant="card" />
+        </button>
+      ) : (
+        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-brand-orange-50 group-hover:text-brand-orange transition-colors mb-6">
+          {getIcon()}
+        </div>
+      )}
 
       <div className="flex-1">
         {/* Affichage du TYPE et du THÈME */}

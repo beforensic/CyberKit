@@ -6,6 +6,7 @@ import {
   resolveResourceTypeId,
   toDbResourceType,
   toResourceFormPayload,
+  uploadToResourcesBucket,
 } from '../../utils/resourceAdmin';
 
 interface ResourceFormProps {
@@ -20,6 +21,7 @@ type ResourceFormData = {
   url: string;
   theme_id: string;
   type: ResourceKind;
+  preview_image_url: string;
 };
 
 const RESOURCE_TYPES: { id: ResourceKind; label: string }[] = [
@@ -37,6 +39,7 @@ export default function ResourceForm({ resource, onClose, onSaved }: ResourceFor
   const [error, setError] = useState<string | null>(null);
   const [themes, setThemes] = useState<ThemeSummary[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<ResourceFormData>({
     title: '',
@@ -44,6 +47,7 @@ export default function ResourceForm({ resource, onClose, onSaved }: ResourceFor
     url: '',
     theme_id: '',
     type: 'guide',
+    preview_image_url: '',
   });
 
   useEffect(() => {
@@ -55,6 +59,7 @@ export default function ResourceForm({ resource, onClose, onSaved }: ResourceFor
         url: resource.url || '',
         theme_id: resource.theme_id || '',
         type: resource.type || 'guide',
+        preview_image_url: resource.preview_image_url || '',
       });
     }
   }, [resource]);
@@ -69,16 +74,32 @@ export default function ResourceForm({ resource, onClose, onSaved }: ResourceFor
     if (!file) return;
     try {
       setUploading(true);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('resources').upload(fileName, file);
-      if (uploadError) throw uploadError;
-      const { data: { publicUrl } } = supabase.storage.from('resources').getPublicUrl(fileName);
-      setFormData(prev => ({ ...prev, url: publicUrl }));
+      const publicUrl = await uploadToResourcesBucket(file, 'files');
+      setFormData((prev) => ({ ...prev, url: publicUrl }));
     } catch (err: unknown) {
       setError("Erreur d'upload : " + formatAppError(err));
     } finally {
       setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handlePreviewUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError("L'aperçu doit être une image (PNG, JPG, WebP…).");
+      return;
+    }
+    try {
+      setUploading(true);
+      const publicUrl = await uploadToResourcesBucket(file, 'previews');
+      setFormData((prev) => ({ ...prev, preview_image_url: publicUrl }));
+    } catch (err: unknown) {
+      setError("Erreur d'upload aperçu : " + formatAppError(err));
+    } finally {
+      setUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -185,6 +206,55 @@ export default function ResourceForm({ resource, onClose, onSaved }: ResourceFor
               </div>
               <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept=".pdf,.jpg,.png,.mp3,.mp4" />
               <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading} className="px-6 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all flex items-center gap-2">
+                {uploading ? <Loader2 className="animate-spin" size={20} /> : <Upload size={20} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">
+              Image d&apos;aperçu (optionnel)
+            </label>
+            <p className="text-xs text-slate-400 mb-2">
+              Vignette affichée sur la carte et dans le modal avant téléchargement. Recommandé pour les infographies.
+            </p>
+            {formData.preview_image_url ? (
+              <div className="relative rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 mb-2">
+                <img
+                  src={formData.preview_image_url}
+                  alt="Aperçu"
+                  className="w-full max-h-48 object-contain object-center"
+                />
+                <button
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, preview_image_url: '' }))}
+                  className="absolute top-2 right-2 px-3 py-1.5 bg-white/90 text-slate-600 text-xs font-bold rounded-lg shadow-sm hover:bg-white"
+                >
+                  Retirer
+                </button>
+              </div>
+            ) : null}
+            <div className="flex gap-2">
+              <input
+                type="url"
+                placeholder="https://... ou uploader une image"
+                value={formData.preview_image_url}
+                onChange={(e) => setFormData({ ...formData, preview_image_url: e.target.value })}
+                className="flex-1 px-5 py-4 bg-slate-50 border-none rounded-2xl font-medium text-blue-600"
+              />
+              <input
+                type="file"
+                ref={previewInputRef}
+                onChange={handlePreviewUpload}
+                className="hidden"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+              />
+              <button
+                type="button"
+                onClick={() => previewInputRef.current?.click()}
+                disabled={uploading}
+                className="px-6 bg-brand-orange-50 text-brand-orange border border-brand-orange-100 rounded-2xl hover:bg-brand-orange hover:text-white transition-all flex items-center gap-2 font-bold text-sm"
+              >
                 {uploading ? <Loader2 className="animate-spin" size={20} /> : <Upload size={20} />}
               </button>
             </div>

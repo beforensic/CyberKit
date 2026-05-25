@@ -48,6 +48,7 @@ export type ResourceFormPayload = {
   description: string | null;
   url: string;
   theme_id: string;
+  preview_image_url: string | null;
 };
 
 export function toResourceFormPayload(data: {
@@ -55,12 +56,26 @@ export function toResourceFormPayload(data: {
   description: string;
   url: string;
   theme_id: string;
+  preview_image_url: string;
 }): ResourceFormPayload {
   const description = data.description.trim();
+  const preview = data.preview_image_url.trim();
   return {
     title: data.title.trim(),
     description: description.length > 0 ? description : null,
     url: data.url.trim(),
     theme_id: data.theme_id,
+    preview_image_url: preview.length > 0 ? preview : null,
   };
+}
+
+export async function uploadToResourcesBucket(file: File, folder: 'files' | 'previews'): Promise<string> {
+  const fileExt = file.name.split('.').pop()?.toLowerCase() || 'bin';
+  const fileName = `${folder}/${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+  const { error: uploadError } = await supabase.storage.from('resources').upload(fileName, file);
+  if (uploadError) throw uploadError;
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from('resources').getPublicUrl(fileName);
+  return publicUrl;
 }
