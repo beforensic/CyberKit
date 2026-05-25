@@ -7,12 +7,14 @@ function registerCyberkitServices(): void {
   const tac = window.tarteaucitron;
   if (!tac) return;
 
-  tac.services.cyberkit_storage = {
-    key: 'cyberkit_storage',
+  // Service « information » : needConsent true pour afficher le bandeau et mémoriser le choix.
+  // Le stockage local (quiz, favoris) n’est pas bloqué par le refus (js/fallback vides).
+  tac.services.cyberkit_preferences = {
+    key: 'cyberkit_preferences',
     type: 'other',
-    name: 'Mémorisation locale (quiz, favoris, progression)',
-    needConsent: false,
-    cookies: [],
+    name: 'Préférences cookies et mémorisation locale',
+    needConsent: true,
+    cookies: ['tarteaucitron'],
     readmoreLink: '/legal#protection-donnees',
     js() {
       'use strict';
@@ -23,14 +25,25 @@ function registerCyberkitServices(): void {
   };
 
   tac.job = tac.job || [];
-  if (!tac.job.includes('cyberkit_storage')) {
-    tac.job.push('cyberkit_storage');
+  if (!tac.job.includes('cyberkit_preferences')) {
+    tac.job.push('cyberkit_preferences');
   }
 
   // Mesure d'audience (ex. Matomo) : décommenter et renseigner l'ID quand activé.
   // tac.user = tac.user || {};
   // tac.user.matomoId = 'VOTRE_ID_MATOMO';
   // tac.job.push('matomo');
+}
+
+/** Affiche le bandeau tant que l'utilisateur n'a pas enregistré de choix (cookie tarteaucitron). */
+function ensureConsentBannerVisible(): void {
+  const tac = window.tarteaucitron;
+  if (!tac?.userInterface || !tac.cookie) return;
+
+  const hasStoredChoice = tac.cookie.read().length > 0;
+  if (!hasStoredChoice) {
+    tac.userInterface.openAlert();
+  }
 }
 
 function getInitOptions(): TarteaucitronInitOptions {
@@ -113,6 +126,15 @@ export async function initTarteaucitron(): Promise<void> {
   initStarted = true;
 
   await loadScript();
+
+  const onRootReady = () => {
+    ensureConsentBannerVisible();
+  };
+  window.addEventListener('tac.root_available', onRootReady, { once: true });
+
   registerCyberkitServices();
   window.tarteaucitron?.init(getInitOptions());
+
+  // Secours si l'événement a déjà été émis avant l'écouteur (SPA / chargement async).
+  window.setTimeout(ensureConsentBannerVisible, 400);
 }

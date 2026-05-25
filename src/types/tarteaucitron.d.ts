@@ -42,11 +42,22 @@ export interface TarteaucitronInitOptions {
   partnersList: boolean;
 }
 
+export interface TarteaucitronUserInterface {
+  openAlert: () => void;
+  closeAlert: () => void;
+}
+
+export interface TarteaucitronCookieApi {
+  read: () => string;
+}
+
 export interface TarteaucitronApi {
   init: (options: TarteaucitronInitOptions) => void;
   services: Record<string, TarteaucitronService>;
   job?: string[];
   user?: Record<string, string>;
+  userInterface?: TarteaucitronUserInterface;
+  cookie?: TarteaucitronCookieApi;
 }
 
 declare global {
