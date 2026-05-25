@@ -1,6 +1,9 @@
 import { Theme } from '../lib/supabase';
 import type { ResourceWithTheme } from '../services/catalog';
 
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const normalizeThemeKey = (value: string) =>
   value.normalize('NFC').trim().toLocaleLowerCase('fr');
 
@@ -11,31 +14,41 @@ export function resolveThemeFromParam(param: string | null, themes: Theme[]): Th
   const normalized = normalizeThemeKey(decoded);
   const lowerDecoded = decoded.toLowerCase();
 
+  if (UUID_REGEX.test(decoded)) {
+    const byId = themes.find((theme) => theme.id.toLowerCase() === lowerDecoded);
+    if (byId) return byId;
+  }
+
   return (
-    themes.find((theme) => theme.id === decoded) ??
     themes.find((theme) => theme.slug?.toLowerCase() === lowerDecoded) ??
     themes.find((theme) => normalizeThemeKey(theme.title) === normalized) ??
     null
   );
 }
 
-export function resourceBelongsToTheme(resource: ResourceWithTheme, theme: Theme | null): boolean {
-  if (!theme) return true;
-
-  if (resource.theme_id?.toLowerCase() === theme.id.toLowerCase()) {
-    return true;
+/** Resolves theme id from URL param, router state, or legacy title/slug strings. */
+export function resolveThemeId(
+  param: string | null,
+  stateThemeId: string | null | undefined,
+  themes: Theme[]
+): string | null {
+  if (stateThemeId && UUID_REGEX.test(stateThemeId)) {
+    const fromState = themes.find((t) => t.id.toLowerCase() === stateThemeId.toLowerCase());
+    if (fromState) return fromState.id;
+    if (themes.length === 0) return stateThemeId;
   }
 
-  const joinedTheme = resource.theme as { title?: string; slug?: string } | null | undefined;
-  if (joinedTheme?.slug && joinedTheme.slug.toLowerCase() === theme.slug.toLowerCase()) {
-    return true;
-  }
+  const fromParam = resolveThemeFromParam(param, themes);
+  return fromParam?.id ?? null;
+}
 
-  if (joinedTheme?.title && normalizeThemeKey(joinedTheme.title) === normalizeThemeKey(theme.title)) {
-    return true;
-  }
-
-  return false;
+export function resourceMatchesThemeId(
+  resource: ResourceWithTheme,
+  themeId: string | null
+): boolean {
+  if (!themeId) return true;
+  if (!resource.theme_id) return false;
+  return resource.theme_id.toLowerCase() === themeId.toLowerCase();
 }
 
 export function themeToSearchParam(theme: Theme): string {

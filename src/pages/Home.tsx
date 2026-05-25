@@ -102,7 +102,11 @@ export default function Home() {
             return (
               <button
                 key={theme.id}
-                onClick={() => navigate(`/resources?themeId=${theme.id}`)}
+                onClick={() =>
+                  navigate(`/resources?themeId=${theme.id}`, {
+                    state: { themeId: theme.id },
+                  })
+                }
                 className="bg-slate-800/20 backdrop-blur-sm p-6 rounded-[2rem] border border-slate-700/30 text-left hover:border-brand-orange/50 hover:bg-slate-800/40 transition-all group flex items-center gap-5"
               >
                 <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-500 group-hover:text-brand-orange-400 transition-colors shrink-0">

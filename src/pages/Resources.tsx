@@ -1,35 +1,51 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { Search, ChevronRight, ChevronLeft, LayoutGrid } from 'lucide-react';
 import ResourceCard from '../components/ResourceCard';
 import { useThemes } from '../hooks/useThemes';
 import { useResources } from '../hooks/useResources';
-import { resolveThemeFromParam, resourceBelongsToTheme } from '../utils/themeNavigation';
+import { resolveThemeId, resourceMatchesThemeId } from '../utils/themeNavigation';
+
+type ResourcesLocationState = { themeId?: string } | null;
 
 export default function Resources() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const locationState = location.state as ResourcesLocationState;
   const themeIdParam = searchParams.get('themeId');
   const themeParam = searchParams.get('theme');
   const activeThemeParam = themeIdParam ?? themeParam;
+
   const { themes, loading: themesLoading } = useThemes();
-  const { resources, loading: resourcesLoading } = useResources();
+  const { resources, loading: resourcesLoading, error: resourcesError, refetch } = useResources();
   const [searchTerm, setSearchTerm] = useState('');
-  const loading = themesLoading || resourcesLoading;
+
+  const selectedThemeId = useMemo(
+    () => resolveThemeId(activeThemeParam, locationState?.themeId, themes),
+    [activeThemeParam, locationState?.themeId, themes]
+  );
 
   const selectedTheme = useMemo(
-    () => resolveThemeFromParam(activeThemeParam, themes),
-    [activeThemeParam, themes]
+    () => (selectedThemeId ? themes.find((t) => t.id === selectedThemeId) ?? null : null),
+    [selectedThemeId, themes]
   );
-  const selectedThemeId = selectedTheme?.id ?? null;
+
+  const waitingForThemeResolution =
+    Boolean(activeThemeParam) && themesLoading && !selectedThemeId;
+
+  const loading = themesLoading || resourcesLoading || waitingForThemeResolution;
+
+  useLayoutEffect(() => {
+    setSearchTerm('');
+  }, [activeThemeParam, locationState?.themeId]);
 
   useEffect(() => {
-    setSearchTerm('');
-  }, [activeThemeParam]);
+    if (!selectedThemeId || themeIdParam === selectedThemeId) return;
+    setSearchParams({ themeId: selectedThemeId }, { replace: true });
+  }, [selectedThemeId, themeIdParam, setSearchParams]);
 
-  // États pour la visibilité des flèches
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -53,15 +69,19 @@ export default function Resources() {
     }
   };
 
-  const currentIndex = themes.findIndex(t => t.id === selectedThemeId);
+  const currentIndex = themes.findIndex((t) => t.id === selectedThemeId);
   const prevTheme = currentIndex > 0 ? themes[currentIndex - 1] : null;
   const nextTheme = currentIndex < themes.length - 1 ? themes[currentIndex + 1] : null;
 
-  const filteredResources = resources.filter(res => {
-    const matchesSearch = res.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTheme = resourceBelongsToTheme(res, selectedTheme);
-    return matchesSearch && matchesTheme;
-  });
+  const filteredResources = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    return resources.filter((res) => {
+      const title = (res.title ?? '').toLowerCase();
+      const matchesSearch = !term || title.includes(term);
+      const matchesTheme = resourceMatchesThemeId(res, selectedThemeId);
+      return matchesSearch && matchesTheme;
+    });
+  }, [resources, searchTerm, selectedThemeId]);
 
   const handleThemeChange = (id: string | null) => {
     if (id) {
@@ -72,11 +92,19 @@ export default function Resources() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange"></div></div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange" />
+      </div>
+    );
+  }
+
+  const unknownThemeFilter =
+    Boolean(activeThemeParam) && themes.length > 0 && !selectedThemeId;
 
   return (
     <div className="page-light pb-32 text-left">
-      {/* HEADER FIXE */}
       <div className="bg-white pt-12 pb-6 px-4 border-b border-slate-100 sticky top-0 z-30 shadow-sm">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
@@ -96,9 +124,7 @@ export default function Resources() {
             </div>
           </div>
 
-          {/* BARRE DE THÈMES AVEC NAVIGATION ACTIVE */}
           <div className="relative flex items-center">
-            {/* Flèche Gauche */}
             {canScrollLeft && (
               <button
                 onClick={() => scroll('left')}
@@ -108,22 +134,24 @@ export default function Resources() {
               </button>
             )}
 
-            {/* Conteneur Scrollable avec masque de fondu */}
             <div
               ref={scrollRef}
               onScroll={checkScroll}
               className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth w-full px-2"
               style={{
-                maskImage: 'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)',
-                WebkitMaskImage: 'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)'
+                maskImage:
+                  'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)',
+                WebkitMaskImage:
+                  'linear-gradient(to right, transparent, black 40px, black calc(100% - 40px), transparent)',
               }}
             >
               <button
                 onClick={() => handleThemeChange(null)}
-                className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${!selectedThemeId
+                className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${
+                  !selectedThemeId
                     ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
-                  }`}
+                }`}
               >
                 Tout voir
               </button>
@@ -131,18 +159,18 @@ export default function Resources() {
                 <button
                   key={theme.id}
                   onClick={() => handleThemeChange(theme.id)}
-                  className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${selectedThemeId === theme.id
+                  className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${
+                    selectedThemeId === theme.id
                       ? 'bg-brand-orange text-white shadow-lg'
                       : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
-                    }`}
+                  }`}
                 >
                   {theme.title}
                 </button>
               ))}
-              <div className="min-w-[40px] h-4"></div>
+              <div className="min-w-[40px] h-4" />
             </div>
 
-            {/* Flèche Droite */}
             {canScrollRight && (
               <button
                 onClick={() => scroll('right')}
@@ -155,9 +183,34 @@ export default function Resources() {
         </div>
       </div>
 
-      {/* Reste du contenu (Ressources + Navigation Basse) inchangé */}
       <div className="max-w-6xl mx-auto px-4 py-12 text-left">
-        {filteredResources.length > 0 ? (
+        {resourcesError && (
+          <div className="mb-8 p-6 rounded-2xl bg-red-50 border border-red-100 text-center">
+            <h3 className="text-lg font-bold text-red-900 mb-2">Impossible de charger les ressources</h3>
+            <p className="text-sm text-red-700 mb-4">{resourcesError}</p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700"
+            >
+              Réessayer
+            </button>
+          </div>
+        )}
+
+        {unknownThemeFilter ? (
+          <div className="py-20 text-center">
+            <h3 className="text-xl font-bold text-slate-900">Thème introuvable</h3>
+            <p className="text-slate-500 mt-2">Le filtre demandé n&apos;existe pas ou n&apos;est plus disponible.</p>
+            <button
+              type="button"
+              onClick={() => handleThemeChange(null)}
+              className="mt-6 px-6 py-3 bg-brand-orange text-white rounded-xl font-bold text-sm"
+            >
+              Voir toutes les ressources
+            </button>
+          </div>
+        ) : filteredResources.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredResources.map((resource) => (
               <ResourceCard key={resource.id} resource={resource} />
@@ -166,29 +219,63 @@ export default function Resources() {
         ) : (
           <div className="py-20 text-center">
             <h3 className="text-xl font-bold text-slate-900">Aucune ressource trouvée</h3>
+            {selectedTheme && (
+              <p className="text-slate-500 mt-2">
+                Aucun contenu pour « {selectedTheme.title} » pour le moment.
+              </p>
+            )}
+            {resources.length === 0 && !resourcesError && (
+              <p className="text-slate-500 mt-2">La bibliothèque est vide ou en cours de chargement.</p>
+            )}
           </div>
         )}
 
-        {selectedThemeId && (
+        {selectedThemeId && !unknownThemeFilter && (
           <div className="mt-20 pt-12 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="w-full md:w-auto">
               {prevTheme ? (
-                <button onClick={() => handleThemeChange(prevTheme.id)} className="group flex items-center gap-4 text-left p-4 rounded-3xl hover:bg-white transition-all">
-                  <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-slate-200"><ChevronLeft size={24} /></div>
-                  <div><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Précédent</p><p className="font-bold text-slate-900">{prevTheme.title}</p></div>
+                <button
+                  onClick={() => handleThemeChange(prevTheme.id)}
+                  className="group flex items-center gap-4 text-left p-4 rounded-3xl hover:bg-white transition-all"
+                >
+                  <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-slate-200">
+                    <ChevronLeft size={24} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Précédent</p>
+                    <p className="font-bold text-slate-900">{prevTheme.title}</p>
+                  </div>
                 </button>
-              ) : <div className="invisible" />}
+              ) : (
+                <div className="invisible" />
+              )}
             </div>
             <div className="w-full md:w-auto flex justify-end">
               {nextTheme ? (
-                <button onClick={() => handleThemeChange(nextTheme.id)} className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all">
-                  <div className="text-right"><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Suivant</p><p className="font-bold text-slate-900">{nextTheme.title}</p></div>
-                  <div className="w-12 h-12 bg-brand-orange-50 rounded-2xl flex items-center justify-center text-brand-orange group-hover:bg-brand-orange group-hover:text-white transition-all"><ChevronRight size={24} /></div>
+                <button
+                  onClick={() => handleThemeChange(nextTheme.id)}
+                  className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all"
+                >
+                  <div className="text-right">
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Suivant</p>
+                    <p className="font-bold text-slate-900">{nextTheme.title}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-brand-orange-50 rounded-2xl flex items-center justify-center text-brand-orange group-hover:bg-brand-orange group-hover:text-white transition-all">
+                    <ChevronRight size={24} />
+                  </div>
                 </button>
               ) : (
-                <button onClick={() => handleThemeChange(null)} className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all">
-                  <div className="text-right"><p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Fin du parcours</p><p className="font-bold text-slate-900">Tout voir</p></div>
-                  <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white"><LayoutGrid size={24} /></div>
+                <button
+                  onClick={() => handleThemeChange(null)}
+                  className="group flex items-center gap-4 text-right p-4 rounded-3xl hover:bg-white transition-all"
+                >
+                  <div className="text-right">
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Fin du parcours</p>
+                    <p className="font-bold text-slate-900">Tout voir</p>
+                  </div>
+                  <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white">
+                    <LayoutGrid size={24} />
+                  </div>
                 </button>
               )}
             </div>

@@ -20,11 +20,20 @@ export async function fetchThemes(): Promise<Theme[]> {
 }
 
 export async function fetchResources(): Promise<ResourceWithTheme[]> {
-  const { data, error } = await supabase
+  const withSlug = await supabase
     .from('resources')
     .select('*, theme:themes(title, slug)')
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
-  return (data ?? []) as ResourceWithTheme[];
+  if (!withSlug.error) {
+    return (withSlug.data ?? []) as ResourceWithTheme[];
+  }
+
+  const fallback = await supabase
+    .from('resources')
+    .select('*, theme:themes(title)')
+    .order('created_at', { ascending: false });
+
+  if (fallback.error) throw fallback.error;
+  return (fallback.data ?? []) as ResourceWithTheme[];
 }
