@@ -137,8 +137,9 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Action | Effort | Statut |
 |--------|--------|--------|
 | `npm audit fix` | 0,5 j | **Fait** (`53e01e2`) |
-| Supprimer Edge Function `admin-contact-messages` (doublon RPC) | 0,5 h | **Fait** (repo) — retirer du dashboard Supabase si encore listée |
-| Retirer secret `OPENAI_API_KEY` si plus utilisé | 5 min | À faire |
+| Supprimer Edge Function `admin-contact-messages` (doublon RPC) | 0,5 h | **Fait** (repo `cab9221`) — absente du dashboard (vérif. CLI mai 2026) |
+| Nettoyer fonctions obsolètes Supabase (`chat-assistant`, etc.) | 5 min | **Fait** — prod : 3 fonctions actives uniquement (vérif. CLI) |
+| Secret IA | — | **OK** — prod : `ANTHROPIC_API_KEY` uniquement (`generate-analysis`, `explain-keyword`). Pas de `OPENAI_API_KEY` côté Supabase. |
 
 ### Intermédiaire
 
@@ -163,7 +164,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 |-----------|--------|--------|
 | Sécurité | RLS CMS / storage | **Fait** |
 | Sécurité | Stripe / entreprise | **Retiré** |
-| Sécurité | Chatbot / chat-assistant | **Retiré** |
+| Sécurité | Chatbot / chat-assistant | **Retiré** (repo + dashboard) |
 | Sécurité | Anti-spam + submit-contact | **Fait** |
 | Sécurité | CORS + rate limit IA | **Fait** (partiel) |
 | Sécurité | Headers Vercel | **Fait** |
@@ -189,9 +190,10 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | `submit-contact` | Oui | Oui — formulaire contact |
 | `generate-analysis` | Oui | Oui — résultats quiz |
 | `explain-keyword` | Oui | Oui — tags ressources |
-| `admin-contact-messages` | **Supprimée du repo** | Non — admin via RPC (`admin_list_contact_messages`, etc.) |
-| `chat-assistant` | À supprimer du dashboard | Non — retiré du repo |
-| `send-contact-email` | Non | Supprimée (logique dans `submit-contact` + Resend) |
+| `admin-contact-messages` | **Non** (repo + dashboard) | Non — admin via RPC (`admin_list_contact_messages`, etc.) |
+| `chat-assistant` | **Non** (repo + dashboard) | Non — retiré |
+| `generate-diagnostic-report` | **Non** | Non — retiré |
+| `send-contact-email` | **Non** | Supprimée (logique dans `submit-contact` + Resend) |
 
 **Secrets Edge Functions**
 
@@ -236,6 +238,8 @@ flowchart LR
 | `b79f371` | Fix boucle déconnexion admin |
 | `4e6fb2c` | Messages admin via RPC (plus Edge Function côté front) |
 | `d4ce274` | `supabase/.temp/` ignoré par git |
+| `53e01e2` | `npm audit fix`, Vite 6.4.2, 0 vulnérabilité npm |
+| `cab9221` | Suppression `admin-contact-messages` + `adminAuth` (RPC seul) |
 
 **Migrations clés :** `20260525120000`, `20260525140000`, `20260525180000`, `20260525190000`, `20260525200000`
 
@@ -244,5 +248,6 @@ flowchart LR
 ## Prochaines étapes suggérées
 
 1. Vérifier en prod : contact (email + ligne BDD), admin Messages, quiz + analyse IA.
-2. Supprimer dans le dashboard Supabase les fonctions retirées du repo : `chat-assistant`, `admin-contact-messages` (si encore listées).
-3. Choisir la suite : accessibilité, `ProgressContext`, ou design system — selon priorité produit.
+2. Choisir la suite : accessibilité, `ProgressContext`, ou design system — selon priorité produit.
+
+**Edge Functions en prod (project-ref `bzxzxzmxiqvnhmlcwqre`, mai 2026) :** `submit-contact`, `generate-analysis`, `explain-keyword` uniquement.

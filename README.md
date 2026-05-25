@@ -67,9 +67,8 @@ Après la migration `20260525120000_harden_rls_single_admin.sql`, le CMS n’acc
 - Espace entreprise multi-utilisateurs (`companies`, invitations)
 - Paiements Stripe / abonnements in-app
 
-Sur Supabase Dashboard → **Edge Functions**, supprimer les fonctions obsolètes **`chat-assistant`** et **`generate-diagnostic-report`** si elles sont encore listées.
+**Edge Functions en production** (project-ref `bzxzxzmxiqvnhmlcwqre`) — uniquement :
 
-Edge Functions actives :
 
 | Fonction | Rôle |
 |----------|------|
