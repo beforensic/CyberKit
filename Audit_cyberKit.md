@@ -1,6 +1,6 @@
 # Audit CyberKit — État au 25 mai 2026 (mise à jour)
 
-Document de suivi : audit initial, durcissement sécurité, contact / Resend, admin messages, retrait chatbot, a11y, progression ressources, durcissement IA (S1), typage admin (A2).
+Document de suivi : audit initial, durcissement sécurité, contact / Resend, admin messages, retrait chatbot, a11y, progression ressources, durcissement IA (S1), typage admin (A2), charte `DESIGN.md`.
 
 **Projet :** application gratuite de sensibilisation cybersécurité (indépendants & TPE belges)  
 **Stack :** React 18, Vite 6, Tailwind, Supabase, Vercel  
@@ -31,9 +31,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 **Fragilités restantes**
 
 - Double thème dark (accueil, quiz) / light (ressources, contact) — assumé ou à documenter
-- Alerte budget **Anthropic** (action manuelle console, clé `SecuriCoach-Prod`)
-
-**Maturité globale :** bonne pour un outil pédagogique ; sécurité et contact **nettement renforcés** ; dette limitée au polish charte (dark/light, design system optionnel).
+**Maturité globale :** bonne pour un outil pédagogique ; sécurité et contact **nettement renforcés** ; dette limitée au design system optionnel (`src/ui/`).
 
 ---
 
@@ -109,9 +107,9 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 
 | Sujet | Recommandation |
 |-------|----------------|
-| Dark vs light par route | Documenter le choix « marketing / lecture » ou unifier |
-| Rayons variables | Mini design system (`Button`, `Card`) optionnel |
-| `DESIGN.md` | Palette + 2 modes de page |
+| Dark vs light par route | **Documenté** — `DESIGN.md` (choix assumé, pas d’unification) |
+| Rayons variables | Mini design system (`Button`, `Card`) optionnel — voir `DESIGN.md` §3 |
+| `DESIGN.md` | **Fait** — palette, modes, checklist nouvelle page |
 
 ---
 
@@ -139,9 +137,9 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 
 | Action | Effort | Statut |
 |--------|--------|--------|
-| Design system minimal (`src/ui/`) | 3–5 j | À faire |
-| Documenter ou unifier dark/light | 3–5 j | À faire |
-| Plafond dépense Anthropic + suivi clé `SecuriCoach-Prod` | 15 min | Action manuelle console |
+| Design system minimal (`src/ui/`) | 3–5 j | À faire (optionnel) |
+| Documenter dark/light (`DESIGN.md`) | 0,5 j | **Fait** (mai 2026) |
+| Plafond dépense Anthropic + suivi clé `SecuriCoach-Prod` | 15 min | **Fait** (validé ops) |
 
 ---
 
@@ -167,10 +165,11 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Architecture | `admin-contact-messages` Edge | **Supprimée** (RPC seul) |
 | Architecture | ProgressContext | **Fait** (localStorage) |
 | A11y | ARIA / clavier (base) | **Fait** |
-| Charte | Dark/light | **À documenter** |
-| Typage | Admin / typecheck (A2) | **Fait** |
+| Charte | Dark/light | **Documenté** (`DESIGN.md`) |
+| Charte | `DESIGN.md` | **Fait** |
+| Typage | Admin / typecheck (A2) | **Fait** (`a361ee9`) |
 | Ops | Vérif prod (contact, admin, quiz, IA) | **Fait** |
-| Ops | Budget Anthropic | **À configurer** (console) |
+| Ops | Budget Anthropic | **Fait** (plafond configuré) |
 
 ---
 
@@ -235,7 +234,9 @@ flowchart LR
 | `b825314` | Accessibilité de base (nav, quiz, contact, ressources, tooltips) |
 | `0af5950` | Persistance `ProgressContext` (localStorage) |
 | `c275fec` | Durcissement IA S1 (JWT, CORS, rate limits, `aiAccess.ts`) |
-| — (mai 2026) | Typage admin (A2) : `ResourceKind`, suppression `any`, `typecheck` vert |
+| `a361ee9` | Typage admin (A2) : `ResourceKind`, suppression `any`, `typecheck` vert |
+| — (mai 2026) | `DESIGN.md` : charte, modes page-dark / page-light, checklist |
+| — (mai 2026) | Plafond Anthropic `SecuriCoach-Prod` validé (ops) |
 
 **Migrations clés :** `20260525120000`, `20260525140000`, `20260525180000`, `20260525190000`, `20260525200000`
 
@@ -243,9 +244,9 @@ flowchart LR
 
 ## Prochaines étapes suggérées
 
-1. Console Anthropic : spend limit + suivi Usage/Cost sur la clé **`SecuriCoach-Prod`**.
-2. Choisir la suite produit : **design system** (`src/ui/`) ou **documentation dark/light** (`DESIGN.md`).
+1. **Optionnel — design system** (`src/ui/`) : `Button` + `Card` avec rayons unifiés — seulement si plusieurs écrans sont refondus en même temps (voir `DESIGN.md` §6).
+2. **Produit / contenu** : enrichir ressources, quiz ou messages admin selon besoins métier (hors dette technique audit).
 
-**Validé (ne plus traiter comme ouvert) :** vérif prod (contact, admin Messages, quiz + analyse IA, infobulles) ; typage admin / `npm run typecheck` (A2).
+**Validé (ne plus traiter comme ouvert) :** vérif prod ; typage admin (A2) ; plafond Anthropic ; documentation charte (`DESIGN.md`, modes dark/light).
 
 **Edge Functions en prod (project-ref `bzxzxzmxiqvnhmlcwqre`, mai 2026) :** `submit-contact`, `generate-analysis`, `explain-keyword` uniquement.
