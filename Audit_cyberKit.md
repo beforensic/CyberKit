@@ -27,7 +27,6 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 
 **Fragilités restantes**
 
-- `ProgressContext` non persisté (perdu au refresh)
 - Double thème dark (accueil, quiz) / light (ressources, contact) — assumé ou à documenter
 
 **Maturité globale :** bonne pour un outil pédagogique ; sécurité et contact **nettement renforcés** ; dette limitée à UX secondaire et polish.
@@ -99,8 +98,8 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 #### A1 — Progression ressources
 
 | Fichier | `src/contexts/ProgressContext.tsx` |
-| Impact | État perdu au refresh |
-| Recommandation | `localStorage` si le parcours ressources est prioritaire |
+| Impact | — |
+| Statut | **Fait** — `localStorage` (`cyberkit_consulted_resources`), badge « Consulté », compteur bibliothèque |
 
 #### A2 — Typage
 
@@ -145,7 +144,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Action | Effort |
 |--------|--------|
 | Accessibilité de base | 1–2 j | **Fait** (base : nav, quiz, contact, ressources, tooltips) |
-| Persistance `ProgressContext` | 0,5 j |
+| Persistance `ProgressContext` | 0,5 j | **Fait** |
 | Renforcer plafonds IA ou auth optionnelle | 1 j |
 
 ### Long terme
@@ -176,7 +175,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Charte | emerald → orange | **Fait** (écrans principaux) |
 | Architecture | ChatBot / ExportProject | **Supprimés** |
 | Architecture | `admin-contact-messages` Edge | **Supprimée** (RPC seul) |
-| Architecture | ProgressContext | **À faire** |
+| Architecture | ProgressContext | **Fait** (localStorage) |
 | Charte | Dark/light | **À documenter** |
 | A11y | ARIA / clavier (base) | **Fait** |
 
@@ -247,6 +246,6 @@ flowchart LR
 ## Prochaines étapes suggérées
 
 1. Vérifier en prod : contact (email + ligne BDD), admin Messages, quiz + analyse IA.
-2. Choisir la suite : `ProgressContext`, design system, ou durcissement IA (S1) — selon priorité produit.
+2. Choisir la suite : design system, ou durcissement IA (S1) — selon priorité produit.
 
 **Edge Functions en prod (project-ref `bzxzxzmxiqvnhmlcwqre`, mai 2026) :** `submit-contact`, `generate-analysis`, `explain-keyword` uniquement.

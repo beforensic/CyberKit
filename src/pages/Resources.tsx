@@ -6,6 +6,7 @@ import { useThemes } from '../hooks/useThemes';
 import { useResources } from '../hooks/useResources';
 import { resolveThemeId, resourceMatchesThemeId } from '../utils/themeNavigation';
 import ContactCtaBanner from '../components/ContactCtaBanner';
+import { useProgress } from '../contexts/ProgressContext';
 
 type ResourcesLocationState = { themeId?: string } | null;
 
@@ -19,6 +20,8 @@ export default function Resources() {
 
   const { themes, loading: themesLoading } = useThemes();
   const { resources, loading: resourcesLoading, error: resourcesError, refetch } = useResources();
+  const { getConsultedCount } = useProgress();
+  const consultedCount = getConsultedCount();
   const [searchTerm, setSearchTerm] = useState('');
 
   const selectedThemeId = useMemo(
@@ -121,6 +124,13 @@ export default function Resources() {
             <div>
               <h1 className="text-3xl font-black text-slate-900 tracking-tighter">Bibliothèque</h1>
               <p className="text-slate-500 text-sm font-medium">Vos outils pour une sécurité maximale</p>
+              {consultedCount > 0 && (
+                <p className="text-brand-orange text-sm font-bold mt-1" aria-live="polite">
+                  {consultedCount} ressource{consultedCount > 1 ? 's' : ''} consultée
+                  {consultedCount > 1 ? 's' : ''}
+                  {resources.length > 0 ? ` · ${resources.length} au catalogue` : ''}
+                </p>
+              )}
             </div>
             <div className="relative max-w-md w-full">
               <label htmlFor="resource-search" className="sr-only">

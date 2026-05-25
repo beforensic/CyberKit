@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState, ReactNode } from 'react';
+import { getConsultedResourceIds, saveConsultedResourceIds } from '../utils/storage';
 
 interface ProgressContextType {
   consultedResources: Set<string>;
@@ -9,20 +10,37 @@ interface ProgressContextType {
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
 
+function loadConsultedSet(): Set<string> {
+  return new Set(getConsultedResourceIds());
+}
+
 export const ProgressProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [consultedResources, setConsultedResources] = useState<Set<string>>(new Set());
+  const [consultedResources, setConsultedResources] = useState<Set<string>>(loadConsultedSet);
 
-  const markAsConsulted = (resourceId: string) => {
-    setConsultedResources(prev => new Set(prev).add(resourceId));
-  };
+  useEffect(() => {
+    const syncFromStorage = () => setConsultedResources(loadConsultedSet());
+    window.addEventListener('progressUpdated', syncFromStorage);
+    return () => window.removeEventListener('progressUpdated', syncFromStorage);
+  }, []);
 
-  const isConsulted = (resourceId: string) => {
-    return consultedResources.has(resourceId);
-  };
+  const markAsConsulted = useCallback((resourceId: string) => {
+    setConsultedResources((prev) => {
+      if (prev.has(resourceId)) return prev;
+      const next = new Set(prev).add(resourceId);
+      saveConsultedResourceIds(Array.from(next));
+      return next;
+    });
+  }, []);
 
-  const getConsultedCount = () => {
-    return consultedResources.size;
-  };
+  const isConsulted = useCallback(
+    (resourceId: string) => consultedResources.has(resourceId),
+    [consultedResources],
+  );
+
+  const getConsultedCount = useCallback(
+    () => consultedResources.size,
+    [consultedResources],
+  );
 
   return (
     <ProgressContext.Provider value={{ consultedResources, markAsConsulted, isConsulted, getConsultedCount }}>

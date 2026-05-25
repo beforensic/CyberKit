@@ -1,9 +1,10 @@
-import { BookOpen, Download, ExternalLink, FileText, Headphones, Image as ImageIcon, MessageCircle } from 'lucide-react';
+import { BookOpen, Download, ExternalLink, FileText, Headphones, Image as ImageIcon, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Resource } from '../lib/supabase';
 import { toggleFavorite, getFavorites } from '../utils/storage';
 import { useState, useEffect } from 'react';
 import KeywordTooltip from './KeywordTooltip';
+import { useProgress } from '../contexts/ProgressContext';
 
 interface ResourceCardProps {
   resource: Resource & { theme?: { title: string } };
@@ -21,7 +22,9 @@ const TYPE_LABELS: Record<string, string> = {
 
 export default function ResourceCard({ resource }: ResourceCardProps) {
   const navigate = useNavigate();
+  const { markAsConsulted, isConsulted } = useProgress();
   const [isFavorite, setIsFavorite] = useState(false);
+  const consulted = isConsulted(resource.id);
 
   useEffect(() => {
     const favorites = getFavorites();
@@ -67,10 +70,16 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
 
       <div className="flex-1">
         {/* Affichage du TYPE et du THÈME */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
           <span className="px-3 py-1 bg-brand-orange-50 text-brand-orange rounded-full text-[10px] font-black uppercase tracking-widest border border-brand-orange-100">
             {TYPE_LABELS[resource.type || ''] || 'Ressource'}
           </span>
+          {consulted && (
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100">
+              <CheckCircle2 size={12} aria-hidden="true" />
+              Consulté
+            </span>
+          )}
           {resource.theme?.title && (
             <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
               • {resource.theme.title}
@@ -103,6 +112,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
           href={resource.url}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => markAsConsulted(resource.id)}
           className="focus-ring w-full py-4 bg-white border-2 border-brand-orange text-brand-orange rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-brand-orange hover:text-white transition-all shadow-sm"
         >
           {resource.type === 'link' ? <ExternalLink size={18} aria-hidden="true" /> : <Download size={18} aria-hidden="true" />}

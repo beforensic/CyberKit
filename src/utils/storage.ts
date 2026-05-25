@@ -6,6 +6,7 @@
 const SCORE_KEY = 'cyberkit_last_score';
 const FAVORITES_KEY = 'cyberkit_favorites';
 const INTEREST_KEY = 'cyberkit_theme_interest';
+const CONSULTED_KEY = 'cyberkit_consulted_resources';
 
 // --- GESTION DU SCORE (QUIZ) ---
 
@@ -70,4 +71,28 @@ export const saveThemeInterest = (theme: string) => {
 
 export const getThemeInterest = (): string | null => {
   return localStorage.getItem(INTEREST_KEY);
+};
+
+// --- PROGRESSION RESSOURCES CONSULTÉES ---
+
+export const getConsultedResourceIds = (): string[] => {
+  try {
+    const stored = localStorage.getItem(CONSULTED_KEY);
+    if (!stored) return [];
+    const parsed: unknown = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((id): id is string => typeof id === 'string' && id.length > 0);
+  } catch (error) {
+    console.error('Erreur lecture progression ressources:', error);
+    return [];
+  }
+};
+
+export const saveConsultedResourceIds = (ids: string[]) => {
+  try {
+    localStorage.setItem(CONSULTED_KEY, JSON.stringify(ids));
+    window.dispatchEvent(new Event('progressUpdated'));
+  } catch (error) {
+    console.error('Erreur sauvegarde progression ressources:', error);
+  }
 };
