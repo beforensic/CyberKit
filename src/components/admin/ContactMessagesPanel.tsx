@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import {
   Mail, Loader, Search, Inbox, MessageCircle,
-  ExternalLink, RefreshCw,
+  ExternalLink, RefreshCw, Trash2, Archive, ArchiveRestore,
 } from 'lucide-react';
 
 export interface ContactMessage {
@@ -14,10 +14,12 @@ export interface ContactMessage {
   quiz_score: number | null;
   theme_interest: string | null;
   created_at: string;
+  archived_at: string | null;
   status: 'new' | 'read' | 'replied';
 }
 
 type StatusFilter = 'all' | ContactMessage['status'];
+type InboxView = 'active' | 'archived';
 
 const STATUS_LABELS: Record<ContactMessage['status'], string> = {
   new: 'Nouveau',
@@ -37,7 +39,9 @@ function normalizeMessage(row: Record<string, unknown>): ContactMessage {
   const status = VALID_STATUS.has(row.status as ContactMessage['status'])
     ? (row.status as ContactMessage['status'])
     : 'new';
-  return { ...row, status } as ContactMessage;
+  const archivedAt =
+    typeof row.archived_at === 'string' ? row.archived_at : null;
+  return { ...row, status, archived_at: archivedAt } as ContactMessage;
 }
 
 function formatDate(iso: string) {
@@ -50,14 +54,30 @@ function formatDate(iso: string) {
   });
 }
 
-export default function ContactMessagesPanel() {
+interface ContactMessagesPanelProps {
+  onMessageCountChange?: (newCount: number) => void;
+}
+
+export default function ContactMessagesPanel({
+  onMessageCountChange,
+}: ContactMessagesPanelProps) {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [inboxView, setInboxView] = useState<InboxView>('active');
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [updating, setUpdating] = useState(false);
+  const [mutating, setMutating] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+
+  const notifyNewCount = useCallback(
+    (rows: ContactMessage[]) => {
+      onMessageCountChange?.(
+        rows.filter(m => m.status === 'new' && !m.archived_at).length,
+      );
+    },
+    [onMessageCountChange],
+  );
 
   const loadMessages = useCallback(async () => {
     try {
@@ -66,6 +86,7 @@ export default function ContactMessagesPanel() {
 
       const { data: rpcData, error: rpcError } = await supabase.rpc(
         'admin_list_contact_messages',
+        { p_archived: inboxView === 'archived' },
       );
 
       if (rpcError) throw rpcError;
@@ -79,7 +100,7 @@ export default function ContactMessagesPanel() {
         const role =
           session?.user?.app_metadata?.role ??
           session?.user?.user_metadata?.role;
-        if (role !== 'admin') {
+        if (role !== 'admin' && inboxView === 'active') {
           setLoadError(
             'Compte sans rôle admin. Exécutez grant_cyberkit_admin.sql avec votre email, puis déconnectez-vous et reconnectez-vous sur /admin.',
           );
@@ -89,7 +110,13 @@ export default function ContactMessagesPanel() {
       }
 
       setMessages(rows);
-      setSelectedId(prev => prev ?? rows[0]?.id ?? null);
+      if (inboxView === 'active') {
+        notifyNewCount(rows);
+      }
+      setSelectedId(prev => {
+        if (prev && rows.some(m => m.id === prev)) return prev;
+        return rows[0]?.id ?? null;
+      });
     } catch (err) {
       console.error('Erreur chargement messages:', err);
       const msg = err instanceof Error ? err.message : 'Erreur inconnue';
@@ -100,15 +127,82 @@ export default function ContactMessagesPanel() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [inboxView, notifyNewCount]);
 
   useEffect(() => {
     loadMessages();
   }, [loadMessages]);
 
+  const removeFromList = (id: string) => {
+    setMessages(prev => {
+      const next = prev.filter(m => m.id !== id);
+      if (inboxView === 'active') notifyNewCount(next);
+      return next;
+    });
+    setSelectedId(current => (current === id ? null : current));
+  };
+
+  const handleArchive = async (id: string) => {
+    if (!confirm('Archiver ce message ? Il restera en base mais hors de la boîte active.')) {
+      return;
+    }
+    try {
+      setMutating(true);
+      const { error } = await supabase.rpc('admin_archive_contact_message', {
+        p_message_id: id,
+      });
+      if (error) throw error;
+      removeFromList(id);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur inconnue';
+      alert('Archivage impossible : ' + msg);
+    } finally {
+      setMutating(false);
+    }
+  };
+
+  const handleUnarchive = async (id: string) => {
+    try {
+      setMutating(true);
+      const { error } = await supabase.rpc('admin_unarchive_contact_message', {
+        p_message_id: id,
+      });
+      if (error) throw error;
+      removeFromList(id);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur inconnue';
+      alert('Restauration impossible : ' + msg);
+    } finally {
+      setMutating(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (
+      !confirm(
+        'Supprimer définitivement ce message archivé ? Cette action est irréversible.',
+      )
+    ) {
+      return;
+    }
+    try {
+      setMutating(true);
+      const { error } = await supabase.rpc('admin_delete_contact_message', {
+        p_message_id: id,
+      });
+      if (error) throw error;
+      removeFromList(id);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur inconnue';
+      alert('Suppression impossible : ' + msg);
+    } finally {
+      setMutating(false);
+    }
+  };
+
   const updateStatus = async (id: string, status: ContactMessage['status']) => {
     try {
-      setUpdating(true);
+      setMutating(true);
       const { error } = await supabase.rpc(
         'admin_update_contact_message_status',
         { p_message_id: id, p_status: status },
@@ -116,14 +210,16 @@ export default function ContactMessagesPanel() {
 
       if (error) throw error;
 
-      setMessages(prev =>
-        prev.map(m => (m.id === id ? { ...m, status } : m)),
-      );
+      setMessages(prev => {
+        const next = prev.map(m => (m.id === id ? { ...m, status } : m));
+        notifyNewCount(next);
+        return next;
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur inconnue';
       alert('Mise à jour impossible : ' + msg);
     } finally {
-      setUpdating(false);
+      setMutating(false);
     }
   };
 
@@ -141,6 +237,7 @@ export default function ContactMessagesPanel() {
 
   const selected = messages.find(m => m.id === selectedId) ?? filtered[0] ?? null;
   const newCount = messages.filter(m => m.status === 'new').length;
+  const isArchivedView = inboxView === 'archived';
 
   if (loading) {
     return (
@@ -157,7 +254,9 @@ export default function ContactMessagesPanel() {
           <Inbox className="w-5 h-5 text-brand-orange" />
           <span className="font-bold text-slate-700">
             {messages.length} message{messages.length !== 1 ? 's' : ''}
-            {newCount > 0 && (
+            {isArchivedView ? ' archivé' : ''}
+            {messages.length !== 1 && isArchivedView ? 's' : ''}
+            {!isArchivedView && newCount > 0 && (
               <span className="ml-2 text-xs font-black px-2 py-0.5 rounded-full bg-brand-orange text-white">
                 {newCount} nouveau{newCount > 1 ? 'x' : ''}
               </span>
@@ -173,6 +272,39 @@ export default function ContactMessagesPanel() {
         </button>
       </div>
 
+      <div className="px-6 pt-4 flex gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            setInboxView('active');
+            setStatusFilter('all');
+            setSelectedId(null);
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
+            inboxView === 'active'
+              ? 'bg-brand-orange text-white'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          Boîte active
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setInboxView('archived');
+            setStatusFilter('all');
+            setSelectedId(null);
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
+            inboxView === 'archived'
+              ? 'bg-slate-700 text-white'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          Archivés
+        </button>
+      </div>
+
       <div className="p-6 border-b border-slate-100 flex flex-col lg:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
@@ -184,16 +316,18 @@ export default function ContactMessagesPanel() {
             className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 font-medium text-sm"
           />
         </div>
-        <select
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value as StatusFilter)}
-          className="bg-slate-50 border-none px-5 py-3 rounded-2xl text-sm font-bold text-slate-600 cursor-pointer"
-        >
-          <option value="all">Tous les statuts</option>
-          <option value="new">Nouveaux</option>
-          <option value="read">Lus</option>
-          <option value="replied">Répondus</option>
-        </select>
+        {!isArchivedView && (
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value as StatusFilter)}
+            className="bg-slate-50 border-none px-5 py-3 rounded-2xl text-sm font-bold text-slate-600 cursor-pointer"
+          >
+            <option value="all">Tous les statuts</option>
+            <option value="new">Nouveaux</option>
+            <option value="read">Lus</option>
+            <option value="replied">Répondus</option>
+          </select>
+        )}
       </div>
 
       {loadError ? (
@@ -207,7 +341,9 @@ export default function ContactMessagesPanel() {
           <Mail className="w-12 h-12 mb-4 opacity-30" />
           <p className="font-medium">
             {messages.length === 0
-              ? 'Aucun message en base.'
+              ? isArchivedView
+                ? 'Aucun message archivé.'
+                : 'Aucun message en base.'
               : 'Aucun message pour ce filtre.'}
           </p>
         </div>
@@ -229,15 +365,21 @@ export default function ContactMessagesPanel() {
                     <span className="font-bold text-slate-900 text-sm truncate">
                       {m.name}
                     </span>
-                    <span
-                      className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full border ${STATUS_STYLES[m.status]}`}
-                    >
-                      {STATUS_LABELS[m.status]}
-                    </span>
+                    {!isArchivedView && (
+                      <span
+                        className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full border ${STATUS_STYLES[m.status]}`}
+                      >
+                        {STATUS_LABELS[m.status]}
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-slate-500 truncate">{m.subject}</p>
                   <p className="text-[10px] text-slate-400 mt-1">
-                    {formatDate(m.created_at)}
+                    {formatDate(
+                      isArchivedView && m.archived_at
+                        ? m.archived_at
+                        : m.created_at,
+                    )}
                   </p>
                 </button>
               </li>
@@ -252,39 +394,81 @@ export default function ContactMessagesPanel() {
                     {selected.subject}
                   </h2>
                   <p className="text-sm text-slate-500">
-                    {formatDate(selected.created_at)}
+                    Reçu le {formatDate(selected.created_at)}
                   </p>
+                  {isArchivedView && selected.archived_at && (
+                    <p className="text-sm text-slate-400 mt-0.5">
+                      Archivé le {formatDate(selected.archived_at)}
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {selected.status !== 'read' && (
-                    <button
-                      type="button"
-                      disabled={updating}
-                      onClick={() => updateStatus(selected.id, 'read')}
-                      className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
-                    >
-                      Marquer lu
-                    </button>
+                  {!isArchivedView && (
+                    <>
+                      {selected.status !== 'read' && (
+                        <button
+                          type="button"
+                          disabled={mutating}
+                          onClick={() => updateStatus(selected.id, 'read')}
+                          className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+                        >
+                          Marquer lu
+                        </button>
+                      )}
+                      {selected.status !== 'replied' && (
+                        <button
+                          type="button"
+                          disabled={mutating}
+                          onClick={() => updateStatus(selected.id, 'replied')}
+                          className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-50"
+                        >
+                          Marquer répondu
+                        </button>
+                      )}
+                      {selected.status !== 'new' && (
+                        <button
+                          type="button"
+                          disabled={mutating}
+                          onClick={() => updateStatus(selected.id, 'new')}
+                          className="px-4 py-2 rounded-xl text-xs font-bold text-brand-orange hover:bg-brand-orange/10 disabled:opacity-50"
+                        >
+                          Nouveau
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        disabled={mutating}
+                        onClick={() => handleArchive(selected.id)}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-50"
+                        title="Archiver le message"
+                      >
+                        <Archive className="w-3.5 h-3.5" />
+                        Archiver
+                      </button>
+                    </>
                   )}
-                  {selected.status !== 'replied' && (
-                    <button
-                      type="button"
-                      disabled={updating}
-                      onClick={() => updateStatus(selected.id, 'replied')}
-                      className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-50"
-                    >
-                      Marquer répondu
-                    </button>
-                  )}
-                  {selected.status !== 'new' && (
-                    <button
-                      type="button"
-                      disabled={updating}
-                      onClick={() => updateStatus(selected.id, 'new')}
-                      className="px-4 py-2 rounded-xl text-xs font-bold text-brand-orange hover:bg-brand-orange/10 disabled:opacity-50"
-                    >
-                      Nouveau
-                    </button>
+                  {isArchivedView && (
+                    <>
+                      <button
+                        type="button"
+                        disabled={mutating}
+                        onClick={() => handleUnarchive(selected.id)}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+                      >
+                        <ArchiveRestore className="w-3.5 h-3.5" />
+                        Restaurer
+                      </button>
+                      <button
+                        type="button"
+                        disabled={mutating}
+                        onClick={() => handleDelete(selected.id)}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
+                        title="Suppression définitive (RGPD)"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Supprimer définitivement
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
@@ -331,12 +515,14 @@ export default function ContactMessagesPanel() {
                 </p>
               </div>
 
-              <a
-                href={`mailto:${selected.email}?subject=${encodeURIComponent(`Re: ${selected.subject}`)}&body=${encodeURIComponent(`Bonjour ${selected.name},\n\n`)}`}
-                className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-brand-orange text-white rounded-2xl font-bold text-sm hover:bg-brand-orange-600 transition-colors"
-              >
-                <Mail className="w-4 h-4" /> Répondre par email
-              </a>
+              {!isArchivedView && (
+                <a
+                  href={`mailto:${selected.email}?subject=${encodeURIComponent(`Re: ${selected.subject}`)}&body=${encodeURIComponent(`Bonjour ${selected.name},\n\n`)}`}
+                  className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-brand-orange text-white rounded-2xl font-bold text-sm hover:bg-brand-orange-600 transition-colors"
+                >
+                  <Mail className="w-4 h-4" /> Répondre par email
+                </a>
+              )}
             </div>
           )}
         </div>
@@ -345,13 +531,15 @@ export default function ContactMessagesPanel() {
   );
 }
 
-/** Nombre de messages « new » pour badge nav admin (optionnel). */
+/** Nombre de messages « new » actifs pour badge nav admin. */
 export async function fetchNewContactCount(): Promise<number> {
   try {
-    const { data, error } = await supabase.rpc('admin_list_contact_messages');
+    const { data, error } = await supabase.rpc('admin_list_contact_messages', {
+      p_archived: false,
+    });
     if (error) return 0;
-    const rows = (data as ContactMessage[]) ?? [];
-    return rows.filter(m => (m.status ?? 'new') === 'new').length;
+    const rows = ((data as Record<string, unknown>[]) ?? []).map(normalizeMessage);
+    return rows.filter(m => m.status === 'new').length;
   } catch {
     return 0;
   }

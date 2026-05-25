@@ -176,7 +176,9 @@ export default function Admin() {
 
           <div className="bg-white rounded-[3rem] shadow-sm border border-slate-200 overflow-hidden min-h-[600px]">
             {activeTab === 'stats' && <StatisticsPanel />}
-            {activeTab === 'messages' && <ContactMessagesPanel />}
+            {activeTab === 'messages' && (
+              <ContactMessagesPanel onMessageCountChange={setNewMessageCount} />
+            )}
             {activeTab === 'resources' && <ResourceList onEdit={(r) => { setEditingResource(r); setShowResourceForm(true); }} />}
             {activeTab === 'questions' && <QuestionList />}
             {activeTab === 'themes' && <ThemeList />}
