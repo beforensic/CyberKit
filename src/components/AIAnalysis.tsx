@@ -51,7 +51,7 @@ export default function AIAnalysis({ score, answers, profileName }: AIAnalysisPr
 
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-8">
-          <div className="bg-orange-500 p-3 rounded-2xl animate-pulse">
+          <div className="bg-brand-orange p-3 rounded-2xl animate-pulse">
             <Sparkles className="w-6 h-6 text-white" />
           </div>
           <h3 className="text-2xl font-black tracking-tight">Analyse Stratégique par IA</h3>
@@ -59,7 +59,7 @@ export default function AIAnalysis({ score, answers, profileName }: AIAnalysisPr
 
         {loading ? (
           <div className="flex flex-col items-center py-10 gap-4">
-            <Loader2 className="w-10 h-10 text-orange-500 animate-spin" />
+            <Loader2 className="w-10 h-10 text-brand-orange animate-spin" />
             <p className="text-slate-400 font-bold animate-pulse text-center">
               Génération de votre rapport personnalisé en cours...
             </p>
@@ -74,12 +74,12 @@ export default function AIAnalysis({ score, answers, profileName }: AIAnalysisPr
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
               <div className="bg-white/5 border border-white/10 p-6 rounded-3xl">
-                <ShieldCheck className="text-orange-500 mb-3" />
+                <ShieldCheck className="text-brand-orange mb-3" />
                 <h4 className="font-black text-sm uppercase tracking-wider mb-1">Point Fort</h4>
                 <p className="text-slate-400 text-sm">Votre conscience des risques est élevée.</p>
               </div>
               <div className="bg-white/5 border border-white/10 p-6 rounded-3xl">
-                <Zap className="text-orange-500 mb-3" />
+                <Zap className="text-brand-orange mb-3" />
                 <h4 className="font-black text-sm uppercase tracking-wider mb-1">Priorité</h4>
                 <p className="text-slate-400 text-sm">Action immédiate requise sur vos mots de passe.</p>
               </div>

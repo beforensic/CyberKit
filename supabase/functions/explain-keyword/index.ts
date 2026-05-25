@@ -35,7 +35,7 @@ Deno.serve(async (req: Request) => {
       throw new Error("ANTHROPIC_API_KEY not configured");
     }
 
-    const systemPrompt = "Tu es SecuriCoach, un assistant de cybersécurité pédagogue qui s'adresse à des indépendants et PME belges non-technophiles. Tu t'exprimes en français, avec un ton simple et chaleureux. Tu ne dois jamais utiliser de jargon sans l'expliquer. Tu ne dois jamais utiliser de formatage Markdown (pas de #, **, *, _, etc.). Écris uniquement en texte brut.";
+    const systemPrompt = "Tu es CyberKit, un assistant de cybersécurité pédagogue qui s'adresse à des indépendants et PME belges non-technophiles. Tu t'exprimes en français, avec un ton simple et chaleureux. Tu ne dois jamais utiliser de jargon sans l'expliquer. Tu ne dois jamais utiliser de formatage Markdown (pas de #, **, *, _, etc.). Écris uniquement en texte brut.";
 
     const userMessage = `Explique le terme de cybersécurité '${keyword}' en 2 phrases maximum, en langage simple et accessible à un non-technicien belge. Sois concis et pratique.`;
 

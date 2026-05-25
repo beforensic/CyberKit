@@ -89,7 +89,7 @@ Message :
 ${message}
 
 ---
-Envoyé depuis le formulaire de contact de SecuriCoach
+Envoyé depuis le formulaire de contact de CyberKit
 `.trim();
 
     const resendResponse = await fetch("https://api.resend.com/emails", {
@@ -99,9 +99,9 @@ Envoyé depuis le formulaire de contact de SecuriCoach
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "SecuriCoach Contact <noreply@updates.beforensic.be>",
+        from: "CyberKit Contact <noreply@updates.beforensic.be>",
         to: ["contact@beforensic.be"],
-        subject: `[SecuriCoach] Nouveau message de ${name} - ${subject}`,
+        subject: `[CyberKit] Nouveau message de ${name} - ${subject}`,
         text: emailBody,
       }),
     });

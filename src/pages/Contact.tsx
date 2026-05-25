@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, MapPin, Send, CheckCircle, AlertCircle, Phone, Home, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getScore, getThemeInterest } from '../utils/storage';
 import GoogleReview from '../components/GoogleReview';
 
-interface ContactProps {
-  onNavigate: (page: any) => void;
-  initialSubject?: string;
-}
-
-export default function Contact({ onNavigate, initialSubject }: ContactProps) {
+export default function Contact() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialSubject = searchParams.get('subject') || '';
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -65,7 +64,7 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
             Merci de votre confiance. Serge Houtain reviendra vers vous personnellement dans les plus brefs délais.
           </p>
           <button
-            onClick={() => onNavigate('home')}
+            onClick={() => navigate('/')}
             className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all"
           >
             Retour à l'accueil
@@ -76,7 +75,7 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-12 px-4 pb-32 text-left">
+    <div className="page-light py-12 px-4 pb-32 text-left">
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
@@ -90,7 +89,7 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
             <div className="space-y-8">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center shrink-0 border border-slate-100">
-                  <Mail className="w-6 h-6 text-[#E8650A]" />
+                  <Mail className="w-6 h-6 text-brand-orange" />
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900">Email direct</h3>
@@ -100,7 +99,7 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
 
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center shrink-0 border border-slate-100">
-                  <MapPin className="w-6 h-6 text-[#E8650A]" />
+                  <MapPin className="w-6 h-6 text-brand-orange" />
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900">Localisation</h3>
@@ -137,7 +136,7 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
                   type="text"
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all"
+                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all"
                   placeholder="Jean Dupont"
                 />
               </div>
@@ -151,7 +150,7 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
                   type="email"
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all"
+                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all"
                   placeholder="jean@exemple.be"
                 />
               </div>
@@ -165,7 +164,7 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
                   type="text"
                   value={formData.subject}
                   onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all"
+                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all"
                   placeholder="Comment sécuriser mes emails ?"
                 />
               </div>
@@ -177,7 +176,7 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
                   rows={4}
                   value={formData.message}
                   onChange={e => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all resize-none"
+                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all resize-none"
                   placeholder="Dites-nous en plus sur votre situation..."
                 />
               </div>
@@ -185,7 +184,7 @@ export default function Contact({ onNavigate, initialSubject }: ContactProps) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-5 bg-[#E8650A] text-white rounded-2xl font-bold text-lg hover:bg-orange-600 transition-all flex items-center justify-center gap-3 shadow-lg shadow-orange-500/20 disabled:opacity-50"
+                className="w-full py-5 bg-brand-orange text-white rounded-2xl font-bold text-lg hover:bg-brand-orange-600 transition-all flex items-center justify-center gap-3 shadow-lg shadow-brand-orange/20 disabled:opacity-50"
               >
                 {loading ? 'Envoi...' : (
                   <>

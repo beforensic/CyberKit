@@ -339,7 +339,7 @@ export default function KeywordManager() {
             <p className="text-sm text-gray-600 mt-1">
               {keywords.length} tag(s) au total
               {unusedCount > 0 && (
-                <span className="text-orange-600 font-semibold ml-2">
+                <span className="text-brand-orange-600 font-semibold ml-2">
                   • {unusedCount} inutilisé(s)
                 </span>
               )}
@@ -349,7 +349,7 @@ export default function KeywordManager() {
             <button
               onClick={handleDeleteUnused}
               disabled={processing}
-              className="flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-lg font-medium hover:bg-orange-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-orange-100 text-brand-orange-700 rounded-lg font-medium hover:bg-brand-orange-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Trash2 className="w-4 h-4" />
               Supprimer les tags inutilisés
@@ -385,7 +385,7 @@ export default function KeywordManager() {
               key={keyword.keyword}
               className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
                 keyword.usageCount === 0
-                  ? 'bg-orange-50 border-orange-200'
+                  ? 'bg-brand-orange-50 border-brand-orange-200'
                   : 'bg-gray-50 border-gray-200 hover:border-gray-300'
               }`}
             >
@@ -412,7 +412,7 @@ export default function KeywordManager() {
                       <span
                         className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
                           keyword.usageCount === 0
-                            ? 'bg-orange-200 text-orange-800'
+                            ? 'bg-brand-orange-200 text-brand-orange-800'
                             : 'bg-blue-100 text-blue-800'
                         }`}
                       >

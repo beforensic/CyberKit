@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import {
   LayoutDashboard, BookOpen, Settings, Plus,
@@ -15,7 +16,8 @@ import KeywordManager from '../components/admin/KeywordManager'; // Corrigé (au
 import StatisticsPanel from '../components/admin/StatisticsPanel';
 import ChatbotAnalytics from '../components/admin/ChatbotAnalytics';
 
-export default function Admin({ onNavigate }: { onNavigate: (page: any) => void }) {
+export default function Admin() {
+  const navigate = useNavigate();
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'stats' | 'resources' | 'questions' | 'themes' | 'keywords' | 'chatbot'>('stats');
@@ -43,14 +45,14 @@ export default function Admin({ onNavigate }: { onNavigate: (page: any) => void 
     setLoading(false);
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-[#E8650A]"></div></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange"></div></div>;
 
   if (!session) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl text-left">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#E8650A]">
+            <div className="w-16 h-16 bg-brand-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-brand-orange">
               <Shield size={32} />
             </div>
             <h1 className="text-2xl font-black text-slate-900">Console CyberKit</h1>
@@ -58,8 +60,8 @@ export default function Admin({ onNavigate }: { onNavigate: (page: any) => void 
           <form onSubmit={handleLogin} className="space-y-4">
             <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-4 bg-slate-50 border-none rounded-2xl" />
             <input type="password" placeholder="Mot de passe" value={password} onChange={e => setPassword(e.target.value)} className="w-full p-4 bg-slate-50 border-none rounded-2xl" />
-            <button className="w-full py-4 bg-[#E8650A] text-white rounded-2xl font-bold shadow-lg shadow-orange-500/20">Se connecter</button>
-            <button type="button" onClick={() => onNavigate('home')} className="w-full text-slate-400 text-sm font-bold pt-2">Retour au site</button>
+            <button className="w-full py-4 bg-brand-orange text-white rounded-2xl font-bold shadow-lg shadow-brand-orange/20">Se connecter</button>
+            <button type="button" onClick={() => navigate('/')} className="w-full text-slate-400 text-sm font-bold pt-2">Retour au site</button>
           </form>
         </div>
       </div>
@@ -71,7 +73,7 @@ export default function Admin({ onNavigate }: { onNavigate: (page: any) => void 
       <div className="w-72 bg-slate-900 text-white flex flex-col fixed h-full z-30">
         <div className="p-8">
           <div className="flex items-center gap-3 mb-10">
-            <div className="bg-[#E8650A] p-2 rounded-xl"><LayoutDashboard className="w-6 h-6" /></div>
+            <div className="bg-brand-orange p-2 rounded-xl"><LayoutDashboard className="w-6 h-6" /></div>
             <span className="font-black text-xl italic tracking-tighter uppercase">CyberKit</span>
           </div>
           <nav className="space-y-2">
@@ -84,7 +86,7 @@ export default function Admin({ onNavigate }: { onNavigate: (page: any) => void 
           </nav>
         </div>
         <div className="mt-auto p-8 border-t border-slate-800">
-          <button onClick={() => onNavigate('home')} className="flex items-center gap-3 text-slate-400 hover:text-white mb-4 w-full px-4 font-bold transition-colors">
+          <button onClick={() => navigate('/')} className="flex items-center gap-3 text-slate-400 hover:text-white mb-4 w-full px-4 font-bold transition-colors">
             <ChevronLeft size={20} /> Site public
           </button>
           <button onClick={() => supabase.auth.signOut()} className="flex items-center gap-3 text-red-400 hover:text-red-300 w-full px-4 font-bold transition-colors">
@@ -102,7 +104,7 @@ export default function Admin({ onNavigate }: { onNavigate: (page: any) => void 
             {activeTab === 'resources' && (
               <button
                 onClick={() => { setEditingResource(null); setShowResourceForm(true); }}
-                className="bg-[#E8650A] text-white px-8 py-4 rounded-2xl font-black flex items-center gap-2 shadow-xl shadow-orange-500/20 hover:scale-105 transition-all"
+                className="bg-brand-orange text-white px-8 py-4 rounded-2xl font-black flex items-center gap-2 shadow-xl shadow-brand-orange/20 hover:scale-105 transition-all"
               >
                 <Plus size={24} /> Ajouter
               </button>
@@ -129,7 +131,7 @@ export default function Admin({ onNavigate }: { onNavigate: (page: any) => void 
 
 function NavItem({ active, onClick, icon, label }: any) {
   return (
-    <button onClick={onClick} className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all ${active ? 'bg-[#E8650A] text-white shadow-lg shadow-orange-500/30' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+    <button onClick={onClick} className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all ${active ? 'bg-brand-orange text-white shadow-lg shadow-brand-orange/30' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
       {icon} <span>{label}</span>
     </button>
   );

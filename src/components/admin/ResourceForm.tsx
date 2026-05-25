@@ -107,11 +107,11 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Titre</label>
-              <input required type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value, slug: resource ? formData.slug : generateSlug(e.target.value) })} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold" />
+              <input required type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value, slug: resource ? formData.slug : generateSlug(e.target.value) })} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 font-bold" />
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Thématique</label>
-              <select required value={formData.theme_id} onChange={e => setFormData({ ...formData, theme_id: e.target.value })} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold">
+              <select required value={formData.theme_id} onChange={e => setFormData({ ...formData, theme_id: e.target.value })} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 font-bold">
                 <option value="">Choisir un thème</option>
                 {themes.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
               </select>
@@ -125,7 +125,7 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
               <select
                 value={formData.type}
                 onChange={e => setFormData({ ...formData, type: e.target.value })}
-                className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-bold text-slate-700"
+                className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 font-bold text-slate-700"
               >
                 {RESOURCE_TYPES.map(type => (
                   <option key={type.id} value={type.id}>{type.label}</option>
@@ -150,12 +150,12 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
 
           <div className="space-y-2">
             <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Description</label>
-            <textarea rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 resize-none" />
+            <textarea rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 resize-none" />
           </div>
 
           <div className="flex gap-4 pt-4">
             <button type="button" onClick={onClose} className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold hover:bg-slate-200">Annuler</button>
-            <button type="submit" disabled={loading || uploading} className="flex-1 py-4 bg-[#E8650A] text-white rounded-2xl font-bold shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2">
+            <button type="submit" disabled={loading || uploading} className="flex-1 py-4 bg-brand-orange text-white rounded-2xl font-bold shadow-lg shadow-brand-orange/20 flex items-center justify-center gap-2">
               {loading ? 'Enregistrement...' : <Save size={20} />} Enregistrer
             </button>
           </div>

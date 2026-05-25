@@ -99,7 +99,7 @@ export default function ThemeForm({ theme, onClose }: ThemeFormProps) {
               type="text"
               value={formData.title}
               onChange={handleTitleChange}
-              className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all font-bold text-slate-700"
+              className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all font-bold text-slate-700"
               placeholder="Ex: Protection des données"
             />
           </div>
@@ -111,7 +111,7 @@ export default function ThemeForm({ theme, onClose }: ThemeFormProps) {
               type="text"
               value={formData.slug}
               onChange={e => setFormData({ ...formData, slug: e.target.value })}
-              className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all font-mono text-xs text-orange-600"
+              className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all font-mono text-xs text-brand-orange-600"
               placeholder="protection-donnees"
             />
           </div>
@@ -122,7 +122,7 @@ export default function ThemeForm({ theme, onClose }: ThemeFormProps) {
               rows={3}
               value={formData.description}
               onChange={e => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all resize-none text-slate-600"
+              className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all resize-none text-slate-600"
               placeholder="Décrivez l'objectif de cette thématique..."
             />
           </div>
@@ -138,7 +138,7 @@ export default function ThemeForm({ theme, onClose }: ThemeFormProps) {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-4 bg-[#E8650A] text-white rounded-2xl font-bold hover:bg-orange-600 shadow-lg shadow-orange-500/20 transition-all flex items-center justify-center gap-2"
+              className="flex-1 py-4 bg-brand-orange text-white rounded-2xl font-bold hover:bg-brand-orange-600 shadow-lg shadow-brand-orange/20 transition-all flex items-center justify-center gap-2"
             >
               {loading ? 'Enregistrement...' : <><Save size={20} /> Enregistrer</>}
             </button>

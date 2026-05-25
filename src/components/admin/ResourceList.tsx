@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Trash2, Edit2, Search, BookOpen, ExternalLink, Filter } from 'lucide-react';
+import { Trash2, Edit2, Search } from 'lucide-react';
+import { useThemes } from '../../hooks/useThemes';
+import { useResources } from '../../hooks/useResources';
 
 interface ResourceListProps {
   onEdit: (resource: any) => void;
 }
 
-// Ce dictionnaire permet d'afficher "Lien externe" au lieu de "link" dans le tableau
 const TYPE_LABELS: Record<string, string> = {
   guide: 'Guide',
   memo: 'Mémo',
@@ -17,44 +18,17 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export default function ResourceList({ onEdit }: ResourceListProps) {
-  const [resources, setResources] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { themes } = useThemes();
+  const { resources, loading, refetch } = useResources();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTheme, setSelectedTheme] = useState('all');
-  const [themes, setThemes] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  async function fetchData() {
-    try {
-      setLoading(true);
-      // Récupération des ressources et de leur thématique associée
-      const { data: resData, error: resError } = await supabase
-        .from('resources')
-        .select('*, theme:themes(title)')
-        .order('created_at', { ascending: false });
-
-      if (resError) throw resError;
-      setResources(resData || []);
-
-      // Récupération des thématiques pour le menu de filtre
-      const { data: themeData } = await supabase.from('themes').select('id, title');
-      setThemes(themeData || []);
-    } catch (err) {
-      console.error('Erreur de chargement:', err);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const handleDelete = async (id: string) => {
     if (!confirm('Voulez-vous vraiment supprimer cette ressource ?')) return;
     try {
       const { error } = await supabase.from('resources').delete().eq('id', id);
       if (error) throw error;
-      setResources(resources.filter(r => r.id !== id));
+      await refetch();
     } catch (err: any) {
       alert("Erreur de suppression : " + err.message);
     }
@@ -68,7 +42,6 @@ export default function ResourceList({ onEdit }: ResourceListProps) {
 
   return (
     <div className="p-8">
-      {/* Barre de recherche et filtres */}
       <div className="flex flex-col lg:flex-row gap-4 mb-8">
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
@@ -77,7 +50,7 @@ export default function ResourceList({ onEdit }: ResourceListProps) {
             placeholder="Rechercher une ressource..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 font-medium"
+            className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 font-medium"
           />
         </div>
         <select
@@ -118,8 +91,7 @@ export default function ResourceList({ onEdit }: ResourceListProps) {
                     </div>
                   </td>
                   <td className="py-5 px-4">
-                    <span className="px-3 py-1 bg-orange-50 text-[#E8650A] rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-100">
-                      {/* On affiche le label propre ou la valeur brute par défaut */}
+                    <span className="px-3 py-1 bg-brand-orange-50 text-brand-orange rounded-full text-[10px] font-black uppercase tracking-widest border border-brand-orange-100">
                       {TYPE_LABELS[res.type] || res.type || 'Guide'}
                     </span>
                   </td>
@@ -127,7 +99,7 @@ export default function ResourceList({ onEdit }: ResourceListProps) {
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => onEdit(res)}
-                        className="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-all"
+                        className="p-2 text-slate-400 hover:text-brand-orange-600 hover:bg-brand-orange-50 rounded-xl transition-all"
                       >
                         <Edit2 size={18} />
                       </button>

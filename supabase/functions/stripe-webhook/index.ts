@@ -112,14 +112,14 @@ Deno.serve(async (req: Request) => {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                from: "SecuriCoach <noreply@securicoach.fr>",
+                from: "CyberKit <noreply@updates.beforensic.be>",
                 to: [customerEmail],
-                subject: "Échec du paiement SecuriCoach Premium",
+                subject: "Échec du paiement CyberKit Premium",
                 html: `
                   <h2>Échec du paiement</h2>
                   <p>Bonjour,</p>
-                  <p>Votre paiement SecuriCoach Premium a échoué. Veuillez mettre à jour vos informations de paiement pour continuer à profiter de toutes les fonctionnalités Premium.</p>
-                  <p>Cordialement,<br>L'équipe SecuriCoach</p>
+                  <p>Votre paiement CyberKit Premium a échoué. Veuillez mettre à jour vos informations de paiement pour continuer à profiter de toutes les fonctionnalités Premium.</p>
+                  <p>Cordialement,<br>L'équipe CyberKit</p>
                 `,
               }),
             });

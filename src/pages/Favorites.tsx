@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Heart, AlertCircle, Trash2, ChevronLeft, BookOpen } from 'lucide-react';
 import { supabase, Resource } from '../lib/supabase';
 import { getFavorites, clearAllFavorites } from '../utils/storage';
 import ResourceCard from '../components/ResourceCard';
 
-interface FavoritesProps {
-  onNavigate: (page: any) => void;
-}
-
-export default function Favorites({ onNavigate }: FavoritesProps) {
+export default function Favorites() {
+  const navigate = useNavigate();
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,18 +54,18 @@ export default function Favorites({ onNavigate }: FavoritesProps) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#E8650A]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-orange"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-12 px-4 pb-32 text-left">
+    <div className="page-light py-12 px-4 pb-32 text-left">
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
           <div>
             <button
-              onClick={() => onNavigate('home')}
+              onClick={() => navigate('/')}
               className="text-slate-400 hover:text-slate-600 flex items-center gap-2 mb-4 font-medium transition-colors"
             >
               <ChevronLeft className="w-4 h-4" /> Retour à l'accueil
@@ -102,8 +100,8 @@ export default function Favorites({ onNavigate }: FavoritesProps) {
               Parcourez la bibliothèque et cliquez sur le cœur pour retrouver vos ressources préférées ici.
             </p>
             <button
-              onClick={() => onNavigate('resources')}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#E8650A] text-white rounded-2xl font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20"
+              onClick={() => navigate('/resources')}
+              className="inline-flex items-center gap-2 px-8 py-4 bg-brand-orange text-white rounded-2xl font-bold hover:bg-brand-orange-600 transition-all shadow-lg shadow-brand-orange/20"
             >
               <BookOpen className="w-5 h-5" /> Découvrir les ressources
             </button>
@@ -114,7 +112,6 @@ export default function Favorites({ onNavigate }: FavoritesProps) {
               <ResourceCard
                 key={resource.id}
                 resource={resource}
-                onNavigate={onNavigate}
               />
             ))}
           </div>

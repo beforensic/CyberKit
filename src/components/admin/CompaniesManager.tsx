@@ -292,7 +292,7 @@ export default function CompaniesManager() {
                             diagnostic.score < 40
                               ? 'bg-red-100 text-red-700'
                               : diagnostic.score < 70
-                              ? 'bg-orange-100 text-orange-700'
+                              ? 'bg-brand-orange-100 text-brand-orange-700'
                               : 'bg-emerald-100 text-emerald-700'
                           }`}>
                             {diagnostic.risk_level}
@@ -348,8 +348,8 @@ export default function CompaniesManager() {
 
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-orange-600" />
+            <div className="p-2 bg-brand-orange-100 rounded-lg">
+              <TrendingUp className="w-6 h-6 text-brand-orange-600" />
             </div>
             <p className="text-sm text-slate-600">Diagnostics complétés</p>
           </div>

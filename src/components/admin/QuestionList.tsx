@@ -55,7 +55,7 @@ export default function QuestionList() {
                         placeholder="Rechercher une question ou un profil..."
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-500/20 transition-all"
+                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all"
                     />
                 </div>
             </div>
@@ -79,7 +79,7 @@ export default function QuestionList() {
                                         <p className="font-bold text-slate-700 leading-tight">{q.text}</p>
                                     </td>
                                     <td className="py-4 px-4">
-                                        <span className="inline-block px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-xs font-bold">
+                                        <span className="inline-block px-3 py-1 bg-brand-orange-50 text-brand-orange-600 rounded-full text-xs font-bold">
                                             {q.quiz_profiles?.name || 'Générique'}
                                         </span>
                                     </td>

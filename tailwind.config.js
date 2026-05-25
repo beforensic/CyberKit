@@ -4,8 +4,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: { DEFAULT: '#2B6CB0', 50: '#EBF4FF', 500: '#2B6CB0', 900: '#0A2440' },
-        accent: { DEFAULT: '#ED8936', 500: '#ED8936', 900: '#5D2608' },
+        surface: {
+          dark: '#0F172A',
+          light: '#FAFAFA',
+          deep: '#020617',
+        },
+        'brand-orange': {
+          DEFAULT: '#E8650A',
+          50: '#FEF3EC',
+          100: '#FDE8D7',
+          200: '#FBCFAD',
+          300: '#F7A872',
+          400: '#F08040',
+          500: '#E8650A',
+          600: '#C95508',
+          700: '#A84406',
+          800: '#873504',
+          900: '#5D2608',
+        },
       },
     },
   },
