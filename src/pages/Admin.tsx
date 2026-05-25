@@ -11,6 +11,7 @@ import {
 // IMPORTATION BASÉE SUR TON ARBORESCENCE RÉELLE
 import ResourceList from '../components/admin/ResourceList';
 import ResourceForm from '../components/admin/ResourceForm';
+import { useResources } from '../hooks/useResources';
 import QuestionList from '../components/admin/QuestionList'; // Celui que nous venons de créer
 import ThemeList from '../components/admin/ThemeList';
 import KeywordManager from '../components/admin/KeywordManager'; // Corrigé (au lieu de TagList)
@@ -25,6 +26,7 @@ export default function Admin() {
   const [newMessageCount, setNewMessageCount] = useState(0);
   const [showResourceForm, setShowResourceForm] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
+  const { refetch: refetchResources } = useResources();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -140,7 +142,16 @@ export default function Admin() {
       </div>
 
       {showResourceForm && (
-        <ResourceForm resource={editingResource} onClose={() => setShowResourceForm(false)} />
+        <ResourceForm
+          resource={editingResource}
+          onClose={() => {
+            setShowResourceForm(false);
+            setEditingResource(null);
+          }}
+          onSaved={async () => {
+            await refetchResources();
+          }}
+        />
       )}
     </div>
   );

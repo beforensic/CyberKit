@@ -5,6 +5,26 @@ import { X, Save, AlertCircle, Link, Upload, Loader2, ListFilter } from 'lucide-
 interface ResourceFormProps {
   resource?: Resource | null;
   onClose: () => void;
+  onSaved?: () => void | Promise<void>;
+}
+
+type ResourceFormData = {
+  title: string;
+  description: string;
+  url: string;
+  theme_id: string;
+  type: ResourceKind;
+};
+
+function toResourcePayload(data: ResourceFormData) {
+  const description = data.description.trim();
+  return {
+    title: data.title.trim(),
+    description: description.length > 0 ? description : null,
+    url: data.url.trim(),
+    theme_id: data.theme_id,
+    type: data.type,
+  };
 }
 
 const RESOURCE_TYPES: { id: ResourceKind; label: string }[] = [
@@ -16,20 +36,19 @@ const RESOURCE_TYPES: { id: ResourceKind; label: string }[] = [
   { id: 'link', label: 'Lien externe' }
 ];
 
-export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
+export default function ResourceForm({ resource, onClose, onSaved }: ResourceFormProps) {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [themes, setThemes] = useState<ThemeSummary[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ResourceFormData>({
     title: '',
-    slug: '',
     description: '',
     url: '',
     theme_id: '',
-    type: 'guide' // Type par défaut
+    type: 'guide',
   });
 
   useEffect(() => {
@@ -37,11 +56,10 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
     if (resource) {
       setFormData({
         title: resource.title || '',
-        slug: generateSlug(resource.title || ''),
         description: resource.description || '',
         url: resource.url || '',
         theme_id: resource.theme_id || '',
-        type: resource.type || 'guide'
+        type: resource.type || 'guide',
       });
     }
   }, [resource]);
@@ -50,10 +68,6 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
     const { data } = await supabase.from('themes').select('id, title').order('title');
     setThemes(data || []);
   }
-
-  const generateSlug = (text: string) => {
-    return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -77,13 +91,28 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
     e.preventDefault();
     setLoading(true);
     try {
+      const payload = toResourcePayload(formData);
+
       if (resource) {
-        const { error } = await supabase.from('resources').update(formData).eq('id', resource.id);
+        const { data, error } = await supabase
+          .from('resources')
+          .update(payload)
+          .eq('id', resource.id)
+          .select('id')
+          .single();
         if (error) throw error;
+        if (!data) throw new Error('La ressource n\'a pas pu être mise à jour.');
       } else {
-        const { error } = await supabase.from('resources').insert([formData]);
+        const { data, error } = await supabase
+          .from('resources')
+          .insert([payload])
+          .select('id')
+          .single();
         if (error) throw error;
+        if (!data) throw new Error('La ressource n\'a pas pu être créée.');
       }
+
+      await onSaved?.();
       onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue');
@@ -106,7 +135,7 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Titre</label>
-              <input required type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value, slug: resource ? formData.slug : generateSlug(e.target.value) })} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 font-bold" />
+              <input required type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 font-bold" />
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase ml-1 tracking-widest">Thématique</label>
