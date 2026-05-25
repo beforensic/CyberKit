@@ -1,5 +1,6 @@
 const DEFAULT_NOTIFY_TO = "contact@beforensic.be";
-const DEFAULT_FROM = "CyberKit Contact <noreply@updates.beforensic.be>";
+// Domaine vérifié chez Resend : beforensic.be (pas updates.beforensic.be)
+const DEFAULT_FROM = "CyberKit <noreply@beforensic.be>";
 
 export interface ContactNotifyPayload {
   name: string;
@@ -60,9 +61,15 @@ export async function sendContactNotification(
 
   if (!resendResponse.ok) {
     const errorData = await resendResponse.text();
-    console.error("Resend error:", errorData);
-    return { sent: false, error: `Resend ${resendResponse.status}` };
+    console.error(
+      `Resend error (${resendResponse.status}) from=${from} to=${to}:`,
+      errorData,
+    );
+    return { sent: false, error: `Resend ${resendResponse.status}: ${errorData}` };
   }
+
+  const resendData = await resendResponse.json();
+  console.log("Resend sent:", resendData.id, "to:", to);
 
   return { sent: true };
 }
