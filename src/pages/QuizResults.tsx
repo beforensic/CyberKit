@@ -80,7 +80,7 @@ export default function QuizResults() {
 
         <AIAnalysis
           score={score}
-          answers={answers as unknown as Record<string, boolean>}
+          answers={answers}
           profileName={profileLabel}
         />
 

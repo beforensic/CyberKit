@@ -63,9 +63,9 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
       setUploading(true);
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('resource-files').upload(fileName, file);
+      const { error: uploadError } = await supabase.storage.from('resources').upload(fileName, file);
       if (uploadError) throw uploadError;
-      const { data: { publicUrl } } = supabase.storage.from('resource-files').getPublicUrl(fileName);
+      const { data: { publicUrl } } = supabase.storage.from('resources').getPublicUrl(fileName);
       setFormData(prev => ({ ...prev, url: publicUrl }));
     } catch (err: any) {
       setError("Erreur d'upload : " + err.message);

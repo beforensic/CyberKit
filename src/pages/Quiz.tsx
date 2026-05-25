@@ -1,50 +1,66 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { Shield, ChevronLeft, User, Building2, Briefcase, ArrowRight, HelpCircle } from 'lucide-react';
+import { Shield, ChevronLeft, User, Building2, Briefcase, ArrowRight, HelpCircle, AlertCircle } from 'lucide-react';
 import { saveQuizResults } from '../utils/quizResults';
+import {
+  fetchQuizQuestions,
+  filterQuestionsByProfile,
+  type QuizQuestion,
+} from '../services/quizQuestions';
 
 export default function Quiz() {
   const navigate = useNavigate();
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [profile, setProfile] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchQuestions();
+    let cancelled = false;
+
+    async function load() {
+      try {
+        setLoading(true);
+        setLoadError(null);
+        const rows = await fetchQuizQuestions();
+        if (!cancelled) setQuestions(rows);
+      } catch {
+        if (!cancelled) {
+          setLoadError(
+            'Impossible de charger les questions du diagnostic. Réessayez dans un instant ou contactez-nous.',
+          );
+          setQuestions([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  async function fetchQuestions() {
-    try {
-      setLoading(true);
-      // On récupère tout proprement, y compris le titre du thème
-      const { data, error } = await supabase
-        .from('questions')
-        .select('*, themes(title)')
-        .order('id');
-
-      if (error) throw error;
-      setQuestions(data || []);
-    } catch (error) {
-      console.error("Erreur technique :", error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const activeQuestions = profile
+    ? filterQuestionsByProfile(questions, profile)
+    : questions;
 
   const handleAnswer = (value: number) => {
-    const currentQuestion = questions[currentStep];
+    const currentQuestion = activeQuestions[currentStep];
+    if (!currentQuestion) return;
+
     const newAnswers = { ...answers, [currentQuestion.id]: value };
     setAnswers(newAnswers);
 
-    if (currentStep < questions.length - 1) {
+    if (currentStep < activeQuestions.length - 1) {
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       const totalScore = Object.values(newAnswers).reduce((a, b) => a + b, 0);
-      const maxScore = questions.length * 5;
+      const maxScore = activeQuestions.length * 5;
       const finalPercentage = Math.round((totalScore / maxScore) * 100);
       const resultData = { score: finalPercentage, answers: newAnswers, profile: profile! };
       saveQuizResults(resultData);
@@ -52,11 +68,22 @@ export default function Quiz() {
     }
   };
 
-  if (loading) return (
-    <div className="page-dark flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange"></div>
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="page-dark flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange"></div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="page-dark flex flex-col items-center justify-center px-6 text-center min-h-[60vh]">
+        <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
+        <p className="text-slate-300 max-w-md">{loadError}</p>
+      </div>
+    );
+  }
 
   // --- ÉTAPE 1 : CHOIX DU PROFIL ---
   if (!profile) {
@@ -77,11 +104,16 @@ export default function Quiz() {
             {[
               { id: 'independant', label: 'Indépendant', desc: 'Freelance ou artisan', icon: User },
               { id: 'liberal', label: 'Libéral', desc: 'Santé, Droit, Conseil...', icon: Briefcase },
-              { id: 'tpe', label: 'TPE / PME', desc: 'Entreprise avec salariés', icon: Building2 }
+              { id: 'tpe', label: 'TPE / PME', desc: 'Entreprise avec salariés', icon: Building2 },
             ].map((item) => (
               <button
                 key={item.id}
-                onClick={() => setProfile(item.id)}
+                type="button"
+                onClick={() => {
+                  setProfile(item.id);
+                  setCurrentStep(0);
+                  setAnswers({});
+                }}
                 className="bg-slate-800/40 backdrop-blur-md border border-slate-700 p-8 rounded-3xl text-left hover:border-brand-orange transition-all group"
               >
                 <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-brand-orange mb-6 transition-colors">
@@ -100,18 +132,34 @@ export default function Quiz() {
     );
   }
 
-  // --- ÉTAPE 2 : LE QUESTIONNAIRE ---
-  const currentQuestion = questions[currentStep];
-  const progress = ((currentStep + 1) / questions.length) * 100;
+  if (activeQuestions.length === 0) {
+    return (
+      <div className="page-dark flex flex-col items-center justify-center px-6 text-center min-h-[60vh]">
+        <AlertCircle className="w-12 h-12 text-brand-orange mb-4" />
+        <p className="text-slate-300 mb-6">Aucune question disponible pour ce profil.</p>
+        <button
+          type="button"
+          onClick={() => setProfile(null)}
+          className="px-6 py-3 bg-brand-orange text-white rounded-xl font-bold"
+        >
+          Changer de profil
+        </button>
+      </div>
+    );
+  }
+
+  const currentQuestion = activeQuestions[currentStep];
+  const progress = ((currentStep + 1) / activeQuestions.length) * 100;
 
   return (
     <div className="page-dark pb-20 relative text-left">
       <div className="max-w-3xl mx-auto px-6 pt-16 relative z-10">
 
-        {/* Progression discrète */}
         <div className="mb-10">
           <div className="flex justify-between items-end mb-3 text-[10px] font-bold uppercase tracking-widest">
-            <span className="text-slate-500">Question {currentStep + 1} sur {questions.length}</span>
+            <span className="text-slate-500">
+              Question {currentStep + 1} sur {activeQuestions.length}
+            </span>
             <span className="text-brand-orange">{Math.round(progress)}%</span>
           </div>
           <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
@@ -122,29 +170,29 @@ export default function Quiz() {
           </div>
         </div>
 
-        {/* Carte Question */}
         <div className="bg-slate-800/20 backdrop-blur-md border border-slate-700/50 rounded-[2.5rem] p-8 md:p-12 shadow-xl">
 
           <div className="flex items-center gap-2 mb-8">
             <div className="px-3 py-1 bg-white/5 rounded-md border border-white/10 text-[10px] font-bold text-brand-orange-400 uppercase tracking-widest">
-              {currentQuestion?.themes?.title || 'Thème'}
+              {currentQuestion.themeTitle}
             </div>
           </div>
 
           <h2 className="text-xl md:text-2xl font-semibold text-white mb-10 leading-relaxed">
-            {currentQuestion?.question_text}
+            {currentQuestion.label}
           </h2>
 
           <div className="grid grid-cols-1 gap-3">
             {[
-              { label: "Pas du tout / Jamais", val: 1 },
-              { label: "Plutôt non / Rarement", val: 2 },
-              { label: "Moyennement / Parfois", val: 3 },
-              { label: "Plutôt oui / Souvent", val: 4 },
-              { label: "Tout à fait / Toujours", val: 5 }
+              { label: 'Pas du tout / Jamais', val: 1 },
+              { label: 'Plutôt non / Rarement', val: 2 },
+              { label: 'Moyennement / Parfois', val: 3 },
+              { label: 'Plutôt oui / Souvent', val: 4 },
+              { label: 'Tout à fait / Toujours', val: 5 },
             ].map((opt) => (
               <button
                 key={opt.val}
+                type="button"
                 onClick={() => handleAnswer(opt.val)}
                 className="w-full p-5 bg-slate-800/40 border border-slate-700/50 rounded-2xl text-left transition-all hover:bg-brand-orange hover:border-brand-orange flex items-center justify-between group"
               >
@@ -161,14 +209,15 @@ export default function Quiz() {
 
         <div className="mt-8 flex justify-between items-center px-2">
           <button
-            onClick={() => currentStep === 0 ? setProfile(null) : setCurrentStep(currentStep - 1)}
+            type="button"
+            onClick={() => (currentStep === 0 ? setProfile(null) : setCurrentStep(currentStep - 1))}
             className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-all"
           >
             <ChevronLeft size={14} /> Retour
           </button>
           <div className="flex items-center gap-2 text-slate-600">
             <HelpCircle size={14} />
-            <span className="text-[10px] font-bold uppercase tracking-widest">Besoin d'aide ?</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest">Besoin d&apos;aide ?</span>
           </div>
         </div>
       </div>

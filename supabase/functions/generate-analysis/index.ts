@@ -22,7 +22,18 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { profile, score, level, weakPoints }: AnalysisRequest = await req.json();
+    const { profile, score, level, weakPoints: rawWeakPoints }: AnalysisRequest = await req.json();
+
+    if (!profile || typeof score !== "number" || !level) {
+      return new Response(
+        JSON.stringify({ error: "Missing profile, score or level" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    const weakPoints = Array.isArray(rawWeakPoints) && rawWeakPoints.length > 0
+      ? rawWeakPoints.filter((p): p is string => typeof p === "string" && p.trim().length > 0)
+      : ["Renforcer vos pratiques de cybersécurité au quotidien"];
 
     const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
     if (!apiKey) {
