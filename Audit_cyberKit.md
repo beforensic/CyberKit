@@ -29,9 +29,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 
 - `ProgressContext` non persisté (perdu au refresh)
 - Double thème dark (accueil, quiz) / light (ressources, contact) — assumé ou à documenter
-- `npm audit fix` non appliqué régulièrement
 - Accessibilité (ARIA, clavier sur tooltips quiz / tags)
-- Fonction Edge `admin-contact-messages` présente mais **non utilisée** par le front (RPC à la place)
 
 **Maturité globale :** bonne pour un outil pédagogique ; sécurité et contact **nettement renforcés** ; dette limitée à UX secondaire et polish.
 
@@ -136,11 +134,11 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 
 ### Quick wins
 
-| Action | Effort |
-|--------|--------|
-| `npm audit fix` | 0,5 j |
-| Supprimer Edge Function `admin-contact-messages` si inutile (doublon RPC) | 0,5 h |
-| Retirer secret `OPENAI_API_KEY` si plus utilisé | 5 min |
+| Action | Effort | Statut |
+|--------|--------|--------|
+| `npm audit fix` | 0,5 j | **Fait** (`53e01e2`) |
+| Supprimer Edge Function `admin-contact-messages` (doublon RPC) | 0,5 h | **Fait** (repo) — retirer du dashboard Supabase si encore listée |
+| Retirer secret `OPENAI_API_KEY` si plus utilisé | 5 min | À faire |
 
 ### Intermédiaire
 
@@ -177,6 +175,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Admin | Boucle login | **Fait** |
 | Charte | emerald → orange | **Fait** (écrans principaux) |
 | Architecture | ChatBot / ExportProject | **Supprimés** |
+| Architecture | `admin-contact-messages` Edge | **Supprimée** (RPC seul) |
 | Architecture | ProgressContext | **À faire** |
 | Charte | Dark/light | **À documenter** |
 | A11y | ARIA / clavier | **À faire** |
@@ -190,7 +189,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | `submit-contact` | Oui | Oui — formulaire contact |
 | `generate-analysis` | Oui | Oui — résultats quiz |
 | `explain-keyword` | Oui | Oui — tags ressources |
-| `admin-contact-messages` | Oui | Non — remplacé par RPC SQL |
+| `admin-contact-messages` | **Supprimée du repo** | Non — admin via RPC (`admin_list_contact_messages`, etc.) |
 | `chat-assistant` | À supprimer du dashboard | Non — retiré du repo |
 | `send-contact-email` | Non | Supprimée (logique dans `submit-contact` + Resend) |
 
@@ -245,5 +244,5 @@ flowchart LR
 ## Prochaines étapes suggérées
 
 1. Vérifier en prod : contact (email + ligne BDD), admin Messages, quiz + analyse IA.
-2. Supprimer `chat-assistant` dans le dashboard Supabase si encore listée.
+2. Supprimer dans le dashboard Supabase les fonctions retirées du repo : `chat-assistant`, `admin-contact-messages` (si encore listées).
 3. Choisir la suite : accessibilité, `ProgressContext`, ou design system — selon priorité produit.
