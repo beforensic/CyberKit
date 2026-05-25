@@ -1,6 +1,6 @@
 # Audit CyberKit — État au 25 mai 2026 (mise à jour)
 
-Document de suivi : audit initial, durcissement sécurité, contact / Resend, admin messages, retrait chatbot, a11y, progression ressources, durcissement IA (S1).
+Document de suivi : audit initial, durcissement sécurité, contact / Resend, admin messages, retrait chatbot, a11y, progression ressources, durcissement IA (S1), typage admin (A2).
 
 **Projet :** application gratuite de sensibilisation cybersécurité (indépendants & TPE belges)  
 **Stack :** React 18, Vite 6, Tailwind, Supabase, Vercel  
@@ -26,14 +26,14 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 - Headers sécurité dans `vercel.json` (CSP, X-Frame-Options, etc.)
 - Charte : accents `brand-orange` harmonisés sur Home / résultats / CoachCallout / succès contact
 - Nav publique sans lien Admin ; CTA contact (`ContactCtaBanner`)
+- Typage admin : `ResourceKind`, types partagés (`supabase.ts`), `npm run typecheck` OK (A2)
 
 **Fragilités restantes**
 
 - Double thème dark (accueil, quiz) / light (ressources, contact) — assumé ou à documenter
-- Typage (`Admin.tsx`, `npm run typecheck`)
 - Alerte budget **Anthropic** (action manuelle console, clé `SecuriCoach-Prod`)
 
-**Maturité globale :** bonne pour un outil pédagogique ; sécurité et contact **nettement renforcés** ; dette limitée à polish (charte, typage).
+**Maturité globale :** bonne pour un outil pédagogique ; sécurité et contact **nettement renforcés** ; dette limitée au polish charte (dark/light, design system optionnel).
 
 ---
 
@@ -94,12 +94,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Code mort | `ChatBot`, `ChatbotAnalytics`, `ExportProject`, `chat-assistant`, `send-contact-email` **supprimés** |
 | Progression ressources (A1) | `ProgressContext` + `localStorage`, badge « Consulté », compteur bibliothèque (`0af5950`) |
 | Accessibilité de base (A3) | skip link, focus route, nav ARIA, quiz, contact, ressources, `KeywordTooltip` (`b825314`) |
-
-### Encore à traiter
-
-#### A2 — Typage
-
-- `any` dans `Admin.tsx` ; `npm run typecheck` avec erreurs préexistantes (build Vite OK)
+| Typage admin (A2) | `ResourceKind`, `Session`/`Resource`/`Theme`, plus de `any` admin ; `npm run typecheck` OK (mai 2026) |
 
 ---
 
@@ -138,6 +133,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Accessibilité de base | 1–2 j | **Fait** (`b825314`) |
 | Persistance `ProgressContext` | 0,5 j | **Fait** (`0af5950`) |
 | Renforcer plafonds IA / auth (S1) | 1 j | **Fait** (`c275fec`, déployé prod) |
+| Typage admin + `typecheck` (A2) | 0,5–1 j | **Fait** (mai 2026) |
 
 ### Long terme — à faire
 
@@ -172,7 +168,8 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Architecture | ProgressContext | **Fait** (localStorage) |
 | A11y | ARIA / clavier (base) | **Fait** |
 | Charte | Dark/light | **À documenter** |
-| Typage | Admin / typecheck | **À faire** |
+| Typage | Admin / typecheck (A2) | **Fait** |
+| Ops | Vérif prod (contact, admin, quiz, IA) | **Fait** |
 | Ops | Budget Anthropic | **À configurer** (console) |
 
 ---
@@ -238,6 +235,7 @@ flowchart LR
 | `b825314` | Accessibilité de base (nav, quiz, contact, ressources, tooltips) |
 | `0af5950` | Persistance `ProgressContext` (localStorage) |
 | `c275fec` | Durcissement IA S1 (JWT, CORS, rate limits, `aiAccess.ts`) |
+| — (mai 2026) | Typage admin (A2) : `ResourceKind`, suppression `any`, `typecheck` vert |
 
 **Migrations clés :** `20260525120000`, `20260525140000`, `20260525180000`, `20260525190000`, `20260525200000`
 
@@ -245,8 +243,9 @@ flowchart LR
 
 ## Prochaines étapes suggérées
 
-1. Vérifier en prod : contact (email + BDD), admin Messages, quiz + analyse IA, infobulles mots-clés.
-2. Console Anthropic : spend limit + suivi Usage/Cost sur la clé **`SecuriCoach-Prod`**.
-3. Choisir la suite produit : **design system** ou **documentation dark/light** ; corriger le typage Admin si prioritaire.
+1. Console Anthropic : spend limit + suivi Usage/Cost sur la clé **`SecuriCoach-Prod`**.
+2. Choisir la suite produit : **design system** (`src/ui/`) ou **documentation dark/light** (`DESIGN.md`).
+
+**Validé (ne plus traiter comme ouvert) :** vérif prod (contact, admin Messages, quiz + analyse IA, infobulles) ; typage admin / `npm run typecheck` (A2).
 
 **Edge Functions en prod (project-ref `bzxzxzmxiqvnhmlcwqre`, mai 2026) :** `submit-contact`, `generate-analysis`, `explain-keyword` uniquement.

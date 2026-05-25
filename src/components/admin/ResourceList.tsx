@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { Resource, supabase } from '../../lib/supabase';
 import { Trash2, Edit2, Search } from 'lucide-react';
 import { useThemes } from '../../hooks/useThemes';
 import { useResources } from '../../hooks/useResources';
 
 interface ResourceListProps {
-  onEdit: (resource: any) => void;
+  onEdit: (resource: Resource) => void;
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -29,8 +29,8 @@ export default function ResourceList({ onEdit }: ResourceListProps) {
       const { error } = await supabase.from('resources').delete().eq('id', id);
       if (error) throw error;
       await refetch();
-    } catch (err: any) {
-      alert("Erreur de suppression : " + err.message);
+    } catch (err: unknown) {
+      alert("Erreur de suppression : " + (err instanceof Error ? err.message : 'Erreur inconnue'));
     }
   };
 

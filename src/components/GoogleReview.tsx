@@ -1,4 +1,3 @@
-import React from 'react';
 import { Star, CheckCircle } from 'lucide-react';
 
 export default function GoogleReview() {

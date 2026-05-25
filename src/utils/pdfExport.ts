@@ -44,7 +44,6 @@ const getAnswerLabel = (answer: 'yes' | 'no' | 'unknown'): string => {
 export const generatePDF = (data: ExportData): void => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;
   const maxWidth = pageWidth - (margin * 2);
   const lineHeight = 7;

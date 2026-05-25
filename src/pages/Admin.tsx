@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import type { Session } from '@supabase/supabase-js';
+import { Resource, supabase } from '../lib/supabase';
 import {
   LayoutDashboard, BookOpen, Plus,
   LogOut, ChevronLeft, Shield, Filter, Tag,
@@ -18,12 +19,12 @@ import ContactMessagesPanel, { fetchNewContactCount } from '../components/admin/
 
 export default function Admin() {
   const navigate = useNavigate();
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'stats' | 'messages' | 'resources' | 'questions' | 'themes' | 'keywords'>('stats');
   const [newMessageCount, setNewMessageCount] = useState(0);
   const [showResourceForm, setShowResourceForm] = useState(false);
-  const [editingResource, setEditingResource] = useState<any>(null);
+  const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 

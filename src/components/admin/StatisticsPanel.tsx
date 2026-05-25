@@ -33,6 +33,23 @@ interface SearchStats {
 
 type PeriodFilter = 'all' | 'year' | 'quarter' | 'month';
 
+interface ResourceViewRow {
+  resource_id: string;
+  resource_type: string | null;
+  resources: { id: string; title: string } | { id: string; title: string }[] | null;
+}
+
+function getViewResource(view: ResourceViewRow): { id: string; title: string } | null {
+  const joined = view.resources;
+  if (!joined) return null;
+  return Array.isArray(joined) ? joined[0] ?? null : joined;
+}
+
+interface SearchQueryRow {
+  query: string | null;
+  results_count: number | null;
+}
+
 export default function StatisticsPanel() {
   const [loading, setLoading] = useState(true);
   const [diagnosticStats, setDiagnosticStats] = useState<DiagnosticStats | null>(null);
@@ -140,11 +157,12 @@ export default function StatisticsPanel() {
       };
     }
 
-    const resourceCounts = views.reduce((acc: Record<string, { title: string; count: number }>, view: any) => {
-      if (view.resources?.id) {
-        const id = view.resources.id;
+    const resourceCounts = (views as unknown as ResourceViewRow[]).reduce((acc: Record<string, { title: string; count: number }>, view) => {
+      const resource = getViewResource(view);
+      if (resource?.id) {
+        const id = resource.id;
         if (!acc[id]) {
-          acc[id] = { title: view.resources.title || 'Sans titre', count: 0 };
+          acc[id] = { title: resource.title || 'Sans titre', count: 0 };
         }
         acc[id].count++;
       }
@@ -156,7 +174,7 @@ export default function StatisticsPanel() {
       .sort((a, b) => b.views - a.views)
       .slice(0, 10);
 
-    const typeCounts = views.reduce((acc: Record<string, number>, view: any) => {
+    const typeCounts = (views as unknown as ResourceViewRow[]).reduce((acc: Record<string, number>, view) => {
       const type = view.resource_type || 'Autre';
       acc[type] = (acc[type] || 0) + 1;
       return acc;
@@ -185,7 +203,7 @@ export default function StatisticsPanel() {
       return { topSearches: [] };
     }
 
-    const queryStats = queries.reduce((acc: Record<string, { count: number; totalResults: number }>, q: any) => {
+    const queryStats = (queries as SearchQueryRow[]).reduce((acc: Record<string, { count: number; totalResults: number }>, q) => {
       const queryText = q.query?.toLowerCase() || '';
       if (!acc[queryText]) {
         acc[queryText] = { count: 0, totalResults: 0 };

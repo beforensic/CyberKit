@@ -30,12 +30,44 @@ export interface ResourceType {
   created_at: string;
 }
 
+/** Valeurs utilisées en prod (admin + bibliothèque) et legacy seed/migrations. */
+export type ResourceKind =
+  | 'guide'
+  | 'memo'
+  | 'infographie'
+  | 'podcast'
+  | 'image'
+  | 'link'
+  | 'pdf'
+  | 'audio'
+  | 'video';
+
+export interface ThemeSummary {
+  id: string;
+  title: string;
+}
+
+export interface AdminQuestionRow {
+  id: string;
+  text: string;
+  points: number;
+  quiz_profiles: { name: string } | { name: string }[] | null;
+}
+
+export function getQuestionProfileName(
+  profiles: AdminQuestionRow['quiz_profiles']
+): string {
+  if (!profiles) return 'Générique';
+  if (Array.isArray(profiles)) return profiles[0]?.name ?? 'Générique';
+  return profiles.name;
+}
+
 export interface Resource {
   id: string;
   theme_id: string;
   title: string;
   description: string | null;
-  type: 'pdf' | 'audio' | 'video' | 'link' | 'image';
+  type: ResourceKind;
   resource_type_id: string;
   url: string;
   tags: string[];

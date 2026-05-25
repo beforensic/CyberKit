@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+import { Theme, supabase } from '../../lib/supabase';
 import { Trash2, Edit2, Plus, Search, LayoutGrid } from 'lucide-react';
 import ThemeForm from './ThemeForm';
 
 export default function ThemeList() {
-  const [themes, setThemes] = useState<any[]>([]);
+  const [themes, setThemes] = useState<Theme[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [editingTheme, setEditingTheme] = useState<any>(null);
+  const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
     fetchThemes();
@@ -38,12 +38,12 @@ export default function ThemeList() {
       const { error } = await supabase.from('themes').delete().eq('id', id);
       if (error) throw error;
       setThemes(themes.filter(t => t.id !== id));
-    } catch (err: any) {
-      alert("Erreur lors de la suppression : " + err.message);
+    } catch (err: unknown) {
+      alert("Erreur lors de la suppression : " + (err instanceof Error ? err.message : 'Erreur inconnue'));
     }
   };
 
-  const handleEdit = (theme: any) => {
+  const handleEdit = (theme: Theme) => {
     setEditingTheme(theme);
     setShowForm(true);
   };

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Trash2, Edit2, AlertCircle, CheckCircle, Search, Filter } from 'lucide-react';
+import { Trash2, Search } from 'lucide-react';
+import { AdminQuestionRow, getQuestionProfileName } from '../../lib/supabase';
 
 export default function QuestionList() {
-    const [questions, setQuestions] = useState<any[]>([]);
+    const [questions, setQuestions] = useState<AdminQuestionRow[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('');
 
@@ -42,7 +43,7 @@ export default function QuestionList() {
 
     const filteredQuestions = questions.filter(q =>
         q.text.toLowerCase().includes(filter.toLowerCase()) ||
-        q.quiz_profiles?.name.toLowerCase().includes(filter.toLowerCase())
+        getQuestionProfileName(q.quiz_profiles).toLowerCase().includes(filter.toLowerCase())
     );
 
     return (
@@ -80,7 +81,7 @@ export default function QuestionList() {
                                     </td>
                                     <td className="py-4 px-4">
                                         <span className="inline-block px-3 py-1 bg-brand-orange-50 text-brand-orange-600 rounded-full text-xs font-bold">
-                                            {q.quiz_profiles?.name || 'Générique'}
+                                            {getQuestionProfileName(q.quiz_profiles)}
                                         </span>
                                     </td>
                                     <td className="py-4 px-4 text-right">

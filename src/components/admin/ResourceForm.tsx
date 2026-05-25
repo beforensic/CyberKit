@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../../lib/supabase';
-import { X, Save, AlertCircle, Link, Type, FileText, LayoutGrid, Upload, File, Loader2, ListFilter } from 'lucide-react';
+import { Resource, ResourceKind, ThemeSummary, supabase } from '../../lib/supabase';
+import { X, Save, AlertCircle, Link, Upload, Loader2, ListFilter } from 'lucide-react';
 
 interface ResourceFormProps {
-  resource?: any;
+  resource?: Resource | null;
   onClose: () => void;
 }
 
-// Liste des types officiels CyberKit
-const RESOURCE_TYPES = [
+const RESOURCE_TYPES: { id: ResourceKind; label: string }[] = [
   { id: 'guide', label: 'Guide' },
   { id: 'memo', label: 'Mémo' },
   { id: 'infographie', label: 'Infographie' },
@@ -21,7 +20,7 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [themes, setThemes] = useState<any[]>([]);
+  const [themes, setThemes] = useState<ThemeSummary[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
@@ -38,7 +37,7 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
     if (resource) {
       setFormData({
         title: resource.title || '',
-        slug: resource.slug || '',
+        slug: generateSlug(resource.title || ''),
         description: resource.description || '',
         url: resource.url || '',
         theme_id: resource.theme_id || '',
@@ -67,8 +66,8 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
       if (uploadError) throw uploadError;
       const { data: { publicUrl } } = supabase.storage.from('resources').getPublicUrl(fileName);
       setFormData(prev => ({ ...prev, url: publicUrl }));
-    } catch (err: any) {
-      setError("Erreur d'upload : " + err.message);
+    } catch (err: unknown) {
+      setError("Erreur d'upload : " + (err instanceof Error ? err.message : 'Erreur inconnue'));
     } finally {
       setUploading(false);
     }
@@ -86,8 +85,8 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
         if (error) throw error;
       }
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur inconnue');
     } finally {
       setLoading(false);
     }
@@ -124,7 +123,7 @@ export default function ResourceForm({ resource, onClose }: ResourceFormProps) {
               <ListFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4" />
               <select
                 value={formData.type}
-                onChange={e => setFormData({ ...formData, type: e.target.value })}
+                onChange={e => setFormData({ ...formData, type: e.target.value as ResourceKind })}
                 className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 font-bold text-slate-700"
               >
                 {RESOURCE_TYPES.map(type => (

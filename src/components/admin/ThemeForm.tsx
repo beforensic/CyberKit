@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+import { Theme, supabase } from '../../lib/supabase';
 import { X, Save, AlertCircle } from 'lucide-react';
 
 interface ThemeFormProps {
-  theme?: any;
+  theme?: Theme | null;
   onClose: () => void;
 }
 
@@ -66,8 +66,8 @@ export default function ThemeForm({ theme, onClose }: ThemeFormProps) {
         if (error) throw error;
       }
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur inconnue');
     } finally {
       setLoading(false);
     }

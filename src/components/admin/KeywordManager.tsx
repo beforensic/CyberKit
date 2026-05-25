@@ -291,9 +291,9 @@ export default function KeywordManager() {
       await loadKeywordsWithUsage();
       setNewTagInput('');
       showToast('Tag créé avec succès', 'success');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating tag:', error);
-      const errorMessage = error?.message || 'Erreur inconnue';
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       showToast(`Erreur lors de la création du tag: ${errorMessage}`, 'error');
     } finally {
       setProcessing(false);

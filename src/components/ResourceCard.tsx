@@ -40,11 +40,20 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
   // Sélection de l'icône selon le type
   const getIcon = () => {
     switch (resource.type) {
-      case 'podcast': return <Headphones className="w-6 h-6" />;
-      case 'infographie': return <ImageIcon className="w-6 h-6" />;
-      case 'memo': return <FileText className="w-6 h-6" />;
-      case 'link': return <ExternalLink className="w-6 h-6" />;
-      default: return <BookOpen className="w-6 h-6" />;
+      case 'podcast':
+      case 'audio':
+        return <Headphones className="w-6 h-6" />;
+      case 'infographie':
+      case 'image':
+        return <ImageIcon className="w-6 h-6" />;
+      case 'memo':
+      case 'pdf':
+      case 'guide':
+        return <FileText className="w-6 h-6" />;
+      case 'link':
+        return <ExternalLink className="w-6 h-6" />;
+      default:
+        return <BookOpen className="w-6 h-6" />;
     }
   };
 

@@ -1,11 +1,12 @@
 import * as LucideIcons from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
-export const getIconComponent = (name: string | null | undefined) => {
+export const getIconComponent = (name: string | null | undefined): LucideIcon => {
   if (!name) return LucideIcons.Shield;
 
   const cleanName = name.toLowerCase().trim();
 
-  const map: Record<string, any> = {
+  const map: Record<string, LucideIcon> = {
     'cadre juridique': LucideIcons.Gavel,
     'confidentialité': LucideIcons.EyeOff,
     'généralités': LucideIcons.Info,
