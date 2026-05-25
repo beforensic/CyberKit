@@ -101,12 +101,18 @@
   }
 }
 
-/* tarteaucitron — au-dessus de la navigation fixe (z-50) */
+/* tarteaucitron — au-dessus de la navigation fixe (z-50).
+   Ne pas forcer z-index sur #tarteaucitronAlertBig : le ::before du root (flou, z-index 100000)
+   passerait devant le bandeau (attendu z-index 10 par tarteaucitron.css). */
 #tarteaucitronRoot,
-#tarteaucitronAlertBig,
-#tarteaucitronManager,
 #tarteaucitronIcon {
   z-index: 10000 !important;
+}
+
+#tarteaucitronRoot #tarteaucitronAlertBig,
+#tarteaucitronRoot #tarteaucitron,
+#tarteaucitronRoot #tarteaucitronBack {
+  z-index: 100001 !important;
 }
 
 #tarteaucitronIcon {
