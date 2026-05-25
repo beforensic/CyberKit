@@ -62,16 +62,16 @@ export default function AIAnalysis({ score, answers, profileName }: AIAnalysisPr
 
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-8">
-          <div className="bg-brand-orange p-3 rounded-2xl animate-pulse">
-            <Sparkles className="w-6 h-6 text-white" />
+          <div className="bg-brand-orange p-3 rounded-2xl motion-safe:animate-pulse">
+            <Sparkles className="w-6 h-6 text-white" aria-hidden="true" />
           </div>
           <h3 className="text-2xl font-black tracking-tight">Analyse personnalisée</h3>
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center py-10 gap-4">
-            <Loader2 className="w-10 h-10 text-brand-orange animate-spin" />
-            <p className="text-slate-400 font-bold animate-pulse text-center">
+          <div className="flex flex-col items-center py-10 gap-4" role="status" aria-live="polite">
+            <Loader2 className="w-10 h-10 text-brand-orange animate-spin" aria-hidden="true" />
+            <p className="text-slate-400 font-bold motion-safe:animate-pulse text-center">
               Génération de votre analyse en cours...
             </p>
           </div>

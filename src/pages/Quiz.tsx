@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { Shield, ChevronLeft, User, Building2, Briefcase, ArrowRight, HelpCircle, AlertCircle } from 'lucide-react';
 import { saveQuizResults } from '../utils/quizResults';
 import {
@@ -10,6 +10,7 @@ import {
 
 export default function Quiz() {
   const navigate = useNavigate();
+  const questionRef = useRef<HTMLHeadingElement>(null);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [profile, setProfile] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
@@ -48,6 +49,12 @@ export default function Quiz() {
     ? filterQuestionsByProfile(questions, profile)
     : questions;
 
+  useEffect(() => {
+    if (profile && activeQuestions.length > 0) {
+      questionRef.current?.focus();
+    }
+  }, [currentStep, profile, activeQuestions.length]);
+
   const handleAnswer = (value: number) => {
     const currentQuestion = activeQuestions[currentStep];
     if (!currentQuestion) return;
@@ -70,28 +77,28 @@ export default function Quiz() {
 
   if (loading) {
     return (
-      <div className="page-dark flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange"></div>
+      <div className="page-dark flex items-center justify-center" role="status" aria-live="polite">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange" aria-hidden="true" />
+        <span className="sr-only">Chargement des questions du diagnostic</span>
       </div>
     );
   }
 
   if (loadError) {
     return (
-      <div className="page-dark flex flex-col items-center justify-center px-6 text-center min-h-[60vh]">
-        <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
+      <div className="page-dark flex flex-col items-center justify-center px-6 text-center min-h-[60vh]" role="alert">
+        <AlertCircle className="w-12 h-12 text-red-400 mb-4" aria-hidden="true" />
         <p className="text-slate-300 max-w-md">{loadError}</p>
       </div>
     );
   }
 
-  // --- ÉTAPE 1 : CHOIX DU PROFIL ---
   if (!profile) {
     return (
       <div className="page-dark py-16 px-6 relative text-left">
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange-400 text-[10px] font-bold uppercase tracking-widest mb-6">
-            <Shield size={14} /> Diagnostic Personnalisé
+            <Shield size={14} aria-hidden="true" /> Diagnostic Personnalisé
           </div>
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
             Commençons par votre profil
@@ -100,33 +107,36 @@ export default function Quiz() {
             Sélectionnez votre situation pour adapter les recommandations à votre quotidien.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { id: 'independant', label: 'Indépendant', desc: 'Freelance ou artisan', icon: User },
-              { id: 'liberal', label: 'Libéral', desc: 'Santé, Droit, Conseil...', icon: Briefcase },
-              { id: 'tpe', label: 'TPE / PME', desc: 'Entreprise avec salariés', icon: Building2 },
-            ].map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  setProfile(item.id);
-                  setCurrentStep(0);
-                  setAnswers({});
-                }}
-                className="bg-slate-800/40 backdrop-blur-md border border-slate-700 p-8 rounded-3xl text-left hover:border-brand-orange transition-all group"
-              >
-                <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-brand-orange mb-6 transition-colors">
-                  <item.icon size={24} />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">{item.label}</h3>
-                <p className="text-sm text-slate-500 mb-6 leading-relaxed">{item.desc}</p>
-                <div className="flex items-center gap-2 text-brand-orange font-bold text-xs uppercase tracking-widest">
-                  Choisir <ArrowRight size={14} />
-                </div>
-              </button>
-            ))}
-          </div>
+          <fieldset>
+            <legend className="sr-only">Choisissez votre profil</legend>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                { id: 'independant', label: 'Indépendant', desc: 'Freelance ou artisan', icon: User },
+                { id: 'liberal', label: 'Libéral', desc: 'Santé, Droit, Conseil...', icon: Briefcase },
+                { id: 'tpe', label: 'TPE / PME', desc: 'Entreprise avec salariés', icon: Building2 },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    setProfile(item.id);
+                    setCurrentStep(0);
+                    setAnswers({});
+                  }}
+                  className="focus-ring bg-slate-800/40 backdrop-blur-md border border-slate-700 p-8 rounded-3xl text-left hover:border-brand-orange transition-all group"
+                >
+                  <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-brand-orange mb-6 transition-colors">
+                    <item.icon size={24} aria-hidden="true" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">{item.label}</h3>
+                  <p className="text-sm text-slate-500 mb-6 leading-relaxed">{item.desc}</p>
+                  <div className="flex items-center gap-2 text-brand-orange font-bold text-xs uppercase tracking-widest">
+                    Choisir <ArrowRight size={14} aria-hidden="true" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          </fieldset>
         </div>
       </div>
     );
@@ -134,13 +144,13 @@ export default function Quiz() {
 
   if (activeQuestions.length === 0) {
     return (
-      <div className="page-dark flex flex-col items-center justify-center px-6 text-center min-h-[60vh]">
-        <AlertCircle className="w-12 h-12 text-brand-orange mb-4" />
+      <div className="page-dark flex flex-col items-center justify-center px-6 text-center min-h-[60vh]" role="alert">
+        <AlertCircle className="w-12 h-12 text-brand-orange mb-4" aria-hidden="true" />
         <p className="text-slate-300 mb-6">Aucune question disponible pour ce profil.</p>
         <button
           type="button"
           onClick={() => setProfile(null)}
-          className="px-6 py-3 bg-brand-orange text-white rounded-xl font-bold"
+          className="focus-ring px-6 py-3 bg-brand-orange text-white rounded-xl font-bold"
         >
           Changer de profil
         </button>
@@ -155,18 +165,25 @@ export default function Quiz() {
     <div className="page-dark pb-20 relative text-left">
       <div className="max-w-3xl mx-auto px-6 pt-16 relative z-10">
 
-        <div className="mb-10">
+        <div className="mb-10" aria-live="polite" aria-atomic="true">
           <div className="flex justify-between items-end mb-3 text-[10px] font-bold uppercase tracking-widest">
             <span className="text-slate-500">
               Question {currentStep + 1} sur {activeQuestions.length}
             </span>
             <span className="text-brand-orange">{Math.round(progress)}%</span>
           </div>
-          <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div
+            className="h-1 w-full bg-slate-800 rounded-full overflow-hidden"
+            role="progressbar"
+            aria-valuenow={Math.round(progress)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Progression du diagnostic"
+          >
             <div
               className="h-full bg-brand-orange transition-all duration-500"
               style={{ width: `${progress}%` }}
-            ></div>
+            />
           </div>
         </div>
 
@@ -178,11 +195,20 @@ export default function Quiz() {
             </div>
           </div>
 
-          <h2 className="text-xl md:text-2xl font-semibold text-white mb-10 leading-relaxed">
+          <h2
+            id="quiz-question"
+            ref={questionRef}
+            tabIndex={-1}
+            className="focus-ring text-xl md:text-2xl font-semibold text-white mb-10 leading-relaxed outline-none rounded-lg"
+          >
             {currentQuestion.label}
           </h2>
 
-          <div className="grid grid-cols-1 gap-3">
+          <div
+            role="radiogroup"
+            aria-labelledby="quiz-question"
+            className="grid grid-cols-1 gap-3"
+          >
             {[
               { label: 'Pas du tout / Jamais', val: 1 },
               { label: 'Plutôt non / Rarement', val: 2 },
@@ -194,13 +220,14 @@ export default function Quiz() {
                 key={opt.val}
                 type="button"
                 onClick={() => handleAnswer(opt.val)}
-                className="w-full p-5 bg-slate-800/40 border border-slate-700/50 rounded-2xl text-left transition-all hover:bg-brand-orange hover:border-brand-orange flex items-center justify-between group"
+                aria-label={`${opt.label}, note ${opt.val} sur 5`}
+                className="focus-ring w-full p-5 bg-slate-800/40 border border-slate-700/50 rounded-2xl text-left transition-all hover:bg-brand-orange hover:border-brand-orange flex items-center justify-between group"
               >
                 <span className="font-medium text-slate-300 group-hover:text-white transition-colors">
                   {opt.label}
                 </span>
-                <div className="w-5 h-5 rounded-full border-2 border-slate-600 group-hover:border-white flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full scale-0 group-hover:scale-100 transition-transform"></div>
+                <div className="w-5 h-5 rounded-full border-2 border-slate-600 group-hover:border-white flex items-center justify-center" aria-hidden="true">
+                  <div className="w-2 h-2 bg-white rounded-full scale-0 group-hover:scale-100 transition-transform" />
                 </div>
               </button>
             ))}
@@ -211,14 +238,17 @@ export default function Quiz() {
           <button
             type="button"
             onClick={() => (currentStep === 0 ? setProfile(null) : setCurrentStep(currentStep - 1))}
-            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-all"
+            className="focus-ring flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-all"
           >
-            <ChevronLeft size={14} /> Retour
+            <ChevronLeft size={14} aria-hidden="true" /> Retour
           </button>
-          <div className="flex items-center gap-2 text-slate-600">
-            <HelpCircle size={14} />
+          <Link
+            to="/contact"
+            className="focus-ring flex items-center gap-2 text-slate-600 hover:text-brand-orange transition-all"
+          >
+            <HelpCircle size={14} aria-hidden="true" />
             <span className="text-[10px] font-bold uppercase tracking-widest">Besoin d&apos;aide ?</span>
-          </div>
+          </Link>
         </div>
       </div>
     </div>

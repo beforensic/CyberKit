@@ -29,7 +29,6 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 
 - `ProgressContext` non persisté (perdu au refresh)
 - Double thème dark (accueil, quiz) / light (ressources, contact) — assumé ou à documenter
-- Accessibilité (ARIA, clavier sur tooltips quiz / tags)
 
 **Maturité globale :** bonne pour un outil pédagogique ; sécurité et contact **nettement renforcés** ; dette limitée à UX secondaire et polish.
 
@@ -109,7 +108,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 
 #### A3 — Accessibilité
 
-- ARIA, focus clavier (navigation, quiz, `KeywordTooltip`)
+- **Base faite** : skip link, focus route, nav ARIA, quiz (`progressbar`, `radiogroup`, live regions), contact (`htmlFor`/`id`), ressources (recherche, filtres), `KeywordTooltip` clavier + `role="tooltip"`, `prefers-reduced-motion`
 
 ---
 
@@ -145,7 +144,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 
 | Action | Effort |
 |--------|--------|
-| Accessibilité de base | 1–2 j |
+| Accessibilité de base | 1–2 j | **Fait** (base : nav, quiz, contact, ressources, tooltips) |
 | Persistance `ProgressContext` | 0,5 j |
 | Renforcer plafonds IA ou auth optionnelle | 1 j |
 
@@ -179,7 +178,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Architecture | `admin-contact-messages` Edge | **Supprimée** (RPC seul) |
 | Architecture | ProgressContext | **À faire** |
 | Charte | Dark/light | **À documenter** |
-| A11y | ARIA / clavier | **À faire** |
+| A11y | ARIA / clavier (base) | **Fait** |
 
 ---
 
@@ -248,6 +247,6 @@ flowchart LR
 ## Prochaines étapes suggérées
 
 1. Vérifier en prod : contact (email + ligne BDD), admin Messages, quiz + analyse IA.
-2. Choisir la suite : accessibilité, `ProgressContext`, ou design system — selon priorité produit.
+2. Choisir la suite : `ProgressContext`, design system, ou durcissement IA (S1) — selon priorité produit.
 
 **Edge Functions en prod (project-ref `bzxzxzmxiqvnhmlcwqre`, mai 2026) :** `submit-contact`, `generate-analysis`, `explain-keyword` uniquement.

@@ -33,7 +33,7 @@ export default function QuizResults() {
         </p>
         <Link
           to="/quiz"
-          className="px-8 py-4 bg-brand-orange text-white rounded-2xl font-bold hover:bg-brand-orange-600 transition-colors"
+          className="focus-ring px-8 py-4 bg-brand-orange text-white rounded-2xl font-bold hover:bg-brand-orange-600 transition-colors"
         >
           Lancer le diagnostic
         </Link>
@@ -72,8 +72,12 @@ export default function QuizResults() {
         </p>
 
         <div className="bg-slate-800/20 backdrop-blur-md border border-slate-700/50 rounded-[2.5rem] p-8 md:p-12 mb-8 text-center">
-          <div className={`inline-flex items-center justify-center w-40 h-40 rounded-full border-8 ${ringColor} mb-6`}>
-            <span className={`text-5xl font-black ${scoreColor}`}>{score}%</span>
+          <div
+            className={`inline-flex items-center justify-center w-40 h-40 rounded-full border-8 ${ringColor} mb-6`}
+            role="img"
+            aria-label={`Score de sécurité : ${score} pour cent`}
+          >
+            <span className={`text-5xl font-black ${scoreColor}`} aria-hidden="true">{score}%</span>
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">{level.label}</h2>
           <p className="text-slate-400">{level.description}</p>
@@ -98,18 +102,18 @@ export default function QuizResults() {
           <button
             type="button"
             onClick={() => navigate('/resources')}
-            className="flex items-center justify-center gap-3 p-6 bg-slate-800/40 border border-slate-700 rounded-2xl text-white font-bold hover:border-brand-orange transition-all"
+            className="focus-ring flex items-center justify-center gap-3 p-6 bg-slate-800/40 border border-slate-700 rounded-2xl text-white font-bold hover:border-brand-orange transition-all"
           >
-            <BookOpen size={20} className="text-brand-orange" />
+            <BookOpen size={20} className="text-brand-orange" aria-hidden="true" />
             Voir les ressources
-            <ArrowRight size={16} />
+            <ArrowRight size={16} aria-hidden="true" />
           </button>
           <button
             type="button"
             onClick={() => navigate('/quiz')}
-            className="flex items-center justify-center gap-3 p-6 bg-slate-800/40 border border-slate-700 rounded-2xl text-white font-bold hover:border-brand-orange transition-all"
+            className="focus-ring flex items-center justify-center gap-3 p-6 bg-slate-800/40 border border-slate-700 rounded-2xl text-white font-bold hover:border-brand-orange transition-all"
           >
-            <RotateCcw size={20} className="text-brand-orange" />
+            <RotateCcw size={20} className="text-brand-orange" aria-hidden="true" />
             Refaire le test
             <ArrowRight size={16} />
           </button>

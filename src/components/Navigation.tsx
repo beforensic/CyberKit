@@ -15,7 +15,7 @@ export default function Navigation() {
   const isQuizActive = pathname === '/quiz' || pathname.startsWith('/quiz/');
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-3 py-2 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+    <nav aria-label="Navigation principale" className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-3 py-2 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
       <div className="max-w-lg mx-auto flex justify-between items-center">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -29,7 +29,7 @@ export default function Navigation() {
               key={item.path}
               to={item.path}
               end={item.end}
-              className={`flex flex-col items-center gap-1 p-2 transition-all rounded-xl ${
+              className={`focus-ring flex flex-col items-center gap-1 p-2 transition-all rounded-xl ${
                 isActive
                   ? 'text-brand-orange'
                   : isHighlight
@@ -46,7 +46,7 @@ export default function Navigation() {
                       : ''
                 }`}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'}`} />
+                <Icon aria-hidden="true" className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'}`} />
               </div>
               <span
                 className={`text-[9px] font-black uppercase tracking-wider ${

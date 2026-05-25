@@ -87,8 +87,9 @@ export default function Contact() {
             Merci de votre confiance. Serge Houtain reviendra vers vous personnellement dans les plus brefs délais.
           </p>
           <button
+            type="button"
             onClick={() => navigate('/')}
-            className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all"
+            className="focus-ring w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all"
           >
             Retour à l'accueil
           </button>
@@ -142,8 +143,8 @@ export default function Contact() {
           <div className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-xl border border-slate-100">
             <form onSubmit={handleSubmit} className="relative space-y-6">
               {error && (
-                <div className="p-4 bg-red-50 text-red-600 rounded-2xl flex items-center gap-3">
-                  <AlertCircle className="w-5 h-5" />
+                <div role="alert" className="p-4 bg-red-50 text-red-600 rounded-2xl flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5" aria-hidden="true" />
                   <p className="text-sm font-medium">{error}</p>
                 </div>
               )}
@@ -160,12 +161,14 @@ export default function Contact() {
               />
 
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">
-                  <User className="w-4 h-4" /> Votre nom
+                <label htmlFor="contact-name" className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">
+                  <User className="w-4 h-4" aria-hidden="true" /> Votre nom
                 </label>
                 <input
+                  id="contact-name"
                   required
                   type="text"
+                  autoComplete="name"
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all"
@@ -174,12 +177,14 @@ export default function Contact() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">
-                  <Mail className="w-4 h-4" /> Email
+                <label htmlFor="contact-email" className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">
+                  <Mail className="w-4 h-4" aria-hidden="true" /> Email
                 </label>
                 <input
+                  id="contact-email"
                   required
                   type="email"
+                  autoComplete="email"
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all"
@@ -188,10 +193,11 @@ export default function Contact() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">
-                  <Home className="w-4 h-4" /> Sujet
+                <label htmlFor="contact-subject" className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">
+                  <Home className="w-4 h-4" aria-hidden="true" /> Sujet
                 </label>
                 <input
+                  id="contact-subject"
                   required
                   type="text"
                   value={formData.subject}
@@ -202,8 +208,9 @@ export default function Contact() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 ml-1">Message</label>
+                <label htmlFor="contact-message" className="text-sm font-bold text-slate-700 ml-1">Message</label>
                 <textarea
+                  id="contact-message"
                   required
                   rows={4}
                   value={formData.message}
@@ -216,7 +223,8 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-5 bg-brand-orange text-white rounded-2xl font-bold text-lg hover:bg-brand-orange-600 transition-all flex items-center justify-center gap-3 shadow-lg shadow-brand-orange/20 disabled:opacity-50"
+                aria-busy={loading}
+                className="focus-ring w-full py-5 bg-brand-orange text-white rounded-2xl font-bold text-lg hover:bg-brand-orange-600 transition-all flex items-center justify-center gap-3 shadow-lg shadow-brand-orange/20 disabled:opacity-50"
               >
                 {loading ? 'Envoi...' : (
                   <>

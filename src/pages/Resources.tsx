@@ -95,8 +95,9 @@ export default function Resources() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange" />
+      <div className="min-h-screen flex items-center justify-center" role="status" aria-live="polite">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange" aria-hidden="true" />
+        <span className="sr-only">Chargement des ressources</span>
       </div>
     );
   }
@@ -122,9 +123,13 @@ export default function Resources() {
               <p className="text-slate-500 text-sm font-medium">Vos outils pour une sécurité maximale</p>
             </div>
             <div className="relative max-w-md w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
+              <label htmlFor="resource-search" className="sr-only">
+                Rechercher une ressource
+              </label>
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" aria-hidden="true" />
               <input
-                type="text"
+                id="resource-search"
+                type="search"
                 placeholder="Rechercher..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -136,10 +141,12 @@ export default function Resources() {
           <div className="relative flex items-center">
             {canScrollLeft && (
               <button
+                type="button"
                 onClick={() => scroll('left')}
-                className="absolute left-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-brand-orange transition-all -ml-2 border border-slate-100"
+                aria-label="Faire défiler les thèmes vers la gauche"
+                className="focus-ring absolute left-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-brand-orange transition-all -ml-2 border border-slate-100"
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft size={20} aria-hidden="true" />
               </button>
             )}
 
@@ -155,8 +162,10 @@ export default function Resources() {
               }}
             >
               <button
+                type="button"
                 onClick={() => handleThemeChange(null)}
-                className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${
+                aria-pressed={!selectedThemeId}
+                className={`focus-ring px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${
                   !selectedThemeId
                     ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
@@ -167,8 +176,10 @@ export default function Resources() {
               {themes.map((theme) => (
                 <button
                   key={theme.id}
+                  type="button"
                   onClick={() => handleThemeChange(theme.id)}
-                  className={`px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${
+                  aria-pressed={selectedThemeId === theme.id}
+                  className={`focus-ring px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${
                     selectedThemeId === theme.id
                       ? 'bg-brand-orange text-white shadow-lg'
                       : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
@@ -182,10 +193,12 @@ export default function Resources() {
 
             {canScrollRight && (
               <button
+                type="button"
                 onClick={() => scroll('right')}
-                className="absolute right-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-brand-orange transition-all -mr-2 border border-slate-100"
+                aria-label="Faire défiler les thèmes vers la droite"
+                className="focus-ring absolute right-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-brand-orange transition-all -mr-2 border border-slate-100"
               >
-                <ChevronRight size={20} />
+                <ChevronRight size={20} aria-hidden="true" />
               </button>
             )}
           </div>

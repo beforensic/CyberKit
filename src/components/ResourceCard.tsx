@@ -53,10 +53,13 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
           {getIcon()}
         </div>
         <button
+          type="button"
           onClick={handleToggleFavorite}
-          className={`p-2 rounded-full transition-colors ${isFavorite ? 'text-red-500 bg-red-50' : 'text-slate-200 hover:text-red-500 hover:bg-red-50'}`}
+          aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+          aria-pressed={isFavorite}
+          className={`focus-ring p-2 rounded-full transition-colors ${isFavorite ? 'text-red-500 bg-red-50' : 'text-slate-200 hover:text-red-500 hover:bg-red-50'}`}
         >
-          <svg className={`w-6 h-6 ${isFavorite ? 'fill-current' : 'fill-none'}`} stroke="currentColor" viewBox="0 0 24 24">
+          <svg aria-hidden="true" className={`w-6 h-6 ${isFavorite ? 'fill-current' : 'fill-none'}`} stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.364-1.364a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
@@ -100,17 +103,19 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
           href={resource.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full py-4 bg-white border-2 border-brand-orange text-brand-orange rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-brand-orange hover:text-white transition-all shadow-sm"
+          className="focus-ring w-full py-4 bg-white border-2 border-brand-orange text-brand-orange rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-brand-orange hover:text-white transition-all shadow-sm"
         >
-          {resource.type === 'link' ? <ExternalLink size={18} /> : <Download size={18} />}
+          {resource.type === 'link' ? <ExternalLink size={18} aria-hidden="true" /> : <Download size={18} aria-hidden="true" />}
           {resource.type === 'link' ? 'Consulter' : 'Télécharger'}
+          <span className="sr-only"> (nouvel onglet)</span>
         </a>
 
         <button
+          type="button"
           onClick={() => navigate(`/contact?subject=${encodeURIComponent(`Question sur : ${resource.title}`)}`)}
-          className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-slate-600 transition-colors text-xs font-medium"
+          className="focus-ring w-full flex items-center justify-center gap-2 text-slate-400 hover:text-slate-600 transition-colors text-xs font-medium"
         >
-          <MessageCircle size={14} /> Besoin d'aide sur ce sujet ?
+          <MessageCircle size={14} aria-hidden="true" /> Besoin d'aide sur ce sujet ?
         </button>
       </div>
     </div>
