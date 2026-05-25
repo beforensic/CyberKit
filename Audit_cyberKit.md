@@ -1,107 +1,86 @@
-# Audit CyberKit — État au 25 mai 2026
+# Audit CyberKit — État au 25 mai 2026 (mise à jour)
 
-Document de suivi après audit initial, correctifs RLS, retrait entreprise/Stripe, et améliorations UX/conversion.
+Document de suivi : audit initial, durcissement sécurité, contact / Resend, admin messages, retrait chatbot.
 
 **Projet :** application gratuite de sensibilisation cybersécurité (indépendants & TPE belges)  
 **Stack :** React 18, Vite, Tailwind, Supabase, Vercel  
-**Production :** [https://www.cyberkit.be](https://www.cyberkit.be)
+**Production :** [https://www.cyberkit.be](https://www.cyberkit.be)  
+**Branche de référence :** `main` (commit récent : `d4ce274`)
 
 ---
 
 ## PARTIE 1 — Vue d’ensemble
 
-CyberKit est une SPA mature pour son périmètre : diagnostic quiz, bibliothèque de ressources, admin CMS, formulaire contact vers beForensic. Le produit est aligné sur un modèle **100 % gratuit in-app**, la conversion payante passant par **Contact** et **À propos**, pas par abonnement Stripe.
+CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèque de ressources, admin CMS, formulaire contact + notification email vers beForensic. Modèle **100 % gratuit in-app** ; l’offre payante passe par **Contact** et **À propos**.
 
 **Points forts actuels**
 
-- React Router avec URLs partageables (`/quiz`, `/quiz/resultats`, `/resources`, etc.)
-- Cache catalogue (`CatalogContext`, `useThemes`, `useResources`)
-- RLS durcie pour l’admin (`is_cyberkit_admin()`, migration `20260525120000`)
-- Diagnostic opérationnel (questions via alias `label:text`, résultats + `generate-analysis`)
-- Tokens `brand-orange` / `surface-*` dans Tailwind
-- CTA contact visibles (`ContactCtaBanner`) ; lien Admin retiré de la nav publique
-- Edge Functions déployées : `chat-assistant`, `generate-analysis`, `explain-keyword`
+- React Router, cache catalogue (`CatalogContext`)
+- RLS admin (`is_cyberkit_admin()`, `grant_cyberkit_admin.sql`)
+- Quiz + `generate-analysis` + infobulles `explain-keyword`
+- Contact : `submit-contact` (anti-spam) + enregistrement BDD + **email Resend** → `contact@beforensic.be` (expéditeur `noreply@beforensic.be`)
+- Admin : onglet **Messages** (`ContactMessagesPanel`, RPC `admin_list_contact_messages`)
+- Edge Functions IA : CORS limité à `cyberkit.be` + rate limiting (`edge_rate_limits`)
+- Headers sécurité dans `vercel.json` (CSP, X-Frame-Options, etc.)
+- Charte : accents `brand-orange` harmonisés sur Home / résultats / CoachCallout / succès contact
+- Nav publique sans lien Admin ; CTA contact (`ContactCtaBanner`)
 
 **Fragilités restantes**
 
-- Edge Functions IA toujours appelables publiquement (CORS `*`, pas de rate limit)
-- `ChatBot` et `ExportProject` présents dans le code mais non routés
-- Double thème visuel dark (accueil/quiz) / light (ressources, contact)
-- Accents `emerald` ponctuels hors charte orange
 - `ProgressContext` non persisté (perdu au refresh)
+- Double thème dark (accueil, quiz) / light (ressources, contact) — assumé ou à documenter
+- `npm audit fix` non appliqué régulièrement
+- Accessibilité (ARIA, clavier sur tooltips quiz / tags)
+- Fonction Edge `admin-contact-messages` présente mais **non utilisée** par le front (RPC à la place)
 
-**Maturité globale :** bonne pour un outil pédagogique interne ; sécurité backend **nettement améliorée** ; dette limitée au code mort et au durcissement des APIs IA.
+**Maturité globale :** bonne pour un outil pédagogique ; sécurité et contact **nettement renforcés** ; dette limitée à UX secondaire et polish.
 
 ---
 
 ## PARTIE 2 — Audit sécurité
 
-### Corrigé en production (migrations appliquées)
+### Corrigé en production
 
 | Sujet | Statut | Référence |
 |-------|--------|-----------|
-| Écriture CMS (resources, themes, keywords) ouverte à `anon` | **Corrigé** | `20260525120000_harden_rls_single_admin.sql` |
-| Storage bucket `resources` modifiable en `anon` | **Corrigé** | idem |
-| Lecture publique table `companies` | **Corrigé** (tables supprimées si présentes) | `20260525140000_remove_enterprise_and_subscriptions.sql` |
-| Lecture anonyme `chat_logs` | **Corrigé** (lecture admin uniquement) | `20260525120000` |
-| Stripe / checkout / webhook entreprise | **Retiré** du repo | fonctions supprimées |
-| Lien Admin dans la navigation publique | **Corrigé** | `src/components/Navigation.tsx` |
+| Écriture CMS / storage en `anon` | **Corrigé** | `20260525120000_harden_rls_single_admin.sql` |
+| Entreprise / Stripe | **Retiré** | `20260525140000_remove_enterprise_and_subscriptions.sql` |
+| Chatbot + `chat-assistant` | **Retiré** | code + INSERT `chat_logs` anon supprimé (`20260525180000`) |
+| Contact INSERT direct `anon` | **Corrigé** | `submit-contact` + RLS (`20260525180000`) |
+| Anti-spam contact | **Corrigé** | honeypot, délai 3 s, rate limit 3/h/IP |
+| Email contact | **Corrigé** | Resend, domaine `beforensic.be`, `RESEND_API_KEY` |
+| Edge Functions IA ouvertes | **Partiellement corrigé** | CORS + rate limit (`_shared/cors.ts`, `rateLimit.ts`) |
+| Headers HTTP | **Corrigé** | `vercel.json` |
+| Admin nav publique | **Corrigé** | `Navigation.tsx` |
+| Lecture `chat_logs` anon | **Corrigé** | admin seul (`20260525120000`) |
 
-**Prérequis admin :** compte Supabase avec `app_metadata.role = "admin"` (script `supabase/scripts/grant_cyberkit_admin.sql`). Reconnexion obligatoire après attribution.
+**Prérequis admin :** `supabase/scripts/grant_cyberkit_admin.sql` → `app_metadata.role = "admin"` → **déconnexion / reconnexion** sur `/admin` (ne pas utiliser `refreshSession()` en boucle).
 
 ### Problèmes encore ouverts
 
-#### S1 — Edge Functions IA sans auth ni rate limiting
+#### S1 — Edge Functions IA : pas de JWT obligatoire
 
 | Champ | Détail |
 |-------|--------|
-| **Problème** | `chat-assistant`, `generate-analysis`, `explain-keyword` acceptent POST avec clé anon ; CORS `*`. |
-| **Risque** | Abus des clés Anthropic/OpenAI, coûts API. |
-| **Criticité** | **Élevé** |
-| **Fichiers** | `supabase/functions/chat-assistant/index.ts`, `generate-analysis/index.ts`, `explain-keyword/index.ts` |
-| **Recommandation** | Rate limiting (IP / session), CORS limité à `https://www.cyberkit.be`, option JWT pour usages sensibles. |
+| **État** | `generate-analysis` et `explain-keyword` : CORS restreint + rate limit (10/h et 30/h par IP). |
+| **Risque résiduel** | Abus possible sous le plafond ; alertes coût Anthropic recommandées. |
+| **Criticité** | **Moyen** (était élevé) |
+| **Fichiers** | `supabase/functions/generate-analysis/`, `explain-keyword/` |
 
-#### S2 — `company_members` encore permissif (si tables réactivées)
+#### S2 — `company_members` (si réactivation entreprise)
 
-| Champ | Détail |
-|-------|--------|
-| **Problème** | Migrations historiques `allow_*` sur `company_members` pour tout `authenticated`. |
-| **Risque** | Faible aujourd’hui (feature entreprise retirée, tables droppées en prod). |
-| **Criticité** | **Faible** (hors périmètre produit actuel) |
-| **Recommandation** | Ne pas réactiver l’espace entreprise sans repenser les policies. |
+| Criticité | **Faible** — tables retirées en prod. |
 
-#### S3 — Formulaire contact : INSERT direct sans rate limit
+#### S3 — Dépendances npm
 
-| Champ | Détail |
-|-------|--------|
-| **Problème** | `Contact.tsx` insère dans `contact_messages` ; `send-contact-email` existe mais n’est pas utilisé par le front. |
-| **Risque** | Spam en base. |
-| **Criticité** | **Moyen** |
-| **Fichiers** | `src/pages/Contact.tsx`, RLS `contact_messages` |
-| **Recommandation** | Honeypot + rate limit ou passage par Edge Function. |
-
-#### S4 — Absence de headers sécurité HTTP (CSP, etc.)
-
-| Champ | Détail |
-|-------|--------|
-| **Problème** | `vercel.json` ne définit que des rewrites SPA. |
-| **Criticité** | **Faible** |
-| **Recommandation** | Ajouter CSP, `X-Frame-Options`, `Referrer-Policy` dans Vercel. |
-
-#### S5 — Dépendances npm (audit)
-
-| Champ | Détail |
-|-------|--------|
-| **Problème** | Vulnérabilités transitoires (ReDoS, etc.) dans la chaîne de build. |
-| **Criticité** | **Faible à moyen** (outil dev) |
-| **Recommandation** | `npm audit fix` régulier. |
+| Criticité | **Faible à moyen** — `npm audit fix` périodique. |
 
 ### Bonnes pratiques en place
 
-- `.env` ignoré par git ; clés API côté Edge Functions uniquement
-- Webhook Stripe supprimé (n’était pas déployé)
-- `is_cyberkit_admin()` pour CMS, storage, analytics, contact (lecture admin)
-- Pas de `dangerouslySetInnerHTML` dans le front
+- Clés API uniquement en secrets Edge Functions
+- `supabase/.temp/` ignoré par git (plus de pollution du working tree)
+- Pas de `dangerouslySetInnerHTML`
+- Contact : double archivage (BDD + email)
 
 ---
 
@@ -111,145 +90,160 @@ CyberKit est une SPA mature pour son périmètre : diagnostic quiz, bibliothèqu
 
 | Sujet | Détail |
 |-------|--------|
-| Routage React Router | `src/App.tsx`, routes quiz/resultats |
-| Cache thèmes/ressources | `CatalogContext`, `src/services/catalog.ts` |
-| Quiz questions vides | `src/services/quizQuestions.ts` (alias `label:text`) |
-| Analyse IA résultats | `AIAnalysis` → `generate-analysis` + `quizWeakPoints.ts` |
-| Upload admin storage | Bucket `resources` dans `ResourceForm.tsx` |
-| Entreprise / Stripe | `CompaniesManager` supprimé ; pas de routes `/entreprise` |
+| Routage, catalogue, quiz `label:text` | inchangé, opérationnel |
+| Analyse IA résultats | `AIAnalysis` → `generate-analysis` |
+| Contact | `Contact.tsx` → `submit-contact` |
+| Admin messages | `ContactMessagesPanel` + RPC |
+| Admin session | plus de boucle déconnexion (`refreshSession` retiré) |
+| Code mort | `ChatBot`, `ChatbotAnalytics`, `ExportProject`, `chat-assistant`, `send-contact-email` **supprimés** |
 
 ### Encore à traiter
 
-#### A1 — Composants orphelins
+#### A1 — Progression ressources
 
-| Composant | Fichier | Impact |
-|-----------|---------|--------|
-| Chatbot flottant | `src/components/ChatBot.tsx` | Non monté dans `AppLayout` — feature invisible |
-| Export projet | `src/pages/ExportProject.tsx` | Non routé |
-| Progression ressources | `src/contexts/ProgressContext.tsx` | État perdu au refresh |
+| Fichier | `src/contexts/ProgressContext.tsx` |
+| Impact | État perdu au refresh |
+| Recommandation | `localStorage` si le parcours ressources est prioritaire |
 
-**Recommandation :** monter `ChatBot` dans `AppLayout` ou supprimer ; supprimer `ExportProject` ou ajouter route ; persister `ProgressContext` en `localStorage` si utile.
+#### A2 — Typage
 
-#### A2 — Typage et dette mineure
-
-- `any` dans `Admin.tsx`, formulaires admin
-- `npm run typecheck` échoue sur imports/typos préexistants (non bloquant au build Vite)
+- `any` dans `Admin.tsx` ; `npm run typecheck` avec erreurs préexistantes (build Vite OK)
 
 #### A3 — Accessibilité
 
-- Peu ou pas d’attributs ARIA sur navigation, modales, tooltips
-- Tooltips mots-clés : survol souris OK, à valider au clavier / mobile
-
-#### A4 — `send-contact-email` non branché
-
-- Fonction déployée possiblement absente ; le contact utilise l’INSERT Supabase direct
+- ARIA, focus clavier (navigation, quiz, `KeywordTooltip`)
 
 ---
 
-## PARTIE 4 — Charte graphique / design system
+## PARTIE 4 — Charte graphique
 
 ### Existant
 
-- Tokens : `brand-orange`, `surface-dark`, `surface-light` (`tailwind.config.js`, `index.css`)
-- Classes utilitaires : `.page-dark`, `.page-light`, `.glass-card`, `.text-gradient`
-- Marque **CyberKit** unifiée sur l’UI principale (PDF / AudioPlayer corrigés)
+- Tokens `brand-orange`, `surface-*`, `.page-dark` / `.page-light`
+- Succès contact et CoachCallout alignés sur **brand-orange** (plus d’`emerald` sur les écrans principaux)
 
-### Incohérences restantes
+### Restant
 
-| Sujet | Où | Recommandation |
-|-------|-----|----------------|
-| Dark vs light par route | `AppLayout.tsx` (`/`, `/quiz` dark ; reste light) | Assumer le split « marketing / outil » ou unifier |
-| Accents `emerald` | `Home.tsx`, `QuizResults.tsx`, `CoachCallout.tsx` | Remplacer par `brand-orange` / slate |
-| Rayons / espacements variables | `rounded-2xl` vs `rounded-[2.5rem]` | Mini design system (`Button`, `Card`) |
-| Contact succès en `green-*` | `Contact.tsx` | Aligner sur `brand-orange` |
-
-### Mini design system suggéré
-
-- Composants : `Button`, `Card`, `Badge`, `ContactCtaBanner` (déjà créé)
-- Document court `DESIGN.md` : palette, rayons, 2 modes de page
+| Sujet | Recommandation |
+|-------|----------------|
+| Dark vs light par route | Documenter le choix « marketing / lecture » ou unifier |
+| Rayons variables | Mini design system (`Button`, `Card`) optionnel |
+| `DESIGN.md` | Palette + 2 modes de page |
 
 ---
 
-## PARTIE 5 — Plan d’amélioration priorisé (restant)
+## PARTIE 5 — Plan d’amélioration (restant)
 
-### Quick wins (1–3 jours)
+### Quick wins
 
-| Action | Objectif | Zone |
-|--------|----------|------|
-| Monter ou supprimer `ChatBot` | Feature assistant visible ou code mort retiré | `AppLayout.tsx` |
-| Remplacer `emerald` par `brand-orange` | Cohérence visuelle | `Home.tsx`, `QuizResults.tsx` |
-| `npm audit fix` | Réduire CVE build | `package.json` |
-| Headers sécurité Vercel | Durcissement navigateur | `vercel.json` |
+| Action | Effort |
+|--------|--------|
+| `npm audit fix` | 0,5 j |
+| Supprimer Edge Function `admin-contact-messages` si inutile (doublon RPC) | 0,5 h |
+| Retirer secret `OPENAI_API_KEY` si plus utilisé | 5 min |
 
-### Intermédiaire (1–2 semaines)
+### Intermédiaire
 
-| Action | Objectif | Zone |
-|--------|----------|------|
-| Rate limit + CORS Edge Functions IA | Limiter abus API | `supabase/functions/*` |
-| Anti-spam contact | Réduire spam formulaire | `Contact.tsx` ou Edge Function |
-| Supprimer `ExportProject` ou l’intégrer | Réduire dette | `src/pages/` |
-| Accessibilité de base | ARIA, focus visible | Navigation, quiz, tooltips |
+| Action | Effort |
+|--------|--------|
+| Accessibilité de base | 1–2 j |
+| Persistance `ProgressContext` | 0,5 j |
+| Renforcer plafonds IA ou auth optionnelle | 1 j |
 
 ### Long terme
 
-| Action | Objectif | Zone |
-|--------|----------|------|
-| Design system minimal | Maintenabilité UI | `src/ui/` |
-| Persistance progression | UX parcours ressources | `ProgressContext` |
-| Admin via Edge Functions + service role | Supprimer toute écriture CMS côté client | Backend + admin |
+| Action | Effort |
+|--------|--------|
+| Design system minimal (`src/ui/`) | 3–5 j |
+| Documenter ou unifier dark/light | 3–5 j |
 
 ---
 
 ## PARTIE 6 — Tableau de synthèse
 
-| Catégorie | Problème | Impact | Priorité | Recommandation | Effort |
-|-----------|----------|--------|----------|----------------|--------|
-| Sécurité | Edge Functions IA ouvertes | Coûts API | P0 | Rate limit + CORS | 2–3 j |
-| Sécurité | Spam contact | Pollution DB | P2 | Honeypot / Edge Function | 1 j |
-| Sécurité | Pas de CSP | XSS amplifié | P3 | Headers Vercel | 0,5 j |
-| Architecture | ChatBot non monté | Feature absente | P1 | Intégrer ou supprimer | 1 h |
-| Architecture | ExportProject orphelin | Dette | P3 | Supprimer ou router | 0,5 j |
-| Architecture | ProgressContext volatile | UX | P3 | localStorage | 0,5 j |
-| UX/UI | CTA contact | Conversion beForensic | — | **Fait** (`ContactCtaBanner`) | — |
-| UX/UI | Admin hors nav | Surface attaque | — | **Fait** | — |
-| UX/UI | explain-keyword | Tags ressources | — | **Fait** (déployé + ResourceCard) | — |
-| Charte | emerald hors palette | Incohérence | P2 | Tokens succès | 1 j |
-| Charte | Dark/light mixte | 2 univers | P3 | Documenter ou unifier | 3–5 j |
-| Sécurité | RLS CMS anon | Défacement | — | **Fait** (migration RLS) | — |
-| Sécurité | Stripe / entreprise | Complexité | — | **Retiré** | — |
-| Produit | Quiz sans libellé | Bloquant | — | **Fait** (`label:text`) | — |
+| Catégorie | Sujet | Statut |
+|-----------|--------|--------|
+| Sécurité | RLS CMS / storage | **Fait** |
+| Sécurité | Stripe / entreprise | **Retiré** |
+| Sécurité | Chatbot / chat-assistant | **Retiré** |
+| Sécurité | Anti-spam + submit-contact | **Fait** |
+| Sécurité | CORS + rate limit IA | **Fait** (partiel) |
+| Sécurité | Headers Vercel | **Fait** |
+| Produit | Quiz libellés | **Fait** |
+| Produit | Email contact Resend | **Fait** |
+| UX | CTA contact, admin hors nav | **Fait** |
+| UX | explain-keyword | **Fait** |
+| Admin | Inbox messages (RPC) | **Fait** |
+| Admin | Boucle login | **Fait** |
+| Charte | emerald → orange | **Fait** (écrans principaux) |
+| Architecture | ChatBot / ExportProject | **Supprimés** |
+| Architecture | ProgressContext | **À faire** |
+| Charte | Dark/light | **À documenter** |
+| A11y | ARIA / clavier | **À faire** |
 
 ---
 
 ## Edge Functions Supabase (état actuel)
 
-| Fonction | Déployée | Utilisée par le front |
-|----------|----------|------------------------|
-| `chat-assistant` | Oui | Non (ChatBot non monté) ; admin analytics lecture logs |
-| `generate-analysis` | Oui | Oui (`AIAnalysis.tsx`) |
-| `explain-keyword` | Oui | Oui (`KeywordTooltip` sur tags ressources) |
-| `send-contact-email` | À vérifier | Non (INSERT direct) |
-| `create-checkout-session` | Non | Supprimée du repo |
-| `stripe-webhook` | Non | Supprimée du repo |
-| `generate-diagnostic-report` | Supprimée | Remplacée par `generate-analysis` |
+| Fonction | Déployée | Utilisée |
+|----------|----------|----------|
+| `submit-contact` | Oui | Oui — formulaire contact |
+| `generate-analysis` | Oui | Oui — résultats quiz |
+| `explain-keyword` | Oui | Oui — tags ressources |
+| `admin-contact-messages` | Oui | Non — remplacé par RPC SQL |
+| `chat-assistant` | À supprimer du dashboard | Non — retiré du repo |
+| `send-contact-email` | Non | Supprimée (logique dans `submit-contact` + Resend) |
 
-**Secrets attendus :** `ANTHROPIC_API_KEY` (et éventuellement `OPENAI_API_KEY` pour `chat-assistant`).
+**Secrets Edge Functions**
+
+| Secret | Usage |
+|--------|--------|
+| `ANTHROPIC_API_KEY` | IA quiz + mots-clés |
+| `RESEND_API_KEY` | Email → `contact@beforensic.be` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Auto (submit-contact, rate limits) |
+
+**RPC admin (PostgreSQL)**
+
+| Fonction | Usage |
+|----------|--------|
+| `admin_list_contact_messages()` | Liste messages dans `/admin` |
+| `admin_update_contact_message_status()` | Statuts new / read / replied |
 
 ---
 
-## Questions à clarifier
+## Flux contact (référence)
 
-1. Souhaitez-vous réactiver le **chatbot flottant** sur toutes les pages ou uniquement sur `/resources` ?
-2. Faut-il brancher **`send-contact-email`** (Resend) à la place de l’INSERT Supabase ?
-3. Le **double thème** dark/light est-il voulu (accueil premium / outil lecture) ou temporaire ?
+```mermaid
+flowchart LR
+  A[Formulaire /contact] --> B[submit-contact]
+  B --> C[(contact_messages)]
+  B --> D[Resend]
+  D --> E[contact@beforensic.be]
+  C --> F[Admin /admin Messages]
+```
 
 ---
 
-## Historique des correctifs (cette session)
+## Historique des correctifs (session mai 2026)
 
-- `20260525120000_harden_rls_single_admin.sql` — RLS admin
-- `20260525140000_remove_enterprise_and_subscriptions.sql` — retrait schéma entreprise
-- Quiz : `quizQuestions.ts`, `getQuestionLabel` / alias `label:text`
-- `AIAnalysis` → `generate-analysis`
-- `ContactCtaBanner`, nav sans Admin, `explain-keyword` déployé
-- Commits : `fa706f3`, `1cad9c5` sur `main`
+| Date / commit | Changement |
+|---------------|------------|
+| `fa706f3` | RLS, retrait entreprise/Stripe, fix quiz |
+| `1cad9c5` | CTA contact, admin hors nav, explain-keyword |
+| `8d6976a` | Audit document initial |
+| `a47603b` | Retrait chatbot, hardening Edge Functions, submit-contact |
+| `df04f0c` / `2cad141` | Resend, domaine `beforensic.be` |
+| `a18d313` | Inbox messages admin |
+| `b79f371` | Fix boucle déconnexion admin |
+| `4e6fb2c` | Messages admin via RPC (plus Edge Function côté front) |
+| `d4ce274` | `supabase/.temp/` ignoré par git |
+
+**Migrations clés :** `20260525120000`, `20260525140000`, `20260525180000`, `20260525190000`, `20260525200000`
+
+---
+
+## Prochaines étapes suggérées
+
+1. Vérifier en prod : contact (email + ligne BDD), admin Messages, quiz + analyse IA.
+2. Supprimer `chat-assistant` dans le dashboard Supabase si encore listée.
+3. Choisir la suite : accessibilité, `ProgressContext`, ou design system — selon priorité produit.
