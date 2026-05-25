@@ -31,6 +31,15 @@ const STATUS_STYLES: Record<ContactMessage['status'], string> = {
   replied: 'bg-slate-100 text-slate-600 border-slate-200',
 };
 
+const VALID_STATUS = new Set<ContactMessage['status']>(['new', 'read', 'replied']);
+
+function normalizeMessage(row: Record<string, unknown>): ContactMessage {
+  const status = VALID_STATUS.has(row.status as ContactMessage['status'])
+    ? (row.status as ContactMessage['status'])
+    : 'new';
+  return { ...row, status } as ContactMessage;
+}
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString('fr-BE', {
     day: '2-digit',
@@ -48,22 +57,39 @@ export default function ContactMessagesPanel() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadMessages = useCallback(async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('contact_messages')
-        .select('*')
-        .order('created_at', { ascending: false });
+      setLoadError(null);
+
+      await supabase.auth.refreshSession();
+
+      const { data, error } = await supabase.functions.invoke(
+        'admin-contact-messages',
+        { body: {} },
+      );
 
       if (error) throw error;
-      const rows = (data as ContactMessage[]) ?? [];
+      if (data?.error) {
+        setLoadError(data.error);
+        setMessages([]);
+        return;
+      }
+
+      const rows = ((data?.messages as Record<string, unknown>[]) ?? []).map(
+        normalizeMessage,
+      );
       setMessages(rows);
       setSelectedId(prev => prev ?? rows[0]?.id ?? null);
     } catch (err) {
       console.error('Erreur chargement messages:', err);
-      alert('Impossible de charger les messages. Vérifiez que votre compte est admin.');
+      const msg = err instanceof Error ? err.message : 'Erreur inconnue';
+      setLoadError(
+        `Impossible de charger les messages (${msg}). Déconnectez-vous puis reconnectez-vous sur /admin après avoir exécuté grant_cyberkit_admin.sql.`,
+      );
+      setMessages([]);
     } finally {
       setLoading(false);
     }
@@ -76,12 +102,13 @@ export default function ContactMessagesPanel() {
   const updateStatus = async (id: string, status: ContactMessage['status']) => {
     try {
       setUpdating(true);
-      const { error } = await supabase
-        .from('contact_messages')
-        .update({ status })
-        .eq('id', id);
+      const { data, error } = await supabase.functions.invoke(
+        'admin-contact-messages',
+        { body: { action: 'update', id, status } },
+      );
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       setMessages(prev =>
         prev.map(m => (m.id === id ? { ...m, status } : m)),
@@ -163,10 +190,20 @@ export default function ContactMessagesPanel() {
         </select>
       </div>
 
-      {filtered.length === 0 ? (
+      {loadError ? (
+        <div className="flex-1 flex flex-col items-center justify-center py-16 px-8 text-center">
+          <Mail className="w-12 h-12 mb-4 text-red-300" />
+          <p className="font-bold text-slate-800 mb-2">Chargement impossible</p>
+          <p className="text-sm text-slate-600 max-w-md leading-relaxed">{loadError}</p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center py-20 text-slate-400">
           <Mail className="w-12 h-12 mb-4 opacity-30" />
-          <p className="font-medium">Aucun message pour ce filtre.</p>
+          <p className="font-medium">
+            {messages.length === 0
+              ? 'Aucun message en base.'
+              : 'Aucun message pour ce filtre.'}
+          </p>
         </div>
       ) : (
         <div className="flex flex-1 flex-col lg:flex-row min-h-0">
@@ -304,11 +341,15 @@ export default function ContactMessagesPanel() {
 
 /** Nombre de messages « new » pour badge nav admin (optionnel). */
 export async function fetchNewContactCount(): Promise<number> {
-  const { count, error } = await supabase
-    .from('contact_messages')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'new');
-
-  if (error) return 0;
-  return count ?? 0;
+  try {
+    const { data, error } = await supabase.functions.invoke(
+      'admin-contact-messages',
+      { body: {} },
+    );
+    if (error || data?.error) return 0;
+    const rows = (data?.messages as ContactMessage[]) ?? [];
+    return rows.filter(m => (m.status ?? 'new') === 'new').length;
+  } catch {
+    return 0;
+  }
 }

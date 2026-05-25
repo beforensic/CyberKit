@@ -40,7 +40,9 @@ export default function Admin() {
 
   useEffect(() => {
     if (!session) return;
-    fetchNewContactCount().then(setNewMessageCount);
+    supabase.auth.refreshSession().then(() => {
+      fetchNewContactCount().then(setNewMessageCount);
+    });
   }, [session, activeTab]);
 
   const handleLogin = async (e: React.FormEvent) => {
