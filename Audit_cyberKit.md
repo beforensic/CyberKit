@@ -45,7 +45,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Contact INSERT direct `anon` | **Corrigé** | `submit-contact` + RLS (`20260525180000`) |
 | Anti-spam contact | **Corrigé** | honeypot, délai 3 s, rate limit 3/h/IP |
 | Email contact | **Corrigé** | Resend, domaine `beforensic.be`, `RESEND_API_KEY` |
-| Edge Functions IA ouvertes | **Partiellement corrigé** | CORS + rate limit (`_shared/cors.ts`, `rateLimit.ts`) |
+| Edge Functions IA ouvertes | **Corrigé** | JWT + CORS + rate limit (`aiAccess.ts`, `config.toml`) |
 | Headers HTTP | **Corrigé** | `vercel.json` |
 | Admin nav publique | **Corrigé** | `Navigation.tsx` |
 | Lecture `chat_logs` anon | **Corrigé** | admin seul (`20260525120000`) |
@@ -54,14 +54,14 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 
 ### Problèmes encore ouverts
 
-#### S1 — Edge Functions IA : pas de JWT obligatoire
+#### S1 — Edge Functions IA — **Corrigé** (déployer les fonctions)
 
 | Champ | Détail |
 |-------|--------|
-| **État** | `generate-analysis` et `explain-keyword` : CORS restreint + rate limit (10/h et 30/h par IP). |
-| **Risque résiduel** | Abus possible sous le plafond ; alertes coût Anthropic recommandées. |
-| **Criticité** | **Moyen** (était élevé) |
-| **Fichiers** | `supabase/functions/generate-analysis/`, `explain-keyword/` |
+| **État** | JWT Supabase obligatoire (`verify_jwt` + vérif. signature), CORS strict, rate limit IP + plafond global 24 h, fail-closed. |
+| **Plafonds** | Analyse : 5/h et 120/j (global) · Mots-clés : 20/h et 400/j (global). |
+| **Risque résiduel** | Alertes budget **Anthropic** côté console (hors repo). |
+| **Fichiers** | `supabase/functions/_shared/aiAccess.ts`, `generate-analysis/`, `explain-keyword/`, `config.toml` |
 
 #### S2 — `company_members` (si réactivation entreprise)
 
@@ -145,7 +145,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 |--------|--------|
 | Accessibilité de base | 1–2 j | **Fait** (base : nav, quiz, contact, ressources, tooltips) |
 | Persistance `ProgressContext` | 0,5 j | **Fait** |
-| Renforcer plafonds IA ou auth optionnelle | 1 j |
+| Renforcer plafonds IA ou auth optionnelle (S1) | 1 j | **Fait** (repo) — déployer `generate-analysis` + `explain-keyword` |
 
 ### Long terme
 
@@ -164,7 +164,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Sécurité | Stripe / entreprise | **Retiré** |
 | Sécurité | Chatbot / chat-assistant | **Retiré** (repo + dashboard) |
 | Sécurité | Anti-spam + submit-contact | **Fait** |
-| Sécurité | CORS + rate limit IA | **Fait** (partiel) |
+| Sécurité | CORS + rate limit + JWT IA | **Fait** (déployer Edge Functions) |
 | Sécurité | Headers Vercel | **Fait** |
 | Produit | Quiz libellés | **Fait** |
 | Produit | Email contact Resend | **Fait** |
@@ -246,6 +246,6 @@ flowchart LR
 ## Prochaines étapes suggérées
 
 1. Vérifier en prod : contact (email + ligne BDD), admin Messages, quiz + analyse IA.
-2. Choisir la suite : design system, ou durcissement IA (S1) — selon priorité produit.
+2. Déployer les Edge Functions IA durcies, puis choisir la suite : design system ou doc dark/light.
 
 **Edge Functions en prod (project-ref `bzxzxzmxiqvnhmlcwqre`, mai 2026) :** `submit-contact`, `generate-analysis`, `explain-keyword` uniquement.

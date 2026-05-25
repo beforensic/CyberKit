@@ -76,6 +76,16 @@ Après la migration `20260525120000_harden_rls_single_admin.sql`, le CMS n’acc
 | `generate-analysis` | Analyse IA des résultats quiz |
 | `explain-keyword` | Infobulles sur les tags ressources |
 
+**Protection IA** (`generate-analysis`, `explain-keyword`) :
+
+- `verify_jwt = true` (JWT Supabase obligatoire, anon ou session)
+- CORS : origines `cyberkit.be` + localhost dev uniquement
+- Rate limit par IP : 5/h (analyse), 20/h (mots-clés)
+- Plafond global : 120 analyses / 400 infobulles par jour
+- En cas d’erreur du store rate limit : refus (fail-closed)
+
+Configurer une alerte de budget sur le compte **Anthropic** (recommandé).
+
 Déploiement (project-ref `bzxzxzmxiqvnhmlcwqre`) :
 
 ```bash

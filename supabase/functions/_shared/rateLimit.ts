@@ -22,22 +22,28 @@ async function hashIp(ip: string): Promise<string> {
     .slice(0, 24);
 }
 
+export type RateLimitScope = "ip" | "global";
+
 export async function checkRateLimit(
   req: Request,
   bucket: string,
   maxRequests: number,
   windowMinutes: number,
+  options?: { scope?: RateLimitScope; failClosed?: boolean },
 ): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  const failClosed = options?.failClosed ?? false;
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
   if (!supabaseUrl || !serviceKey) {
     console.error("Rate limit skipped: missing Supabase env");
-    return { allowed: true };
+    return failClosed ? { allowed: false, retryAfterSec: 300 } : { allowed: true };
   }
 
-  const ip = await hashIp(getClientIp(req));
-  const bucketKey = `${bucket}:${ip}`;
+  const scopeKey = options?.scope === "global"
+    ? "global"
+    : await hashIp(getClientIp(req));
+  const bucketKey = `${bucket}:${scopeKey}`;
   const windowMs = windowMinutes * 60 * 1000;
   const now = Date.now();
   const windowStart = new Date(
@@ -56,7 +62,7 @@ export async function checkRateLimit(
 
   if (readError) {
     console.error("Rate limit read error:", readError.message);
-    return { allowed: true };
+    return failClosed ? { allowed: false, retryAfterSec: 300 } : { allowed: true };
   }
 
   if (
@@ -88,7 +94,7 @@ export async function checkRateLimit(
 
   if (upsertError) {
     console.error("Rate limit write error:", upsertError.message);
-    return { allowed: true };
+    return failClosed ? { allowed: false, retryAfterSec: 300 } : { allowed: true };
   }
 
   return { allowed: true };

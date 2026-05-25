@@ -1,9 +1,15 @@
-const ALLOWED_ORIGINS = [
+export const ALLOWED_ORIGINS = [
   "https://www.cyberkit.be",
   "https://cyberkit.be",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
 ];
+
+export function isAllowedOrigin(req: Request): boolean {
+  const origin = req.headers.get("Origin");
+  if (!origin) return true;
+  return ALLOWED_ORIGINS.includes(origin);
+}
 
 export function getCorsHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get("Origin") ?? "";
@@ -22,6 +28,9 @@ export function getCorsHeaders(req: Request): Record<string, string> {
 
 export function handleCorsPreflight(req: Request): Response | null {
   if (req.method === "OPTIONS") {
+    if (!isAllowedOrigin(req)) {
+      return new Response(null, { status: 403 });
+    }
     return new Response(null, { status: 204, headers: getCorsHeaders(req) });
   }
   return null;

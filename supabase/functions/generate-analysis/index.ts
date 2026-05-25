@@ -1,9 +1,10 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { getCorsHeaders, handleCorsPreflight } from "../_shared/cors.ts";
 import {
-  checkRateLimit,
-  rateLimitResponse,
-} from "../_shared/rateLimit.ts";
+  enforceAiRateLimits,
+  enforceAllowedOrigin,
+  requireSupabaseJwt,
+} from "../_shared/aiAccess.ts";
+import { getCorsHeaders, handleCorsPreflight } from "../_shared/cors.ts";
 
 interface AnalysisRequest {
   profile: string;
@@ -25,10 +26,14 @@ Deno.serve(async (req: Request) => {
     });
   }
 
-  const rate = await checkRateLimit(req, "generate-analysis", 10, 60);
-  if (!rate.allowed) {
-    return rateLimitResponse(req, rate.retryAfterSec ?? 3600);
-  }
+  const originError = enforceAllowedOrigin(req);
+  if (originError) return originError;
+
+  const authError = await requireSupabaseJwt(req);
+  if (authError) return authError;
+
+  const rateError = await enforceAiRateLimits(req, "generate-analysis");
+  if (rateError) return rateError;
 
   try {
     const { profile, score, level, weakPoints: rawWeakPoints }: AnalysisRequest =
