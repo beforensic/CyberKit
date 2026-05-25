@@ -18,7 +18,7 @@ export default function AppLayout() {
       <main id="main-content" tabIndex={-1} className="outline-none">
         <Outlet />
       </main>
-      <Navigation />
+      <Navigation isDarkSurface={isDarkSurface} />
     </div>
   );
 }

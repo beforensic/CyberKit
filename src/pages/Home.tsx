@@ -22,20 +22,19 @@ export default function Home() {
 
       {/* --- HALOS DE LUMIÈRE DE FOND (L'effet vaporeux Stenow) --- */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">
-        <div className="absolute top-[-10%] left-[10%] w-[60%] h-[50%] bg-brand-orange/10 blur-[150px] rounded-full"></div>
-        <div className="absolute bottom-[20%] right-[10%] w-[50%] h-[50%] bg-blue-500/10 blur-[150px] rounded-full"></div>
+        <div className="absolute top-[-10%] left-[10%] w-[50%] h-[45%] bg-brand-orange/8 blur-[120px] rounded-full" />
       </div>
 
       {/* --- SECTION HERO --- */}
       <div className="relative pt-24 pb-16 md:pt-32 md:pb-24 px-4 z-10">
         <div className="max-w-6xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-orange/5 border border-brand-orange/10 text-brand-orange-400 text-xs font-bold uppercase tracking-widest mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-orange/5 border border-brand-orange/10 text-brand-orange-400 text-xs font-semibold mb-8">
             <Sparkles className="w-4 h-4" /> La sécurité numérique, en toute simplicité.
           </div>
 
           <h1 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tight leading-[1.05]">
             Protégez votre activité <br />
-            <span className="text-gradient">en toute sérénité.</span>
+            <span className="text-brand-orange">en toute sérénité.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-slate-400 mb-12 leading-relaxed max-w-2xl">
@@ -70,7 +69,7 @@ export default function Home() {
               { icon: Lock, title: "Apprentissage", text: "Des fiches pratiques et mémos vidéo accessibles.", color: "text-blue-400" },
               { icon: Activity, title: "Progression", text: "Suivez l'évolution de votre score de sécurité.", color: "text-brand-orange-400" }
             ].map((step, i) => (
-              <div key={i} className="bg-slate-800/30 backdrop-blur-md border border-slate-700/50 p-8 rounded-[2rem] flex flex-col gap-5">
+              <div key={i} className="surface-card-dark p-8 flex flex-col gap-5">
                 <div className={`w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center ${step.color}`}>
                   <step.icon className="w-6 h-6" />
                 </div>
@@ -91,7 +90,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-black text-white">Thématiques clés</h2>
             <p className="text-slate-500 mt-2">Cliquez sur un domaine pour renforcer votre protection.</p>
           </div>
-          <div className="flex items-center gap-2 text-brand-orange-400 font-bold bg-brand-orange/5 border border-brand-orange/10 px-4 py-2 rounded-xl text-xs">
+          <div className="flex items-center gap-2 text-brand-orange-400 font-semibold bg-brand-orange/5 border border-brand-orange/10 px-4 py-2 rounded-xl text-xs">
             <CheckCircle className="w-4 h-4" /> +50 ressources gratuites à disposition
           </div>
         </div>
@@ -108,7 +107,7 @@ export default function Home() {
                     state: { themeId: theme.id },
                   })
                 }
-                className="bg-slate-800/20 backdrop-blur-sm p-6 rounded-[2rem] border border-slate-700/30 text-left hover:border-brand-orange/50 hover:bg-slate-800/40 transition-all group flex items-center gap-5"
+                className="bg-slate-800/35 p-6 rounded-panel border border-slate-700/40 text-left hover:border-brand-orange/50 hover:bg-slate-800/50 transition-all group flex items-center gap-5"
               >
                 <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-500 group-hover:text-brand-orange-400 transition-colors shrink-0">
                   <IconComponent className="w-7 h-7" />
@@ -117,7 +116,7 @@ export default function Home() {
                   <h3 className="text-lg font-bold text-slate-200 group-hover:text-white transition-colors">
                     {theme.title}
                   </h3>
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Accéder au module</p>
+                  <p className="text-xs font-medium text-slate-500 mt-1">Accéder au module</p>
                 </div>
                 <ArrowRight className="w-5 h-5 text-slate-600 group-hover:text-brand-orange-400 group-hover:translate-x-1 transition-all" />
               </button>

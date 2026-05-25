@@ -55,17 +55,17 @@ export default function AIAnalysis({ score, answers, profileName }: AIAnalysisPr
       : 'Votre démarche de diagnostic montre une vraie prise de conscience des risques.';
 
   return (
-    <div className="mt-12 bg-slate-900 rounded-[3rem] p-8 md:p-12 text-white relative overflow-hidden text-left shadow-2xl">
+    <div className="mt-12 bg-slate-900 rounded-panel p-8 md:p-12 text-white relative overflow-hidden text-left shadow-xl border border-slate-800">
       <div className="absolute top-0 right-0 p-8 opacity-10">
         <BrainCircuit size={120} />
       </div>
 
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-8">
-          <div className="bg-brand-orange p-3 rounded-2xl motion-safe:animate-pulse">
+          <div className="bg-brand-orange p-3 rounded-2xl">
             <Sparkles className="w-6 h-6 text-white" aria-hidden="true" />
           </div>
-          <h3 className="text-2xl font-black tracking-tight">Analyse personnalisée</h3>
+          <h3 className="text-2xl font-bold tracking-tight">Analyse personnalisée</h3>
         </div>
 
         {loading ? (
@@ -86,12 +86,12 @@ export default function AIAnalysis({ score, answers, profileName }: AIAnalysisPr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
               <div className="bg-white/5 border border-white/10 p-6 rounded-3xl">
                 <ShieldCheck className="text-brand-orange mb-3" />
-                <h4 className="font-black text-sm uppercase tracking-wider mb-1">Point positif</h4>
+                <h4 className="font-semibold text-sm text-slate-200 mb-1">Point positif</h4>
                 <p className="text-slate-400 text-sm">{strengthText}</p>
               </div>
               <div className="bg-white/5 border border-white/10 p-6 rounded-3xl">
                 <Zap className="text-brand-orange mb-3" />
-                <h4 className="font-black text-sm uppercase tracking-wider mb-1">Priorité</h4>
+                <h4 className="font-semibold text-sm text-slate-200 mb-1">Priorité</h4>
                 <p className="text-slate-400 text-sm">
                   {priorityHint ?? 'Consolider vos réflexes de sécurité au quotidien.'}
                 </p>

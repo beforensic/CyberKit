@@ -35,3 +35,11 @@ export const getScoreLevel = (score: number): { label: string; description: stri
   if (score < 90) return { label: 'Bien protégé', description: 'Votre niveau de sécurité est satisfaisant.' };
   return { label: 'Excellent', description: 'Votre maturité cybersécurité est remarquable.' };
 };
+
+/** Couleurs du score alignées sur la marque (rouge uniquement si critique). */
+export const getScoreDisplayStyles = (score: number): { text: string; ring: string } => {
+  if (score < 50) return { text: 'text-red-400', ring: 'border-red-400/90' };
+  if (score < 70) return { text: 'text-brand-orange-300', ring: 'border-brand-orange-300' };
+  if (score < 90) return { text: 'text-brand-orange', ring: 'border-brand-orange' };
+  return { text: 'text-brand-orange-400', ring: 'border-brand-orange-400' };
+};

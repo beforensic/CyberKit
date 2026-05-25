@@ -3,6 +3,10 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      borderRadius: {
+        card: '1.5rem',
+        panel: '2rem',
+      },
       colors: {
         surface: {
           dark: '#0F172A',

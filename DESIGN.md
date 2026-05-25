@@ -56,18 +56,19 @@ Document de référence pour les choix visuels du site public et de l’admin.
 
 ---
 
-## 3. Rayons et cartes (convention actuelle)
+## 3. Rayons et cartes
 
-Pas encore de composants `Button` / `Card` partagés — rayons **ad hoc** en Tailwind :
+Tokens Tailwind (`tailwind.config.js`) :
 
-| Contexte | Rayon typique |
-|----------|----------------|
-| Carte ressource, formulaire contact, modales admin | `rounded-[2.5rem]` |
-| Blocs home / quiz | `rounded-[2rem]` |
-| Petits contrôles, tags | `rounded-xl` / `rounded-2xl` |
-| Admin panel principal | `rounded-[3rem]` |
+| Token | Classe | Usage |
+|-------|--------|--------|
+| `rounded-card` | 1,5 rem | Cartes ressources, blocs secondaires |
+| `rounded-panel` | 2 rem | Panneaux quiz, accueil, bannières CTA |
+| `rounded-2xl` | — | Boutons, champs |
 
-**Évolution prévue :** design system minimal (`src/ui/`) pour figer 2–3 rayons et 2 variantes de bouton — **après** stabilisation de ce document.
+Classe composant dark : `.surface-card-dark` (`index.css`) — fond `slate-800/40`, bordure discrète, `rounded-panel`, sans blur lourd.
+
+**Évolution prévue :** design system minimal (`src/ui/`) si plusieurs écrans sont refondus ensemble.
 
 ---
 

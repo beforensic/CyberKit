@@ -57,7 +57,11 @@
   }
 
   .glass-card {
-    @apply bg-slate-900/40 backdrop-blur-xl border border-white/10 shadow-2xl transition-all duration-300;
+    @apply bg-slate-800/50 border border-slate-700/40 shadow-lg transition-all duration-300;
+  }
+
+  .surface-card-dark {
+    @apply bg-slate-800/40 border border-slate-700/50 rounded-panel;
   }
 
   .text-gradient {

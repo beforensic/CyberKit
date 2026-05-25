@@ -42,10 +42,10 @@ export default function ContactCtaBanner({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-[2.5rem] p-8 md:p-10 border ${
+      className={`relative overflow-hidden rounded-panel p-8 md:p-10 border ${
         isDark
-          ? 'bg-gradient-to-br from-brand-orange/20 via-slate-800/40 to-slate-900/80 border-brand-orange/30'
-          : 'bg-gradient-to-br from-brand-orange-50 to-white border-brand-orange/25 shadow-lg shadow-brand-orange/5'
+          ? 'bg-slate-800/50 border-brand-orange/25'
+          : 'bg-brand-orange-50/80 border-brand-orange/20 shadow-md shadow-brand-orange/5'
       }`}
     >
       {isDark && (

@@ -58,7 +58,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-brand-orange/5 transition-all group relative flex flex-col h-full text-left">
+    <div className="bg-white rounded-card p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-brand-orange/5 transition-all group relative flex flex-col h-full text-left">
       {/* En-tête de la carte */}
       <div className="flex justify-between items-start mb-6">
         <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-brand-orange-50 group-hover:text-brand-orange transition-colors">
@@ -80,17 +80,17 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
       <div className="flex-1">
         {/* Affichage du TYPE et du THÈME */}
         <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <span className="px-3 py-1 bg-brand-orange-50 text-brand-orange rounded-full text-[10px] font-black uppercase tracking-widest border border-brand-orange-100">
+          <span className="px-3 py-1 bg-brand-orange-50 text-brand-orange rounded-full text-xs font-semibold border border-brand-orange-100">
             {TYPE_LABELS[resource.type || ''] || 'Ressource'}
           </span>
           {consulted && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-brand-orange-50 text-brand-orange-700 rounded-full text-xs font-semibold border border-brand-orange-100">
               <CheckCircle2 size={12} aria-hidden="true" />
               Consulté
             </span>
           )}
           {resource.theme?.title && (
-            <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+            <span className="text-xs font-medium text-slate-400">
               • {resource.theme.title}
             </span>
           )}

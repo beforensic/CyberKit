@@ -2,7 +2,7 @@ import { Star, CheckCircle } from 'lucide-react';
 
 export default function GoogleReview() {
   return (
-    <div className="bg-slate-800/30 backdrop-blur-md border border-slate-700/50 rounded-[2.5rem] p-8 md:p-12">
+    <div className="surface-card-dark p-8 md:p-12">
       <div className="flex flex-col md:flex-row items-center justify-between gap-8">
         <div className="flex-1 text-center md:text-left">
           <div className="flex items-center justify-center md:justify-start gap-1 text-yellow-500 mb-4" aria-hidden="true">
@@ -10,7 +10,7 @@ export default function GoogleReview() {
               <Star key={i} size={20} fill="currentColor" />
             ))}
           </div>
-          <h3 className="text-2xl font-black text-white mb-4">
+          <h3 className="text-2xl font-bold text-white mb-4">
             CyberKit est noté 5/5 sur Google
           </h3>
           <p className="text-slate-400 leading-relaxed max-w-xl">
@@ -24,12 +24,12 @@ export default function GoogleReview() {
             href="https://www.google.com/search?hl=fr-BE&gl=be&q=beForensic,+Rue+Andr%C3%A9+Masquelier+35,+7000+Mons&ludocid=5704346060213982022&lsig=AB86z5VMUktlwZ-vtx0WlGadPLWz#lrd=0x8b257f26da49395:0x4f29e884d2f41346,3"
             target="_blank"
             rel="noopener noreferrer"
-            className="focus-ring px-8 py-4 bg-white text-slate-900 rounded-2xl font-black hover:bg-slate-100 transition-all shadow-xl flex items-center gap-2"
+            className="focus-ring px-8 py-4 bg-white text-slate-900 rounded-2xl font-bold hover:bg-slate-100 transition-all shadow-lg flex items-center gap-2"
           >
             Laisser un avis <CheckCircle className="text-brand-orange" aria-hidden="true" />
             <span className="sr-only"> (nouvel onglet)</span>
           </a>
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+          <p className="text-xs font-medium text-slate-500">
             Propulsé par Google Reviews
           </p>
         </div>

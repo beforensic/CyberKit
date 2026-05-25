@@ -166,7 +166,7 @@ export default function Quiz() {
       <div className="max-w-3xl mx-auto px-6 pt-16 relative z-10">
 
         <div className="mb-10" aria-live="polite" aria-atomic="true">
-          <div className="flex justify-between items-end mb-3 text-[10px] font-bold uppercase tracking-widest">
+          <div className="flex justify-between items-end mb-3 text-xs font-semibold text-slate-400">
             <span className="text-slate-500">
               Question {currentStep + 1} sur {activeQuestions.length}
             </span>
@@ -187,10 +187,10 @@ export default function Quiz() {
           </div>
         </div>
 
-        <div className="bg-slate-800/20 backdrop-blur-md border border-slate-700/50 rounded-[2.5rem] p-8 md:p-12 shadow-xl">
+        <div className="surface-card-dark p-8 md:p-12 shadow-lg">
 
           <div className="flex items-center gap-2 mb-8">
-            <div className="px-3 py-1 bg-white/5 rounded-md border border-white/10 text-[10px] font-bold text-brand-orange-400 uppercase tracking-widest">
+            <div className="px-3 py-1 bg-white/5 rounded-md border border-white/10 text-xs font-semibold text-brand-orange-400">
               {currentQuestion.themeTitle}
             </div>
           </div>

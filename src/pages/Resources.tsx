@@ -122,7 +122,7 @@ export default function Resources() {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
-              <h1 className="text-3xl font-black text-slate-900 tracking-tighter">Bibliothèque</h1>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Bibliothèque</h1>
               <p className="text-slate-500 text-sm font-medium">Vos outils pour une sécurité maximale</p>
               {consultedCount > 0 && (
                 <p className="text-brand-orange text-sm font-bold mt-1" aria-live="polite">
@@ -175,7 +175,7 @@ export default function Resources() {
                 type="button"
                 onClick={() => handleThemeChange(null)}
                 aria-pressed={!selectedThemeId}
-                className={`focus-ring px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${
+                className={`focus-ring px-6 py-3 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                   !selectedThemeId
                     ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
@@ -189,7 +189,7 @@ export default function Resources() {
                   type="button"
                   onClick={() => handleThemeChange(theme.id)}
                   aria-pressed={selectedThemeId === theme.id}
-                  className={`focus-ring px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all shrink-0 ${
+                  className={`focus-ring px-6 py-3 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                     selectedThemeId === theme.id
                       ? 'bg-brand-orange text-white shadow-lg'
                       : 'bg-slate-50 text-slate-400 hover:bg-slate-100'

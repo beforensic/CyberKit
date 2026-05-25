@@ -7,6 +7,7 @@ import { saveScore } from '../utils/storage';
 import {
   getQuizResults,
   getScoreLevel,
+  getScoreDisplayStyles,
   PROFILE_LABELS,
   type QuizResultData,
 } from '../utils/quizResults';
@@ -45,22 +46,12 @@ export default function QuizResults() {
   const level = getScoreLevel(score);
   const profileLabel = PROFILE_LABELS[profile] || profile;
 
-  const scoreColor =
-    score < 50 ? 'text-red-400' :
-    score < 70 ? 'text-orange-400' :
-    score < 90 ? 'text-blue-400' :
-    'text-brand-orange-400';
-
-  const ringColor =
-    score < 50 ? 'border-red-400' :
-    score < 70 ? 'border-orange-400' :
-    score < 90 ? 'border-blue-400' :
-    'border-brand-orange-400';
+  const { text: scoreColor, ring: ringColor } = getScoreDisplayStyles(score);
 
   return (
     <div className="page-dark pb-24 relative text-left">
       <div className="max-w-4xl mx-auto px-6 pt-16 relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange-400 text-[10px] font-bold uppercase tracking-widest mb-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange-400 text-xs font-semibold mb-6">
           <Shield size={14} /> Résultats du diagnostic
         </div>
 
@@ -71,7 +62,7 @@ export default function QuizResults() {
           Profil : <span className="text-white font-semibold">{profileLabel}</span>
         </p>
 
-        <div className="bg-slate-800/20 backdrop-blur-md border border-slate-700/50 rounded-[2.5rem] p-8 md:p-12 mb-8 text-center">
+        <div className="surface-card-dark p-8 md:p-12 mb-8 text-center">
           <div
             className={`inline-flex items-center justify-center w-40 h-40 rounded-full border-8 ${ringColor} mb-6`}
             role="img"
