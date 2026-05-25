@@ -1,11 +1,11 @@
 # Audit CyberKit — État au 25 mai 2026 (mise à jour)
 
-Document de suivi : audit initial, durcissement sécurité, contact / Resend, admin messages, retrait chatbot.
+Document de suivi : audit initial, durcissement sécurité, contact / Resend, admin messages, retrait chatbot, a11y, progression ressources, durcissement IA (S1).
 
 **Projet :** application gratuite de sensibilisation cybersécurité (indépendants & TPE belges)  
-**Stack :** React 18, Vite, Tailwind, Supabase, Vercel  
+**Stack :** React 18, Vite 6, Tailwind, Supabase, Vercel  
 **Production :** [https://www.cyberkit.be](https://www.cyberkit.be)  
-**Branche de référence :** `main` (commit récent : `d4ce274`)
+**Branche de référence :** `main` (commit récent : `c275fec`)
 
 ---
 
@@ -20,7 +20,9 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 - Quiz + `generate-analysis` + infobulles `explain-keyword`
 - Contact : `submit-contact` (anti-spam) + enregistrement BDD + **email Resend** → `contact@beforensic.be` (expéditeur `noreply@beforensic.be`)
 - Admin : onglet **Messages** (`ContactMessagesPanel`, RPC `admin_list_contact_messages`)
-- Edge Functions IA : CORS limité à `cyberkit.be` + rate limiting (`edge_rate_limits`)
+- Edge Functions IA : JWT Supabase, CORS `cyberkit.be`, rate limit IP + plafond global (`aiAccess.ts`, `edge_rate_limits`)
+- Progression ressources persistée (`ProgressContext` + `localStorage`)
+- Accessibilité de base (skip link, ARIA quiz/contact, tooltips clavier)
 - Headers sécurité dans `vercel.json` (CSP, X-Frame-Options, etc.)
 - Charte : accents `brand-orange` harmonisés sur Home / résultats / CoachCallout / succès contact
 - Nav publique sans lien Admin ; CTA contact (`ContactCtaBanner`)
@@ -28,8 +30,10 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 **Fragilités restantes**
 
 - Double thème dark (accueil, quiz) / light (ressources, contact) — assumé ou à documenter
+- Typage (`Admin.tsx`, `npm run typecheck`)
+- Alerte budget **Anthropic** (action manuelle console, clé `SecuriCoach-Prod`)
 
-**Maturité globale :** bonne pour un outil pédagogique ; sécurité et contact **nettement renforcés** ; dette limitée à UX secondaire et polish.
+**Maturité globale :** bonne pour un outil pédagogique ; sécurité et contact **nettement renforcés** ; dette limitée à polish (charte, typage).
 
 ---
 
@@ -45,35 +49,31 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Contact INSERT direct `anon` | **Corrigé** | `submit-contact` + RLS (`20260525180000`) |
 | Anti-spam contact | **Corrigé** | honeypot, délai 3 s, rate limit 3/h/IP |
 | Email contact | **Corrigé** | Resend, domaine `beforensic.be`, `RESEND_API_KEY` |
-| Edge Functions IA ouvertes | **Corrigé** | JWT + CORS + rate limit (`aiAccess.ts`, `config.toml`) |
+| Edge Functions IA (S1) | **Corrigé** | JWT (`verify_jwt` + `aiAccess.ts`), CORS strict, rate limit IP + global 24 h, fail-closed — **déployé** prod |
+| Dépendances npm | **Corrigé** | `npm audit fix`, Vite 6.4.2, 0 vulnérabilité (`53e01e2`) |
 | Headers HTTP | **Corrigé** | `vercel.json` |
 | Admin nav publique | **Corrigé** | `Navigation.tsx` |
 | Lecture `chat_logs` anon | **Corrigé** | admin seul (`20260525120000`) |
+
+**S1 — détail Edge Functions IA**
+
+| Champ | Détail |
+|-------|--------|
+| **Plafonds** | Analyse : 5/h et 120/j (global) · Mots-clés : 20/h et 400/j (global) |
+| **Fichiers** | `supabase/functions/_shared/aiAccess.ts`, `generate-analysis/`, `explain-keyword/`, `config.toml` |
+| **Risque résiduel** | Plafond de dépense + suivi Usage/Cost dans la console Anthropic (clé API nommée `SecuriCoach-Prod`, héritage SecuriCoach) |
 
 **Prérequis admin :** `supabase/scripts/grant_cyberkit_admin.sql` → `app_metadata.role = "admin"` → **déconnexion / reconnexion** sur `/admin` (ne pas utiliser `refreshSession()` en boucle).
 
 ### Problèmes encore ouverts
 
-#### S1 — Edge Functions IA — **Corrigé** (déployer les fonctions)
-
-| Champ | Détail |
-|-------|--------|
-| **État** | JWT Supabase obligatoire (`verify_jwt` + vérif. signature), CORS strict, rate limit IP + plafond global 24 h, fail-closed. |
-| **Plafonds** | Analyse : 5/h et 120/j (global) · Mots-clés : 20/h et 400/j (global). |
-| **Risque résiduel** | Alertes budget **Anthropic** côté console (hors repo). |
-| **Fichiers** | `supabase/functions/_shared/aiAccess.ts`, `generate-analysis/`, `explain-keyword/`, `config.toml` |
-
 #### S2 — `company_members` (si réactivation entreprise)
 
 | Criticité | **Faible** — tables retirées en prod. |
 
-#### S3 — Dépendances npm
-
-| Criticité | **Faible à moyen** — `npm audit fix` périodique. |
-
 ### Bonnes pratiques en place
 
-- Clés API uniquement en secrets Edge Functions
+- Clés API uniquement en secrets Edge Functions (`ANTHROPIC_API_KEY`, `RESEND_API_KEY`)
 - `supabase/.temp/` ignoré par git (plus de pollution du working tree)
 - Pas de `dangerouslySetInnerHTML`
 - Contact : double archivage (BDD + email)
@@ -92,22 +92,14 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Admin messages | `ContactMessagesPanel` + RPC |
 | Admin session | plus de boucle déconnexion (`refreshSession` retiré) |
 | Code mort | `ChatBot`, `ChatbotAnalytics`, `ExportProject`, `chat-assistant`, `send-contact-email` **supprimés** |
+| Progression ressources (A1) | `ProgressContext` + `localStorage`, badge « Consulté », compteur bibliothèque (`0af5950`) |
+| Accessibilité de base (A3) | skip link, focus route, nav ARIA, quiz, contact, ressources, `KeywordTooltip` (`b825314`) |
 
 ### Encore à traiter
-
-#### A1 — Progression ressources
-
-| Fichier | `src/contexts/ProgressContext.tsx` |
-| Impact | — |
-| Statut | **Fait** — `localStorage` (`cyberkit_consulted_resources`), badge « Consulté », compteur bibliothèque |
 
 #### A2 — Typage
 
 - `any` dans `Admin.tsx` ; `npm run typecheck` avec erreurs préexistantes (build Vite OK)
-
-#### A3 — Accessibilité
-
-- **Base faite** : skip link, focus route, nav ARIA, quiz (`progressbar`, `radiogroup`, live regions), contact (`htmlFor`/`id`), ressources (recherche, filtres), `KeywordTooltip` clavier + `role="tooltip"`, `prefers-reduced-motion`
 
 ---
 
@@ -130,29 +122,30 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 
 ## PARTIE 5 — Plan d’amélioration (restant)
 
-### Quick wins
+### Quick wins — terminés
 
 | Action | Effort | Statut |
 |--------|--------|--------|
 | `npm audit fix` | 0,5 j | **Fait** (`53e01e2`) |
-| Supprimer Edge Function `admin-contact-messages` (doublon RPC) | 0,5 h | **Fait** (repo `cab9221`) — absente du dashboard (vérif. CLI mai 2026) |
-| Nettoyer fonctions obsolètes Supabase (`chat-assistant`, etc.) | 5 min | **Fait** — prod : 3 fonctions actives uniquement (vérif. CLI) |
-| Secret IA | — | **OK** — prod : `ANTHROPIC_API_KEY` uniquement (`generate-analysis`, `explain-keyword`). Pas de `OPENAI_API_KEY` côté Supabase. |
+| Supprimer Edge Function `admin-contact-messages` (doublon RPC) | 0,5 h | **Fait** (`cab9221`, absent dashboard) |
+| Nettoyer fonctions obsolètes Supabase (`chat-assistant`, etc.) | 5 min | **Fait** — 3 fonctions actives |
+| Secret IA | — | **OK** — `ANTHROPIC_API_KEY` uniquement (pas d’`OPENAI_API_KEY`) |
 
-### Intermédiaire
+### Intermédiaire — terminés
 
-| Action | Effort |
-|--------|--------|
-| Accessibilité de base | 1–2 j | **Fait** (base : nav, quiz, contact, ressources, tooltips) |
-| Persistance `ProgressContext` | 0,5 j | **Fait** |
-| Renforcer plafonds IA ou auth optionnelle (S1) | 1 j | **Fait** (repo) — déployer `generate-analysis` + `explain-keyword` |
+| Action | Effort | Statut |
+|--------|--------|--------|
+| Accessibilité de base | 1–2 j | **Fait** (`b825314`) |
+| Persistance `ProgressContext` | 0,5 j | **Fait** (`0af5950`) |
+| Renforcer plafonds IA / auth (S1) | 1 j | **Fait** (`c275fec`, déployé prod) |
 
-### Long terme
+### Long terme — à faire
 
-| Action | Effort |
-|--------|--------|
-| Design system minimal (`src/ui/`) | 3–5 j |
-| Documenter ou unifier dark/light | 3–5 j |
+| Action | Effort | Statut |
+|--------|--------|--------|
+| Design system minimal (`src/ui/`) | 3–5 j | À faire |
+| Documenter ou unifier dark/light | 3–5 j | À faire |
+| Plafond dépense Anthropic + suivi clé `SecuriCoach-Prod` | 15 min | Action manuelle console |
 
 ---
 
@@ -164,7 +157,8 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Sécurité | Stripe / entreprise | **Retiré** |
 | Sécurité | Chatbot / chat-assistant | **Retiré** (repo + dashboard) |
 | Sécurité | Anti-spam + submit-contact | **Fait** |
-| Sécurité | CORS + rate limit + JWT IA | **Fait** (déployer Edge Functions) |
+| Sécurité | JWT + CORS + rate limit IA (S1) | **Fait** (repo + prod) |
+| Sécurité | npm audit / Vite 6 | **Fait** |
 | Sécurité | Headers Vercel | **Fait** |
 | Produit | Quiz libellés | **Fait** |
 | Produit | Email contact Resend | **Fait** |
@@ -176,8 +170,10 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | Architecture | ChatBot / ExportProject | **Supprimés** |
 | Architecture | `admin-contact-messages` Edge | **Supprimée** (RPC seul) |
 | Architecture | ProgressContext | **Fait** (localStorage) |
-| Charte | Dark/light | **À documenter** |
 | A11y | ARIA / clavier (base) | **Fait** |
+| Charte | Dark/light | **À documenter** |
+| Typage | Admin / typecheck | **À faire** |
+| Ops | Budget Anthropic | **À configurer** (console) |
 
 ---
 
@@ -188,7 +184,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 | `submit-contact` | Oui | Oui — formulaire contact |
 | `generate-analysis` | Oui | Oui — résultats quiz |
 | `explain-keyword` | Oui | Oui — tags ressources |
-| `admin-contact-messages` | **Non** (repo + dashboard) | Non — admin via RPC (`admin_list_contact_messages`, etc.) |
+| `admin-contact-messages` | **Non** (repo + dashboard) | Non — admin via RPC |
 | `chat-assistant` | **Non** (repo + dashboard) | Non — retiré |
 | `generate-diagnostic-report` | **Non** | Non — retiré |
 | `send-contact-email` | **Non** | Supprimée (logique dans `submit-contact` + Resend) |
@@ -197,7 +193,7 @@ CyberKit est une SPA adaptée à son périmètre : diagnostic quiz, bibliothèqu
 
 | Secret | Usage |
 |--------|--------|
-| `ANTHROPIC_API_KEY` | IA quiz + mots-clés |
+| `ANTHROPIC_API_KEY` | IA quiz + mots-clés (console Anthropic : clé **`SecuriCoach-Prod`**) |
 | `RESEND_API_KEY` | Email → `contact@beforensic.be` |
 | `SUPABASE_SERVICE_ROLE_KEY` | Auto (submit-contact, rate limits) |
 
@@ -238,6 +234,10 @@ flowchart LR
 | `d4ce274` | `supabase/.temp/` ignoré par git |
 | `53e01e2` | `npm audit fix`, Vite 6.4.2, 0 vulnérabilité npm |
 | `cab9221` | Suppression `admin-contact-messages` + `adminAuth` (RPC seul) |
+| `63e1890` | Sync audit / README avec état Edge Supabase |
+| `b825314` | Accessibilité de base (nav, quiz, contact, ressources, tooltips) |
+| `0af5950` | Persistance `ProgressContext` (localStorage) |
+| `c275fec` | Durcissement IA S1 (JWT, CORS, rate limits, `aiAccess.ts`) |
 
 **Migrations clés :** `20260525120000`, `20260525140000`, `20260525180000`, `20260525190000`, `20260525200000`
 
@@ -245,7 +245,8 @@ flowchart LR
 
 ## Prochaines étapes suggérées
 
-1. Vérifier en prod : contact (email + ligne BDD), admin Messages, quiz + analyse IA.
-2. Déployer les Edge Functions IA durcies, puis choisir la suite : design system ou doc dark/light.
+1. Vérifier en prod : contact (email + BDD), admin Messages, quiz + analyse IA, infobulles mots-clés.
+2. Console Anthropic : spend limit + suivi Usage/Cost sur la clé **`SecuriCoach-Prod`**.
+3. Choisir la suite produit : **design system** ou **documentation dark/light** ; corriger le typage Admin si prioritaire.
 
 **Edge Functions en prod (project-ref `bzxzxzmxiqvnhmlcwqre`, mai 2026) :** `submit-contact`, `generate-analysis`, `explain-keyword` uniquement.
