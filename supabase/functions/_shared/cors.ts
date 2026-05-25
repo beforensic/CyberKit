@@ -15,7 +15,7 @@ export function getCorsHeaders(req: Request): Record<string, string> {
     "Access-Control-Allow-Origin": allowOrigin,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers":
-      "Content-Type, Authorization, X-Client-Info, Apikey",
+      "authorization, x-client-info, apikey, content-type, accept, prefer, x-supabase-api-version",
     "Vary": "Origin",
   };
 }

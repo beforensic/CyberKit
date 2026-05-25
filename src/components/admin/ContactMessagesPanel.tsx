@@ -64,28 +64,37 @@ export default function ContactMessagesPanel() {
       setLoading(true);
       setLoadError(null);
 
-      const { data, error } = await supabase.functions.invoke(
-        'admin-contact-messages',
-        { body: {} },
+      const { data: rpcData, error: rpcError } = await supabase.rpc(
+        'admin_list_contact_messages',
       );
 
-      if (error) throw error;
-      if (data?.error) {
-        setLoadError(data.error);
-        setMessages([]);
-        return;
-      }
+      if (rpcError) throw rpcError;
 
-      const rows = ((data?.messages as Record<string, unknown>[]) ?? []).map(
+      const rows = ((rpcData as Record<string, unknown>[]) ?? []).map(
         normalizeMessage,
       );
+
+      if (rows.length === 0) {
+        const { data: { session } } = await supabase.auth.getSession();
+        const role =
+          session?.user?.app_metadata?.role ??
+          session?.user?.user_metadata?.role;
+        if (role !== 'admin') {
+          setLoadError(
+            'Compte sans rôle admin. Exécutez grant_cyberkit_admin.sql avec votre email, puis déconnectez-vous et reconnectez-vous sur /admin.',
+          );
+          setMessages([]);
+          return;
+        }
+      }
+
       setMessages(rows);
       setSelectedId(prev => prev ?? rows[0]?.id ?? null);
     } catch (err) {
       console.error('Erreur chargement messages:', err);
       const msg = err instanceof Error ? err.message : 'Erreur inconnue';
       setLoadError(
-        `Impossible de charger les messages (${msg}). Déconnectez-vous puis reconnectez-vous sur /admin après avoir exécuté grant_cyberkit_admin.sql.`,
+        `Impossible de charger les messages (${msg}). Vérifiez grant_cyberkit_admin.sql puis reconnectez-vous.`,
       );
       setMessages([]);
     } finally {
@@ -100,13 +109,12 @@ export default function ContactMessagesPanel() {
   const updateStatus = async (id: string, status: ContactMessage['status']) => {
     try {
       setUpdating(true);
-      const { data, error } = await supabase.functions.invoke(
-        'admin-contact-messages',
-        { body: { action: 'update', id, status } },
+      const { error } = await supabase.rpc(
+        'admin_update_contact_message_status',
+        { p_message_id: id, p_status: status },
       );
 
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
 
       setMessages(prev =>
         prev.map(m => (m.id === id ? { ...m, status } : m)),
@@ -340,12 +348,9 @@ export default function ContactMessagesPanel() {
 /** Nombre de messages « new » pour badge nav admin (optionnel). */
 export async function fetchNewContactCount(): Promise<number> {
   try {
-    const { data, error } = await supabase.functions.invoke(
-      'admin-contact-messages',
-      { body: {} },
-    );
-    if (error || data?.error) return 0;
-    const rows = (data?.messages as ContactMessage[]) ?? [];
+    const { data, error } = await supabase.rpc('admin_list_contact_messages');
+    if (error) return 0;
+    const rows = (data as ContactMessage[]) ?? [];
     return rows.filter(m => (m.status ?? 'new') === 'new').length;
   } catch {
     return 0;
