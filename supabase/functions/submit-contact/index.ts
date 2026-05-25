@@ -5,6 +5,7 @@ import {
   checkRateLimit,
   rateLimitResponse,
 } from "../_shared/rateLimit.ts";
+import { sendContactNotification } from "../_shared/resend.ts";
 
 const MIN_FORM_DELAY_MS = 3000;
 const MAX_NAME = 120;
@@ -119,6 +120,24 @@ Deno.serve(async (req: Request) => {
     if (insertError) {
       console.error("contact insert:", insertError.message);
       throw insertError;
+    }
+
+    const notify = await sendContactNotification({
+      name,
+      email,
+      subject,
+      message,
+      quiz_score: typeof body.quiz_score === "number"
+        ? Math.round(body.quiz_score)
+        : null,
+      theme_interest: body.theme_interest?.trim() || null,
+    });
+
+    if (!notify.sent) {
+      console.error(
+        "contact saved but email not sent:",
+        notify.error ?? "unknown",
+      );
     }
 
     return new Response(

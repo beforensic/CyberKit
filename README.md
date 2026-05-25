@@ -86,7 +86,17 @@ npx supabase@2.101.0 functions deploy generate-analysis --project-ref bzxzxzmxiq
 npx supabase@2.101.0 functions deploy explain-keyword --project-ref bzxzxzmxiqvnhmlcwqre
 ```
 
-Secrets Edge Functions : `ANTHROPIC_API_KEY` (obligatoire pour l’IA). `SUPABASE_SERVICE_ROLE_KEY` est injecté automatiquement par Supabase pour `submit-contact` et le rate limiting.
+Secrets Edge Functions :
+
+| Secret | Usage |
+|--------|--------|
+| `ANTHROPIC_API_KEY` | Analyse quiz et infobulles mots-clés |
+| `RESEND_API_KEY` | Notification email à chaque message contact (`contact@beforensic.be`) |
+| `CONTACT_NOTIFY_EMAIL` | (optionnel) Destinataire, défaut `contact@beforensic.be` |
+
+`SUPABASE_SERVICE_ROLE_KEY` est injecté automatiquement par Supabase.
+
+Configurer `RESEND_API_KEY` : Supabase Dashboard → Project Settings → Edge Functions → Secrets.
 
 L’accès admin reste sur `/admin` (non listé dans la navigation publique).
 
