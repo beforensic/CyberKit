@@ -106,9 +106,9 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
         <button
           type="button"
           onClick={openPreview}
-          className="focus-ring text-left w-full mb-3 rounded-lg -mx-1 px-1"
+          className="focus-ring text-left w-full mb-3 rounded-lg -mx-1 px-1 cursor-pointer"
         >
-          <h3 className="text-xl font-bold text-slate-900 leading-tight group-hover:text-brand-orange transition-colors">
+          <h3 className="text-xl font-bold text-slate-900 leading-tight group-hover:text-brand-orange transition-colors underline-offset-2 hover:underline">
             {resource.title}
           </h3>
         </button>
@@ -133,7 +133,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
         <button
           type="button"
           onClick={openPreview}
-          className="focus-ring w-full py-3.5 bg-slate-50 text-slate-700 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-100 border border-slate-200 transition-all text-sm"
+          className="focus-ring w-full py-4 bg-brand-orange-50 text-brand-orange rounded-2xl font-bold flex items-center justify-center gap-2 border-2 border-brand-orange hover:bg-brand-orange hover:text-white transition-all shadow-sm shadow-brand-orange/10"
         >
           <Eye size={18} aria-hidden="true" />
           Aperçu
@@ -143,7 +143,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => markAsConsulted(resource.id)}
-          className="focus-ring w-full py-4 bg-white border-2 border-brand-orange text-brand-orange rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-brand-orange hover:text-white transition-all shadow-sm"
+          className="focus-ring w-full py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-2xl font-bold flex items-center justify-center gap-2 hover:border-brand-orange hover:text-brand-orange transition-all"
         >
           {resource.type === 'link' ? <ExternalLink size={18} aria-hidden="true" /> : <Download size={18} aria-hidden="true" />}
           {resource.type === 'link' ? 'Consulter' : 'Télécharger'}
