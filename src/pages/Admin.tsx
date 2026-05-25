@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import {
   LayoutDashboard, BookOpen, Settings, Plus,
   LogOut, ChevronLeft, Shield, Filter, Tag,
-  ClipboardList, BarChart3
+  ClipboardList, BarChart3, Mail
 } from 'lucide-react';
 
 // IMPORTATION BASÉE SUR TON ARBORESCENCE RÉELLE
@@ -14,11 +14,14 @@ import QuestionList from '../components/admin/QuestionList'; // Celui que nous v
 import ThemeList from '../components/admin/ThemeList';
 import KeywordManager from '../components/admin/KeywordManager'; // Corrigé (au lieu de TagList)
 import StatisticsPanel from '../components/admin/StatisticsPanel';
+import ContactMessagesPanel, { fetchNewContactCount } from '../components/admin/ContactMessagesPanel';
+
 export default function Admin() {
   const navigate = useNavigate();
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'stats' | 'resources' | 'questions' | 'themes' | 'keywords'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'messages' | 'resources' | 'questions' | 'themes' | 'keywords'>('stats');
+  const [newMessageCount, setNewMessageCount] = useState(0);
   const [showResourceForm, setShowResourceForm] = useState(false);
   const [editingResource, setEditingResource] = useState<any>(null);
   const [email, setEmail] = useState('');
@@ -34,6 +37,11 @@ export default function Admin() {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!session) return;
+    fetchNewContactCount().then(setNewMessageCount);
+  }, [session, activeTab]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +84,13 @@ export default function Admin() {
           </div>
           <nav className="space-y-2">
             <NavItem active={activeTab === 'stats'} onClick={() => setActiveTab('stats')} icon={<BarChart3 size={20} />} label="Statistiques" />
+            <NavItem
+              active={activeTab === 'messages'}
+              onClick={() => setActiveTab('messages')}
+              icon={<Mail size={20} />}
+              label="Messages"
+              badge={newMessageCount > 0 ? newMessageCount : undefined}
+            />
             <NavItem active={activeTab === 'resources'} onClick={() => setActiveTab('resources')} icon={<BookOpen size={20} />} label="Ressources" />
             <NavItem active={activeTab === 'questions'} onClick={() => setActiveTab('questions')} icon={<ClipboardList size={20} />} label="Diagnostic" />
             <NavItem active={activeTab === 'themes'} onClick={() => setActiveTab('themes')} icon={<Filter size={20} />} label="Thématiques" />
@@ -110,6 +125,7 @@ export default function Admin() {
 
           <div className="bg-white rounded-[3rem] shadow-sm border border-slate-200 overflow-hidden min-h-[600px]">
             {activeTab === 'stats' && <StatisticsPanel />}
+            {activeTab === 'messages' && <ContactMessagesPanel />}
             {activeTab === 'resources' && <ResourceList onEdit={(r) => { setEditingResource(r); setShowResourceForm(true); }} />}
             {activeTab === 'questions' && <QuestionList />}
             {activeTab === 'themes' && <ThemeList />}
@@ -125,10 +141,22 @@ export default function Admin() {
   );
 }
 
-function NavItem({ active, onClick, icon, label }: any) {
+function NavItem({ active, onClick, icon, label, badge }: {
+  active: boolean;
+  onClick: () => void;
+  icon: ReactNode;
+  label: string;
+  badge?: number;
+}) {
   return (
     <button onClick={onClick} className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all ${active ? 'bg-brand-orange text-white shadow-lg shadow-brand-orange/30' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
-      {icon} <span>{label}</span>
+      {icon}
+      <span className="flex-1 text-left">{label}</span>
+      {badge != null && badge > 0 && (
+        <span className={`text-[10px] font-black min-w-[1.25rem] h-5 px-1.5 rounded-full flex items-center justify-center ${active ? 'bg-white text-brand-orange' : 'bg-brand-orange text-white'}`}>
+          {badge > 99 ? '99+' : badge}
+        </span>
+      )}
     </button>
   );
 }
