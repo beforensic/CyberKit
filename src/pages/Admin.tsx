@@ -2,7 +2,7 @@ import { useState, useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import {
-  LayoutDashboard, BookOpen, Settings, Plus,
+  LayoutDashboard, BookOpen, Plus,
   LogOut, ChevronLeft, Shield, Filter, Tag,
   ClipboardList, BarChart3, Mail
 } from 'lucide-react';
@@ -28,28 +28,30 @@ export default function Admin() {
   const [password, setPassword] = useState('');
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
       setLoading(false);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
     });
     return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (!session) return;
-    supabase.auth.refreshSession().then(() => {
-      fetchNewContactCount().then(setNewMessageCount);
-    });
-  }, [session, activeTab]);
+    if (!session?.user?.id) return;
+    fetchNewContactCount().then(setNewMessageCount);
+  }, [session?.user?.id]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) alert("Erreur : " + error.message);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      alert("Erreur : " + error.message);
+      setLoading(false);
+      return;
+    }
+    if (data.session) {
+      setSession(data.session);
+    }
     setLoading(false);
   };
 

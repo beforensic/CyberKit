@@ -64,8 +64,6 @@ export default function ContactMessagesPanel() {
       setLoading(true);
       setLoadError(null);
 
-      await supabase.auth.refreshSession();
-
       const { data, error } = await supabase.functions.invoke(
         'admin-contact-messages',
         { body: {} },
