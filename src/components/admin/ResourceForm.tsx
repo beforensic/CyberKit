@@ -100,7 +100,7 @@ export default function ResourceForm({ resource, onClose, onSaved }: ResourceFor
         if (error) throw error;
         if (!data?.length) {
           throw new Error(
-            'Mise à jour refusée. Vérifiez que votre compte a le rôle admin (métadonnées JWT).'
+            'Mise à jour refusée : droits admin insuffisants. Exécutez grant_cyberkit_admin.sql dans Supabase, appliquez les migrations récentes, puis reconnectez-vous.'
           );
         }
       } else {

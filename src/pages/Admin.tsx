@@ -17,6 +17,7 @@ import ThemeList from '../components/admin/ThemeList';
 import KeywordManager from '../components/admin/KeywordManager'; // Corrigé (au lieu de TagList)
 import StatisticsPanel from '../components/admin/StatisticsPanel';
 import ContactMessagesPanel, { fetchNewContactCount } from '../components/admin/ContactMessagesPanel';
+import { hasAdminRoleInSession } from '../utils/adminAccess';
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ export default function Admin() {
   const { refetch: refetchResources } = useResources();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [serverAdminOk, setServerAdminOk] = useState<boolean | null>(null);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
@@ -39,8 +41,23 @@ export default function Admin() {
   }, []);
 
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id) {
+      setServerAdminOk(null);
+      return;
+    }
+
     fetchNewContactCount().then(setNewMessageCount);
+
+    supabase
+      .rpc('admin_check_access')
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('admin_check_access:', error);
+          setServerAdminOk(false);
+          return;
+        }
+        setServerAdminOk(Boolean(data));
+      });
   }, [session?.user?.id]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -116,6 +133,33 @@ export default function Admin() {
 
       <div className="flex-1 ml-72 p-12">
         <div className="max-w-6xl mx-auto">
+          {serverAdminOk === false && (
+            <div
+              className="mb-8 p-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950"
+              role="alert"
+            >
+              <p className="font-bold text-lg mb-2">Droits administrateur manquants</p>
+              <p className="text-sm leading-relaxed mb-3">
+                Votre compte est connecté mais Supabase refuse les modifications (rôle{' '}
+                <code className="bg-amber-100 px-1 rounded">admin</code> absent).
+              </p>
+              <ol className="text-sm list-decimal list-inside space-y-1 mb-3">
+                <li>
+                  Supabase → SQL Editor : exécuter{' '}
+                  <code className="bg-amber-100 px-1 rounded">supabase/scripts/grant_cyberkit_admin.sql</code>{' '}
+                  avec votre email admin
+                </li>
+                <li>Appliquer la migration <code className="bg-amber-100 px-1 rounded">20260525210000_is_cyberkit_admin_from_auth_users.sql</code></li>
+                <li>Se déconnecter puis se reconnecter sur cette page</li>
+              </ol>
+              {!hasAdminRoleInSession(session) && (
+                <p className="text-xs text-amber-800">
+                  JWT actuel : pas de rôle admin visible — normal avant la procédure ci-dessus.
+                </p>
+              )}
+            </div>
+          )}
+
           <header className="flex justify-between items-center mb-10">
             <div>
               <h1 className="text-4xl font-black text-slate-900 capitalize">{activeTab}</h1>

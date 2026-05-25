@@ -1,7 +1,10 @@
 /*
-  À exécuter UNE FOIS dans Supabase → SQL Editor (avant ou juste après la migration RLS).
+  À exécuter UNE FOIS dans Supabase → SQL Editor.
 
-  Remplacez l'email par celui de votre compte admin (celui du gestionnaire de mots de passe).
+  1. Remplacez l'email ci-dessous par celui de votre compte admin (/admin).
+  2. Appliquez aussi la migration 20260525210000_is_cyberkit_admin_from_auth_users.sql
+     (is_cyberkit_admin lit auth.users — écritures CMS sans JWT obsolète).
+  3. Déconnexion / reconnexion sur /admin si besoin.
 */
 
 UPDATE auth.users
