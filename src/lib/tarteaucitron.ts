@@ -1,4 +1,5 @@
 import type { TarteaucitronInitOptions } from '../types/tarteaucitron';
+import { getMatomoConfig } from '../utils/matomoConfig';
 
 const SCRIPT_ID = 'cyberkit-tarteaucitron';
 const SCRIPT_SRC = '/tarteaucitron/tarteaucitron.min.js';
@@ -29,10 +30,33 @@ function registerCyberkitServices(): void {
     tac.job.push('cyberkit_preferences');
   }
 
-  // Mesure d'audience (ex. Matomo) : décommenter et renseigner l'ID quand activé.
-  // tac.user = tac.user || {};
-  // tac.user.matomoId = 'VOTRE_ID_MATOMO';
-  // tac.job.push('matomo');
+  registerMatomoIfConfigured(tac);
+}
+
+function registerMatomoIfConfigured(tac: NonNullable<Window['tarteaucitron']>): void {
+  const matomo = getMatomoConfig();
+  if (!matomo) return;
+
+  tac.user = tac.user || {};
+  tac.user.matomoId = matomo.siteId;
+  tac.user.matomoHost = matomo.host;
+
+  tac.job = tac.job || [];
+  if (!tac.job.includes('matomo')) {
+    tac.job.push('matomo');
+  }
+
+  window.addEventListener(
+    'tac.root_available',
+    () => {
+      const service = tac.services.matomo;
+      if (!service) return;
+      service.needConsent = true;
+      service.name = "Mesure d'audience (Matomo)";
+      service.readmoreLink = '/legal#protection-donnees';
+    },
+    { once: true },
+  );
 }
 
 /** Affiche le bandeau tant que l'utilisateur n'a pas enregistré de choix (cookie tarteaucitron). */

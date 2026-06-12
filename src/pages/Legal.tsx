@@ -128,7 +128,10 @@ export default function Legal() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-brand-orange font-bold">✓</span>
-                  <span><strong>Aucun log d'activité</strong> n'est enregistré</span>
+                  <span>
+                    <strong>Pas de suivi publicitaire</strong> : une mesure d'audience Matomo
+                    anonyme ne s'active qu'avec votre consentement explicite
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-brand-orange font-bold">✓</span>
@@ -136,6 +139,14 @@ export default function Legal() {
                 </li>
               </ul>
             </div>
+
+            <h3 className="font-bold text-slate-900 text-lg pt-4">Mesure d'audience (optionnelle)</h3>
+            <p>
+              Si vous l'acceptez dans le panneau cookies, <strong>Matomo</strong> peut être utilisé pour
+              mesurer la fréquentation du site de manière anonyme (pages vues, pays d'origine approximatif).
+              Aucune revente de données, pas de profilage publicitaire. Refus par défaut tant que vous n'avez
+              pas consenti.
+            </p>
 
             <h3 className="font-bold text-slate-900 text-lg pt-4">Gestion du consentement (cookies)</h3>
             <p>

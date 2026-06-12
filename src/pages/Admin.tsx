@@ -30,6 +30,8 @@ export default function Admin() {
   const { refetch: refetchResources } = useResources();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginSubmitting, setLoginSubmitting] = useState(false);
   const [serverAdminOk, setServerAdminOk] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -62,17 +64,20 @@ export default function Admin() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setLoginSubmitting(true);
+    setLoginError(null);
+
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      alert("Erreur : " + error.message);
-      setLoading(false);
+      setLoginError(error.message);
+      setLoginSubmitting(false);
       return;
     }
+
     if (data.session) {
       setSession(data.session);
     }
-    setLoading(false);
+    setLoginSubmitting(false);
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange"></div></div>;
@@ -87,11 +92,52 @@ export default function Admin() {
             </div>
             <h1 className="text-2xl font-black text-slate-900">Console CyberKit</h1>
           </div>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-4 bg-slate-50 border-none rounded-2xl" />
-            <input type="password" placeholder="Mot de passe" value={password} onChange={e => setPassword(e.target.value)} className="w-full p-4 bg-slate-50 border-none rounded-2xl" />
-            <button className="w-full py-4 bg-brand-orange text-white rounded-2xl font-bold shadow-lg shadow-brand-orange/20">Se connecter</button>
-            <button type="button" onClick={() => navigate('/')} className="w-full text-slate-400 text-sm font-bold pt-2">Retour au site</button>
+          <form onSubmit={handleLogin} className="space-y-4" noValidate>
+            {loginError && (
+              <div role="alert" className="p-4 bg-red-50 text-red-700 rounded-2xl text-sm font-medium">
+                {loginError}
+              </div>
+            )}
+            <div>
+              <label htmlFor="admin-email" className="sr-only">Adresse email</label>
+              <input
+                id="admin-email"
+                type="email"
+                name="email"
+                autoComplete="email"
+                required
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                aria-invalid={loginError ? true : undefined}
+                className="focus-ring w-full p-4 bg-slate-50 border-none rounded-2xl"
+              />
+            </div>
+            <div>
+              <label htmlFor="admin-password" className="sr-only">Mot de passe</label>
+              <input
+                id="admin-password"
+                type="password"
+                name="password"
+                autoComplete="current-password"
+                required
+                placeholder="Mot de passe"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                aria-invalid={loginError ? true : undefined}
+                className="focus-ring w-full p-4 bg-slate-50 border-none rounded-2xl"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loginSubmitting}
+              className="focus-ring w-full py-4 bg-brand-orange text-white rounded-2xl font-bold shadow-lg shadow-brand-orange/20 disabled:opacity-60"
+            >
+              {loginSubmitting ? 'Connexion…' : 'Se connecter'}
+            </button>
+            <button type="button" onClick={() => navigate('/')} className="focus-ring w-full text-slate-400 text-sm font-bold pt-2">
+              Retour au site
+            </button>
           </form>
         </div>
       </div>
