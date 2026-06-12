@@ -19,7 +19,7 @@ export default function AppLayout() {
       <main id="main-content" tabIndex={-1} className="outline-none">
         <Outlet />
       </main>
-      <Footer />
+      <Footer variant={isDarkSurface ? 'dark' : 'light'} />
       <Navigation isDarkSurface={isDarkSurface} />
     </div>
   );

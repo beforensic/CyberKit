@@ -218,7 +218,7 @@ export default function Legal() {
         </section>
 
       </div>
-      <Footer withBottomNavOffset={false} />
+      <Footer withBottomNavOffset={false} variant="light" />
     </div>
   );
 }

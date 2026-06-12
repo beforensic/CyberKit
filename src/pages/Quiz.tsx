@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Shield, ChevronLeft, User, Building2, Briefcase, ArrowRight, HelpCircle, AlertCircle } from 'lucide-react';
 import { saveQuizResults } from '../utils/quizResults';
+import { trackDiagnosticCompletion } from '../services/analytics';
 import {
   fetchQuizQuestions,
   filterQuestionsByProfile,
@@ -71,6 +72,7 @@ export default function Quiz() {
       const finalPercentage = Math.round((totalScore / maxScore) * 100);
       const resultData = { score: finalPercentage, answers: newAnswers, profile: profile! };
       saveQuizResults(resultData);
+      void trackDiagnosticCompletion(finalPercentage, profile!);
       navigate('/quiz/resultats', { state: resultData });
     }
   };

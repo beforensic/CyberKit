@@ -7,6 +7,7 @@ import { toggleFavorite, getFavorites } from '../utils/storage';
 import { useState, useEffect } from 'react';
 import KeywordTooltip from './KeywordTooltip';
 import { useProgress } from '../contexts/ProgressContext';
+import { trackResourceView } from '../services/analytics';
 
 interface ResourceCardProps {
   resource: Resource & { theme?: { title: string } };
@@ -32,6 +33,7 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
 
   const openPreview = () => {
     markAsConsulted(resource.id);
+    void trackResourceView(resource.id, resource.type);
     setPreviewOpen(true);
   };
 

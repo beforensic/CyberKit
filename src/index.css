@@ -145,7 +145,6 @@
 
   nav,
   button:not(.print-keep),
-  .chatbot,
   [class*="fixed"],
   [class*="sticky"] {
     display: none !important;

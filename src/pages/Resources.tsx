@@ -7,6 +7,7 @@ import { useResources } from '../hooks/useResources';
 import { resolveThemeId, resourceMatchesThemeId } from '../utils/themeNavigation';
 import ContactCtaBanner from '../components/ContactCtaBanner';
 import { useProgress } from '../contexts/ProgressContext';
+import { trackSearchQuery } from '../services/analytics';
 
 type ResourcesLocationState = { themeId?: string } | null;
 
@@ -23,6 +24,7 @@ export default function Resources() {
   const { getConsultedCount } = useProgress();
   const consultedCount = getConsultedCount();
   const [searchTerm, setSearchTerm] = useState('');
+  const lastTrackedSearch = useRef('');
 
   const selectedThemeId = useMemo(
     () => resolveThemeId(activeThemeParam, locationState?.themeId, themes),
@@ -41,6 +43,7 @@ export default function Resources() {
 
   useLayoutEffect(() => {
     setSearchTerm('');
+    lastTrackedSearch.current = '';
   }, [activeThemeParam, locationState?.themeId]);
 
   useEffect(() => {
@@ -86,6 +89,20 @@ export default function Resources() {
       return matchesSearch && matchesTheme;
     });
   }, [resources, searchTerm, selectedThemeId]);
+
+  useEffect(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (term.length < 2) return;
+
+    const timer = window.setTimeout(() => {
+      const key = `${term}:${filteredResources.length}`;
+      if (lastTrackedSearch.current === key) return;
+      lastTrackedSearch.current = key;
+      void trackSearchQuery(term, filteredResources.length);
+    }, 800);
+
+    return () => window.clearTimeout(timer);
+  }, [searchTerm, filteredResources.length]);
 
   const handleThemeChange = (id: string | null) => {
     if (id) {
