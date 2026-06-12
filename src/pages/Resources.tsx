@@ -6,10 +6,12 @@ import { useThemes } from '../hooks/useThemes';
 import { useResources } from '../hooks/useResources';
 import { resolveThemeId, resourceMatchesThemeId } from '../utils/themeNavigation';
 import ContactCtaBanner from '../components/ContactCtaBanner';
+import GuidedPathBanner from '../components/GuidedPathBanner';
 import { useProgress } from '../contexts/ProgressContext';
 import { trackSearchQuery } from '../services/analytics';
+import { getGuidedPathProgress } from '../utils/quizGuidedPath';
 
-type ResourcesLocationState = { themeId?: string } | null;
+type ResourcesLocationState = { themeId?: string; guidedPath?: boolean } | null;
 
 export default function Resources() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -24,6 +26,7 @@ export default function Resources() {
   const { getConsultedCount } = useProgress();
   const consultedCount = getConsultedCount();
   const [searchTerm, setSearchTerm] = useState('');
+  const [guidedPathKey, setGuidedPathKey] = useState(0);
   const lastTrackedSearch = useRef('');
 
   const selectedThemeId = useMemo(
@@ -75,6 +78,10 @@ export default function Resources() {
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
+
+  // guidedPathKey forces re-read after sessionStorage clear (exit / finish path)
+  void guidedPathKey;
+  const guidedProgress = getGuidedPathProgress(selectedThemeId);
 
   const currentIndex = themes.findIndex((t) => t.id === selectedThemeId);
   const prevTheme = currentIndex > 0 ? themes[currentIndex - 1] : null;
@@ -134,6 +141,14 @@ export default function Resources() {
           title="Une question ou un besoin d'accompagnement ?"
         />
       </div>
+
+      {guidedProgress && (
+        <GuidedPathBanner
+          themeId={selectedThemeId}
+          onThemeChange={(id) => handleThemeChange(id)}
+          onPathChange={() => setGuidedPathKey((key) => key + 1)}
+        />
+      )}
 
       <div className="bg-white pt-8 pb-6 px-4 border-b border-slate-100 sticky top-0 z-30 shadow-sm">
         <div className="max-w-6xl mx-auto">
@@ -279,7 +294,7 @@ export default function Resources() {
           </div>
         )}
 
-        {selectedThemeId && !unknownThemeFilter && (
+        {selectedThemeId && !unknownThemeFilter && !guidedProgress && (
           <div className="mt-20 pt-12 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="w-full md:w-auto">
               {prevTheme ? (

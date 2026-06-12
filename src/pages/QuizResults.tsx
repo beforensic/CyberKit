@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Shield, ArrowRight, BookOpen, RotateCcw } from 'lucide-react';
 import AIAnalysis from '../components/AIAnalysis';
+import GuidedThemePath from '../components/GuidedThemePath';
 import ContactCtaBanner from '../components/ContactCtaBanner';
 import { saveScore } from '../utils/storage';
 import {
@@ -86,6 +87,8 @@ export default function QuizResults() {
           answers={answers}
           profileName={profileLabel}
         />
+
+        <GuidedThemePath answers={answers} />
 
         <div className="mt-12">
           <ContactCtaBanner
