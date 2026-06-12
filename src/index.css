@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-#comodoTL,
-.comodo-tl {
-  display: none;
-}
-
 /* 1. VARIABLES "STENOW STYLE" */
 :root {
   --surface-dark: #0F172A;

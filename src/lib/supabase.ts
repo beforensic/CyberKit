@@ -1,13 +1,32 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+export const isSupabaseConfigured = Boolean(
+  supabaseUrl?.trim() && supabaseAnonKey?.trim(),
+);
+
+let client: SupabaseClient | null = null;
+
+export function getSupabaseClient(): SupabaseClient {
+  if (!isSupabaseConfigured) {
+    throw new Error('Missing Supabase environment variables');
+  }
+  if (!client) {
+    client = createClient(supabaseUrl!, supabaseAnonKey!);
+  }
+  return client;
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase: SupabaseClient = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const value = Reflect.get(getSupabaseClient(), prop);
+    return typeof value === 'function'
+      ? (value as CallableFunction).bind(getSupabaseClient())
+      : value;
+  },
+});
 
 export interface Theme {
   id: string;
@@ -55,7 +74,7 @@ export interface AdminQuestionRow {
 }
 
 export function getQuestionProfileName(
-  profiles: AdminQuestionRow['quiz_profiles']
+  profiles: AdminQuestionRow['quiz_profiles'],
 ): string {
   if (!profiles) return 'Générique';
   if (Array.isArray(profiles)) return profiles[0]?.name ?? 'Générique';
@@ -77,5 +96,5 @@ export interface Resource {
   updated_at: string;
   theme?: Theme;
   resource_type?: ResourceType;
-  is_pinned: boolean; // Corrigé ici pour correspondre à la DB
+  is_pinned: boolean;
 }

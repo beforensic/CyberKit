@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 const DARK_SURFACE_PATHS = ['/', '/quiz', '/quiz/resultats'];
 
@@ -17,7 +18,9 @@ export default function AppLayout() {
         Aller au contenu principal
       </a>
       <main id="main-content" tabIndex={-1} className="outline-none">
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
       <Footer variant={isDarkSurface ? 'dark' : 'light'} />
       <Navigation isDarkSurface={isDarkSurface} />

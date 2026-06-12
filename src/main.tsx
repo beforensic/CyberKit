@@ -4,13 +4,21 @@ import App from './App.tsx';
 import './index.css';
 import { ProgressProvider } from './contexts/ProgressContext';
 import { CatalogProvider } from './contexts/CatalogContext';
+import ConfigMissing from './components/ConfigMissing';
+import { isSupabaseConfigured } from './lib/supabase';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <CatalogProvider>
-      <ProgressProvider>
-        <App />
-      </ProgressProvider>
-    </CatalogProvider>
-  </StrictMode>
+const root = createRoot(document.getElementById('root')!);
+
+root.render(
+  isSupabaseConfigured ? (
+    <StrictMode>
+      <CatalogProvider>
+        <ProgressProvider>
+          <App />
+        </ProgressProvider>
+      </CatalogProvider>
+    </StrictMode>
+  ) : (
+    <ConfigMissing />
+  ),
 );
