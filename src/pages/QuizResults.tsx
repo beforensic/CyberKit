@@ -11,6 +11,7 @@ import {
   PROFILE_LABELS,
   type QuizResultData,
 } from '../utils/quizResults';
+import { fireQuizCompletionConfetti } from '../utils/quizConfetti';
 
 export default function QuizResults() {
   const navigate = useNavigate();
@@ -23,6 +24,12 @@ export default function QuizResults() {
       saveScore(results.score);
     }
   }, [results]);
+
+  useEffect(() => {
+    if (stateData) {
+      fireQuizCompletionConfetti(stateData.score);
+    }
+  }, [stateData]);
 
   if (!results) {
     return (
