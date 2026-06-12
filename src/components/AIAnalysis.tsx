@@ -3,6 +3,11 @@ import { Sparkles, BrainCircuit, ShieldCheck, Zap, Loader2 } from 'lucide-react'
 import { supabase } from '../lib/supabase';
 import { getScoreLevel } from '../utils/quizResults';
 import { getQuizWeakPoints } from '../utils/quizWeakPoints';
+import {
+  buildAiAnalysisCacheKey,
+  getCachedAiAnalysis,
+  setCachedAiAnalysis,
+} from '../utils/aiAnalysisCache';
 
 interface AIAnalysisProps {
   score: number;
@@ -10,17 +15,31 @@ interface AIAnalysisProps {
   profileName: string;
 }
 
+const FALLBACK_ANALYSIS =
+  "L'analyse IA est momentanément indisponible, mais vos résultats indiquent que vous devriez prioriser la sécurisation de vos sauvegardes et de vos mots de passe.";
+
 export default function AIAnalysis({ score, answers, profileName }: AIAnalysisProps) {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [priorityHint, setPriorityHint] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const generateAnalysis = useCallback(async () => {
+    const cacheKey = buildAiAnalysisCacheKey(profileName, score, answers);
+    const cached = getCachedAiAnalysis(cacheKey);
+
+    if (cached) {
+      setAnalysis(cached.analysis);
+      setPriorityHint(cached.priorityHint);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const level = getScoreLevel(score);
       const weakPoints = await getQuizWeakPoints(answers);
-      setPriorityHint(weakPoints[0] ?? null);
+      const topPriority = weakPoints[0] ?? null;
+      setPriorityHint(topPriority);
 
       const { data, error } = await supabase.functions.invoke('generate-analysis', {
         body: {
@@ -34,12 +53,19 @@ export default function AIAnalysis({ score, answers, profileName }: AIAnalysisPr
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      setAnalysis(data.analysis ?? null);
+      const generatedAnalysis = data.analysis ?? null;
+      if (!generatedAnalysis?.trim()) {
+        throw new Error('Empty analysis');
+      }
+
+      setAnalysis(generatedAnalysis);
+      setCachedAiAnalysis(cacheKey, {
+        analysis: generatedAnalysis,
+        priorityHint: topPriority,
+      });
     } catch (err) {
       console.error('Erreur IA:', err);
-      setAnalysis(
-        "L'analyse IA est momentanément indisponible, mais vos résultats indiquent que vous devriez prioriser la sécurisation de vos sauvegardes et de vos mots de passe.",
-      );
+      setAnalysis(FALLBACK_ANALYSIS);
     } finally {
       setLoading(false);
     }
