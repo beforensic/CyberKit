@@ -5,7 +5,10 @@ import { supabase } from '../lib/supabase';
 import { getScore, getThemeInterest } from '../utils/storage';
 import GoogleReview from '../components/GoogleReview';
 
-const MIN_SUBMIT_DELAY_MS = 3000;
+import {
+  validateContactSubmission,
+  getContactValidationMessage,
+} from '../utils/contactForm';
 
 export default function Contact() {
   const navigate = useNavigate();
@@ -41,14 +44,14 @@ export default function Contact() {
     setLoading(true);
     setError(null);
 
-    if (Date.now() - formLoadedAt.current < MIN_SUBMIT_DELAY_MS) {
-      setError('Veuillez patienter quelques secondes avant d\'envoyer.');
-      setLoading(false);
-      return;
-    }
+    const validationError = validateContactSubmission({
+      formLoadedAt: formLoadedAt.current,
+      gdprConsent,
+      website: formData.website,
+    });
 
-    if (!gdprConsent) {
-      setError('Vous devez accepter le traitement de vos données pour envoyer le message.');
+    if (validationError) {
+      setError(getContactValidationMessage(validationError));
       setLoading(false);
       return;
     }

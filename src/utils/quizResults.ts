@@ -29,6 +29,18 @@ export const PROFILE_LABELS: Record<string, string> = {
   tpe: 'TPE / PME',
 };
 
+export function calculateQuizScore(
+  answers: Record<string, number>,
+  maxScorePerQuestion = 5,
+): number {
+  const values = Object.values(answers);
+  if (values.length === 0) return 0;
+
+  const totalScore = values.reduce((sum, value) => sum + value, 0);
+  const maxScore = values.length * maxScorePerQuestion;
+  return Math.round((totalScore / maxScore) * 100);
+}
+
 export const getScoreLevel = (score: number): { label: string; description: string } => {
   if (score < 50) return { label: 'À renforcer', description: 'Des actions prioritaires sont recommandées.' };
   if (score < 70) return { label: 'En progression', description: 'Vous avez de bonnes bases à consolider.' };

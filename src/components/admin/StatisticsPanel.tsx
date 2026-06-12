@@ -65,16 +65,19 @@ export default function StatisticsPanel() {
   const getDateFilter = (): string | null => {
     const now = new Date();
     switch (periodFilter) {
-      case 'year':
+      case 'year': {
         const yearStart = new Date(now.getFullYear(), 0, 1);
         return yearStart.toISOString();
-      case 'quarter':
+      }
+      case 'quarter': {
         const quarterMonth = Math.floor(now.getMonth() / 3) * 3;
         const quarterStart = new Date(now.getFullYear(), quarterMonth, 1);
         return quarterStart.toISOString();
-      case 'month':
+      }
+      case 'month': {
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         return monthStart.toISOString();
+      }
       default:
         return null;
     }
