@@ -1,5 +1,6 @@
 import { ChevronLeft, Building2, Mail, ShieldCheck, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Footer from '../components/Footer';
 
 export default function Legal() {
   return (
@@ -216,12 +217,8 @@ export default function Legal() {
           </div>
         </section>
 
-        <div className="text-center pt-8 pb-4">
-          <p className="text-slate-500 text-sm">
-            © 2026 beForensic - Tous droits réservés
-          </p>
-        </div>
       </div>
+      <Footer withBottomNavOffset={false} />
     </div>
   );
 }
