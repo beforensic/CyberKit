@@ -56,6 +56,12 @@ export default function Home() {
             >
               Explorer les outils
             </button>
+            <button
+              onClick={() => navigate('/about')}
+              className="px-8 py-4 text-slate-400 rounded-2xl font-semibold text-lg hover:text-white transition-colors underline-offset-4 hover:underline"
+            >
+              Qui est beForensic ?
+            </button>
           </div>
         </div>
       </div>

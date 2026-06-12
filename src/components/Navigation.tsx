@@ -1,4 +1,4 @@
-import { Home, ClipboardList, BookOpen, Mail, Star } from 'lucide-react';
+import { Home, ClipboardList, BookOpen, Mail, Star, User } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 const navItems = [
@@ -6,6 +6,7 @@ const navItems = [
   { path: '/quiz', label: 'Diagnostic', icon: ClipboardList, end: false },
   { path: '/resources', label: 'Ressources', icon: BookOpen, end: false },
   { path: '/favorites', label: 'Favoris', icon: Star, end: false },
+  { path: '/about', label: 'À propos', icon: User, end: false },
   { path: '/contact', label: 'Contact', icon: Mail, end: false, highlight: true },
 ];
 
@@ -27,7 +28,7 @@ export default function Navigation({ isDarkSurface = false }: NavigationProps) {
       aria-label="Navigation principale"
       className={`fixed bottom-0 left-0 right-0 border-t px-3 py-2 z-50 ${barClass}`}
     >
-      <div className="max-w-lg mx-auto flex justify-between items-center">
+      <div className="max-w-2xl mx-auto flex justify-between items-center gap-0.5">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.path === '/quiz' ? isQuizActive : (

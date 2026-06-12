@@ -22,24 +22,24 @@ export default function Footer({ withBottomNavOffset = true, variant = 'dark' }:
         <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
           © {new Date().getFullYear()} beForensic — CyberKit
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+        <nav aria-label="Liens secondaires" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           <Link
             to="/about"
-            className={`text-xs transition-colors ${
-              isDark ? 'text-slate-400 hover:text-brand-orange' : 'text-slate-500 hover:text-brand-orange'
+            className={`text-sm font-medium transition-colors ${
+              isDark ? 'text-slate-300 hover:text-brand-orange' : 'text-slate-600 hover:text-brand-orange'
             }`}
           >
             À propos
           </Link>
           <Link
             to="/legal"
-            className={`text-xs transition-colors ${
-              isDark ? 'text-slate-400 hover:text-brand-orange' : 'text-slate-500 hover:text-brand-orange'
+            className={`text-sm font-medium transition-colors ${
+              isDark ? 'text-slate-300 hover:text-brand-orange' : 'text-slate-600 hover:text-brand-orange'
             }`}
           >
             Mentions légales
           </Link>
-        </div>
+        </nav>
       </div>
     </footer>
   );

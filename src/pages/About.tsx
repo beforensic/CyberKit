@@ -1,5 +1,5 @@
-import { Award, Users, Presentation, Laptop, MessageSquare } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Award, Users, Presentation, Laptop, MessageSquare, ChevronLeft } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function About() {
   const navigate = useNavigate();
@@ -29,6 +29,13 @@ export default function About() {
   return (
     <div className="page-light py-12 md:py-20 px-4 pb-32 text-left">
       <div className="max-w-5xl mx-auto">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-brand-orange hover:text-brand-orange-600 font-semibold transition-colors mb-8"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          Retour à l'accueil
+        </Link>
 
         {/* Bio Card */}
         <div className="bg-white p-8 md:p-16 rounded-[3rem] shadow-2xl border border-slate-100 mb-20 relative overflow-hidden">
