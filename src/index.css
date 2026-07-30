@@ -15,21 +15,14 @@
 /* 2. STYLE GLOBAL */
 @layer base {
   body {
-    @apply bg-surface-light text-slate-900 antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    @apply bg-surface-light text-slate-900 antialiased font-sans tracking-tight;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
   button,
-  span,
-  p {
-    font-family: 'Inter', sans-serif !important;
-    @apply tracking-tight;
+  input,
+  textarea,
+  select {
+    font-family: inherit;
   }
 }
 
@@ -103,6 +96,11 @@
 }
 
 @layer utilities {
+  .font-display {
+    font-family: 'Source Serif 4', Georgia, serif !important;
+    letter-spacing: -0.02em;
+  }
+
   .sr-only {
     position: absolute;
     width: 1px;

@@ -93,7 +93,7 @@ export default function Contact() {
           <div className="w-20 h-20 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-8">
             <CheckCircle className="w-10 h-10 text-brand-orange" />
           </div>
-          <h2 className="text-3xl font-black text-slate-900 mb-4">Message envoyé !</h2>
+          <h2 className="font-display font-semibold text-[clamp(1.75rem,4vw,2.5rem)] text-slate-900 mb-4">Message envoyé !</h2>
           <p className="text-slate-600 mb-10 leading-relaxed">
             Merci de votre confiance. Serge Houtain reviendra vers vous personnellement dans les plus brefs délais.
           </p>
@@ -115,7 +115,9 @@ export default function Contact() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
           <div>
-            <h1 className="text-4xl font-black text-slate-900 mb-6">Contactez-nous</h1>
+            <h1 className="font-display font-semibold text-[clamp(1.75rem,4vw,2.5rem)] md:text-[clamp(2.5rem,7vw,3.25rem)] text-slate-900 mb-6">
+              Contactez-nous
+            </h1>
             <p className="text-lg text-slate-600 mb-12 leading-relaxed">
               Une question sur votre diagnostic ? Besoin d'une conférence de sensibilisation pour votre association ou TPE ? Échangeons ensemble.
             </p>

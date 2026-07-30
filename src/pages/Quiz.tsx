@@ -78,7 +78,7 @@ export default function Quiz() {
   if (loading) {
     return (
       <div className="page-dark flex items-center justify-center" role="status" aria-live="polite">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange" aria-hidden="true" />
+        <div className="animate-spin h-12 w-12 rounded-full border-2 border-slate-700 border-t-slate-300" aria-hidden="true" />
         <span className="sr-only">Chargement des questions du diagnostic</span>
       </div>
     );
@@ -100,7 +100,7 @@ export default function Quiz() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange-400 text-[10px] font-bold uppercase tracking-widest mb-6">
             <Shield size={14} aria-hidden="true" /> Diagnostic Personnalisé
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
+          <h1 className="font-display font-semibold text-[clamp(1.75rem,4vw,2.5rem)] md:text-[clamp(2.5rem,7vw,4.5rem)] text-white mb-6">
             Commençons par votre profil
           </h1>
           <p className="text-lg text-slate-400 mb-12 max-w-2xl">

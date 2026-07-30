@@ -20,7 +20,28 @@
         "rule": "gradient-text",
         "value": "bg-clip-text bg-gradient",
         "createdAt": "2026-07-30T16:56:12.075Z",
-        "reason": ".text-gradient orange→rose is an intentional DESIGN.md signature"
+        "reason": "DESIGN.md .text-gradient signature"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "source serif 4",
+        "createdAt": "2026-07-30T17:13:55.995Z",
+        "reason": "Approved identity plan: display face for La Lanterne double"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#eee",
+        "createdAt": "2026-07-30T17:13:56.055Z",
+        "reason": "Print-only border in @media print"
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "src/index.css"
+        ],
+        "createdAt": "2026-07-30T17:14:57.577Z",
+        "reason": "DESIGN.md documents .text-gradient as intentional rose flame accent"
       }
     ]
   }

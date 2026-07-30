@@ -123,7 +123,7 @@ export default function Resources() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" role="status" aria-live="polite">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-brand-orange" aria-hidden="true" />
+        <div className="animate-spin h-12 w-12 rounded-full border-2 border-slate-200 border-t-slate-500" aria-hidden="true" />
         <span className="sr-only">Chargement des ressources</span>
       </div>
     );
@@ -154,7 +154,9 @@ export default function Resources() {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Bibliothèque</h1>
+              <h1 className="font-display font-semibold text-[clamp(1.75rem,4vw,2.5rem)] text-slate-900 tracking-tight">
+                Bibliothèque
+              </h1>
               <p className="text-slate-500 text-sm font-medium">Vos outils pour une sécurité maximale</p>
               {consultedCount > 0 && (
                 <p className="text-brand-orange text-sm font-bold mt-1" aria-live="polite">

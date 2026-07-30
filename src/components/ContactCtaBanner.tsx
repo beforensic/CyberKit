@@ -65,7 +65,7 @@ export default function ContactCtaBanner({
           >
             Accompagnement beForensic
           </p>
-          <h2 className={`text-2xl md:text-3xl font-black mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h2 className={`font-display font-semibold text-[clamp(1.75rem,4vw,2.5rem)] mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
             {title}
           </h2>
           <p className={`text-sm md:text-base leading-relaxed max-w-xl ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>

@@ -64,7 +64,8 @@ Cible produit : **WCAG 2.2 niveau AA** (web). Accessibilité de base déjà en p
 - Éditeur / marque expert : **beForensic** (Serge Houtain)
 - Voix : français belge, vouvoiement, pédagogue, sans jargon technique inutile
 - Gratuité in-app + lead beForensic : non négociable
-- Assets : portrait Serge (`Profil-1-beforensic.png` / Storage Supabase), identité orange marque (DOCUMENTÉ dans DESIGN.md, hors scope init)
+- Assets : portrait Serge (`Profil-1-beforensic.png` / Storage Supabase), identité orange marque
+- Typographie : **Source Serif 4** (display marketing) + **Inter** (UI / corps) — voir DESIGN.md
 
 ## Evidence on Hand
 

@@ -36,7 +36,7 @@ export default function Favorites() {
   if (waitingForCatalog) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white" role="status" aria-live="polite">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-orange" aria-hidden="true" />
+        <div className="animate-spin h-12 w-12 rounded-full border-2 border-slate-200 border-t-slate-500" aria-hidden="true" />
         <span className="sr-only">Chargement de vos favoris</span>
       </div>
     );
@@ -55,8 +55,8 @@ export default function Favorites() {
             >
               <ChevronLeft className="w-4 h-4" /> Retour à l'accueil
             </button>
-            <h1 className="text-4xl font-black text-slate-900 flex items-center gap-3">
-              Mes Favoris <Heart className="w-8 h-8 text-red-500 fill-red-500" />
+            <h1 className="font-display font-semibold text-[clamp(1.75rem,4vw,2.5rem)] text-slate-900 flex items-center gap-3">
+              Mes Favoris <Heart className="w-8 h-8 text-red-500 fill-red-500" aria-hidden="true" />
             </h1>
           </div>
 

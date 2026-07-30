@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-30T16:59:06.000Z",
+  "generatedAt": "2026-07-30T17:18:19.000Z",
   "title": "Design System: CyberKit",
   "extensions": {
     "colorMeta": {
@@ -83,23 +83,23 @@
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Hero marketing Accueil uniquement."
+        "purpose": "Heroes marketing (Home, Quiz, About) — Source Serif 4 via font-display."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Titres de section et de page."
+        "purpose": "Titres de section marketing — Source Serif 4."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Titres de cartes et modules."
+        "purpose": "Titres de cartes et modules — Inter."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Paragraphes et descriptions ; max ~65–75ch."
+        "purpose": "Paragraphes et descriptions ; max ~65–75ch — Inter."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Eyebrows uppercase, chips, badges type."
+        "purpose": "Eyebrows uppercase, chips, badges type — Inter."
       }
     },
     "shadows": [
@@ -201,7 +201,7 @@
       "refersTo": "card-dark",
       "description": "Carte marketing / quiz — tonal layering, pas de blur lourd.",
       "html": "<div class=\"ds-card-dark\"><h3 class=\"ds-card-dark-title\">Diagnostic</h3><p class=\"ds-card-dark-body\">Faites le point sur vos risques en quelques minutes.</p></div>",
-      "css": ".ds-card-dark { background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(51, 65, 85, 0.5); border-radius: 2rem; padding: 2rem; color: #cbd5e1; font-family: Inter, system-ui, sans-serif; } .ds-card-dark-title { margin: 0 0 0.5rem; color: #fff; font-weight: 700; font-size: 1.25rem; letter-spacing: -0.025em; } .ds-card-dark-body { margin: 0; font-size: 0.875rem; line-height: 1.625; color: #94a3b8; }"
+      "css": ".ds-card-dark { background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(51, 65, 85, 0.5); border-radius: 2rem; padding: 2rem; color: #cbd5e1; font-family: Inter, system-ui, sans-serif; } .ds-card-dark-title { margin: 0 0 0.5rem; color: #fff; font-family: Inter, system-ui, sans-serif; font-weight: 700; font-size: 1.25rem; letter-spacing: -0.025em; } .ds-card-dark-body { margin: 0; font-size: 0.875rem; line-height: 1.625; color: #94a3b8; }"
     },
     {
       "name": "Light Resource Card",
@@ -241,22 +241,20 @@
       "refersTo": "card-dark",
       "description": "Signature conversion — gratuit CyberKit → expert beForensic.",
       "html": "<aside class=\"ds-cta-banner\"><div class=\"ds-cta-icon\" aria-hidden=\"true\"><svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z\"/></svg></div><div class=\"ds-cta-copy\"><p class=\"ds-cta-eyebrow\">Accompagnement beForensic</p><h2 class=\"ds-cta-title\">Besoin d'un expert à vos côtés ?</h2><p class=\"ds-cta-body\">Formation, coaching ou audit au-delà des ressources gratuites.</p></div><a class=\"ds-cta-btn\" href=\"#\">Me contacter</a></aside>",
-      "css": ".ds-cta-banner { position: relative; overflow: hidden; display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; padding: 2.5rem; border-radius: 2rem; background: rgba(30, 41, 59, 0.5); border: 1px solid rgb(232 101 10 / 0.25); font-family: Inter, system-ui, sans-serif; color: #cbd5e1; } .ds-cta-icon { flex-shrink: 0; padding: 1rem; border-radius: 1rem; background: #E8650A; color: #fff; } .ds-cta-copy { flex: 1; min-width: 12rem; } .ds-cta-eyebrow { margin: 0 0 0.5rem; font-size: 10px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: #F08040; } .ds-cta-title { margin: 0 0 0.75rem; color: #fff; font-size: 1.75rem; font-weight: 900; letter-spacing: -0.025em; } .ds-cta-body { margin: 0; max-width: 36rem; font-size: 0.875rem; line-height: 1.625; } .ds-cta-btn { display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 2rem; background: #E8650A; color: #fff; border-radius: 1rem; font-weight: 900; font-size: 1.125rem; text-decoration: none; box-shadow: 0 20px 25px -5px rgb(232 101 10 / 0.25); transition: background 0.2s; } .ds-cta-btn:hover { background: #C95508; } .ds-cta-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #0F172A, 0 0 0 4px #E8650A; }"
+      "css": ".ds-cta-banner { position: relative; overflow: hidden; display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; padding: 2.5rem; border-radius: 2rem; background: rgba(30, 41, 59, 0.5); border: 1px solid rgb(232 101 10 / 0.25); font-family: Inter, system-ui, sans-serif; color: #cbd5e1; } .ds-cta-icon { flex-shrink: 0; padding: 1rem; border-radius: 1rem; background: #E8650A; color: #fff; } .ds-cta-copy { flex: 1; min-width: 12rem; } .ds-cta-eyebrow { margin: 0 0 0.5rem; font-size: 10px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: #F08040; } .ds-cta-title { margin: 0 0 0.75rem; color: #fff; font-family: \"Source Serif 4\", Georgia, serif; font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 600; letter-spacing: -0.02em; } .ds-cta-body { margin: 0; max-width: 36rem; font-size: 0.875rem; line-height: 1.625; } .ds-cta-btn { display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 2rem; background: #E8650A; color: #fff; border-radius: 1rem; font-weight: 900; font-size: 1.125rem; text-decoration: none; box-shadow: 0 20px 25px -5px rgb(232 101 10 / 0.25); transition: background 0.2s; } .ds-cta-btn:hover { background: #C95508; } .ds-cta-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #0F172A, 0 0 0 4px #E8650A; }"
     }
   ],
   "narrative": {
     "northStar": "La Lanterne double",
-    "overview": "CyberKit porte une flamme unique — la braise beForensic — dans deux chambres : une salle sombre pour accrocher et accompagner le diagnostic, une salle claire pour lire, choisir et remplir. Même orange, même Inter, même générosité de rayon ; densité et contraste changent avec le job de la page.\n\nLe système est direct, rassurant, contrasté. Il parle aux indépendants et TPE belges non-technophiles : titres lourds et lisibles, CTA orange décisifs, surfaces sobres. Pas de théâtre cyber ; de la clarté de terrain.\n\nAnti-références confirmées : purple-on-white / indigo SaaS générique ; néon cyberpunk ; glassmorphism lourd et flou omniprésent ; emerald comme accent de succès sur les parcours principaux.",
+    "overview": "CyberKit porte une flamme — la braise beForensic — dans deux chambres. La chambre sombre accroche et montre l’humain (Serge, expertise terrain belge). La chambre claire lit, choisit, remplit. Même orange ; la personnalité vient du serif display (Source Serif 4) + de la preuve humaine, pas d’une grille d’icônes SaaS.\n\nLe système est direct, rassurant, incarné. Indépendants et TPE belges non-technophiles : clarté de terrain, pas de théâtre cyber.\n\nAnti-références : purple SaaS, néon cyberpunk, emerald succès, mur de cartes icône-titre-flèche.",
     "keyCharacteristics": [
       "Double mode page : .page-dark (marketing / quiz) vs .page-light (lecture / formulaires)",
-      "Accent unique : braise beForensic (#E8650A) pour actions et états positifs",
-      "Rayons généreux : card 1.5rem, panel 2rem, boutons 2xl",
-      "Inter forcé globalement ; titres marketing souvent font-black",
-      "Nav principale en barre fixe bas d’écran (mobile-first)",
-      "Admin hors charte publique : slate-50 + sidebar slate-900",
-      "Nav dock safe-area (.nav-dock) + cibles ≥44px",
-      "Footer .footer-with-nav dégage barre + encoche ; viewport-fit=cover",
-      "CTA hero Home : colonne full-width mobile → row sm+"
+      "Accent unique : braise beForensic (#E8650A)",
+      "Display Source Serif 4 (font-display) + Inter UI/corps",
+      "Preuve humaine : portrait Serge sur Home / About",
+      "Rayons généreux : card 1.5rem, panel 2rem",
+      "Nav dock bas + safe-area ; cibles ≥44px",
+      "Admin hors charte publique"
     ],
     "rules": [
       {
@@ -266,13 +264,23 @@
       },
       {
         "name": "The Dual Chamber Rule",
-        "body": "Marketing / diagnostic → .page-dark + cartes glass / surface-card-dark. Lecture / formulaires / catalogue → .page-light + cartes blanches. Ne pas unifier globalement sans décision métier.",
+        "body": "Marketing / diagnostic → .page-dark. Lecture / formulaires / catalogue → .page-light. Ne pas unifier sans décision métier.",
         "section": "colors"
       },
       {
-        "name": "The Single Face Rule",
-        "body": "Pas de serif display ni de mono UI hors code admin. Inter partout ; la personnalité vient du poids et du contraste de mode.",
+        "name": "The Human First Rule",
+        "body": "Sur Home et surfaces Persuade, au moins une ancre humaine réelle (portrait / nom / expertise) avant ou à côté du catalogue d’outils.",
+        "section": "imagery"
+      },
+      {
+        "name": "The Two Faces Rule",
+        "body": "Source Serif 4 sur heroes marketing (font-display) ; Inter pour UI, corps, labels. Pas de mono hors code admin.",
         "section": "typography"
+      },
+      {
+        "name": "The Catalogue Second Rule",
+        "body": "Pas de mur de cartes icône-titre-flèche comme structure principale du premier viewport Home.",
+        "section": "layout"
       },
       {
         "name": "The Bottom Dock Rule",
@@ -281,30 +289,30 @@
       },
       {
         "name": "The Flat-By-Default Rule",
-        "body": "Surfaces dark plates (bordure + opacité). Ombres structurelles réservées au mode light et aux CTA ; le glow orange est un état, pas un décor permanent.",
+        "body": "Surfaces dark plates (bordure + opacité). Ombres structurelles réservées au mode light et aux CTA.",
         "section": "elevation"
       },
       {
         "name": "The Soft Shell Rule",
-        "body": "Préférer card / panel aux petits rayons (4–8px) sur surfaces produit. Les coins serrés restent admin ou micro-contrôles.",
+        "body": "Préférer card / panel aux petits rayons (4–8px) sur surfaces produit.",
         "section": "shapes"
       }
     ],
     "dos": [
       "Do choisir .page-dark ou .page-light en racine de chaque page publique.",
       "Do utiliser brand-orange pour CTA, focus et états positifs produit.",
+      "Do utiliser font-display sur les heroes marketing.",
+      "Do montrer la preuve humaine (Serge) sur Home / About.",
       "Do appliquer .focus-ring sur éléments interactifs.",
-      "Do garder Inter + tracking-tight ; titres marketing en font-black si besoin d’impact.",
-      "Do utiliser rounded-card / rounded-panel pour les surfaces produit.",
-      "Do traiter l’admin (/admin) comme console séparée (slate), hors modes page."
+      "Do garder Inter pour corps / UI ; Source Serif 4 pour display.",
+      "Do traiter l’admin (/admin) comme console séparée."
     ],
     "donts": [
-      "Don't unifier tout le site en dark ou light sans décision métier.",
-      "Don't introduire emerald (ou un second accent succès) sur les parcours principaux.",
-      "Don't utiliser accent-rose hors .text-gradient.",
-      "Don't ajouter une nouvelle couleur de marque sans mettre à jour ce fichier + tailwind.config.js + :root.",
-      "Don't empiler du glassmorphism / blur lourd sur toutes les cartes — blur = halo décoratif localisé.",
-      "Don't remplacer la bottom nav publique par une top bar générique SaaS."
+      "Don’t purple SaaS / néon / emerald succès sur parcours principal.",
+      "Don’t forcer Inter sur les titres display.",
+      "Don’t remplacer le portrait réel par des avatars génériques.",
+      "Don’t faire du premier viewport un mur de cartes outils.",
+      "Don’t déplacer la nav dock sans demande explicite."
     ]
   }
 }

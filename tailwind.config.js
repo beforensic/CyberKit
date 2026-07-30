@@ -3,6 +3,10 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Source Serif 4"', 'Georgia', 'serif'],
+      },
       borderRadius: {
         card: '1.5rem',
         panel: '2rem',

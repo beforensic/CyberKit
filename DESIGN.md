@@ -1,6 +1,6 @@
 ---
 name: CyberKit
-description: Diagnostic cyber gratuit pour indépendants et TPE belges — double mode marketing sombre / lecture claire.
+description: Diagnostic cyber gratuit pour indépendants et TPE belges — Lanterne double, preuve humaine beForensic.
 colors:
   brand-orange: "#E8650A"
   brand-orange-50: "#FEF3EC"
@@ -25,17 +25,17 @@ colors:
   white: "#ffffff"
 typography:
   display:
-    fontFamily: "Inter, system-ui, sans-serif"
-    fontSize: "clamp(3rem, 8vw, 4.5rem)"
-    fontWeight: 900
-    lineHeight: 1.05
-    letterSpacing: "-0.025em"
+    fontFamily: "\"Source Serif 4\", Georgia, serif"
+    fontSize: "clamp(2.5rem, 7vw, 4.5rem)"
+    fontWeight: 600
+    lineHeight: 1.08
+    letterSpacing: "-0.02em"
   headline:
-    fontFamily: "Inter, system-ui, sans-serif"
-    fontSize: "clamp(1.875rem, 4vw, 2.25rem)"
-    fontWeight: 900
+    fontFamily: "\"Source Serif 4\", Georgia, serif"
+    fontSize: "clamp(1.75rem, 4vw, 2.5rem)"
+    fontWeight: 600
     lineHeight: 1.15
-    letterSpacing: "-0.025em"
+    letterSpacing: "-0.02em"
   title:
     fontFamily: "Inter, system-ui, sans-serif"
     fontSize: "1.25rem"
@@ -114,148 +114,112 @@ components:
 
 **Creative North Star: "La Lanterne double"**
 
-CyberKit porte une flamme unique — la braise beForensic — dans deux chambres : une salle sombre pour accrocher et accompagner le diagnostic, une salle claire pour lire, choisir et remplir. Même orange, même Inter, même générosité de rayon ; densité et contraste changent avec le job de la page.
+CyberKit porte une flamme — la braise beForensic — dans deux chambres. La chambre sombre accroche et **montre l’humain** (Serge, expertise terrain belge). La chambre claire lit, choisit, remplit. Même orange ; la personnalité vient du **serif display** + de la preuve humaine, pas d’une grille d’icônes SaaS.
 
-Le système est **direct, rassurant, contrasté**. Il parle aux indépendants et TPE belges non-technophiles : titres lourds et lisibles, CTA orange décisifs, surfaces sobres. Pas de théâtre cyber ; de la clarté de terrain.
+Le système est **direct, rassurant, incarné**. Indépendants et TPE belges non-technophiles : clarté de terrain, pas de théâtre cyber.
 
-**Anti-références confirmées :** purple-on-white / indigo SaaS générique ; néon cyberpunk ; glassmorphism lourd et flou omniprésent ; emerald comme accent de succès sur les parcours principaux.
+**Anti-références :** purple SaaS ; néon cyberpunk ; glassmorphism lourd ; emerald succès ; mur de cartes icône–titre–flèche comme structure principale d’une page marketing.
 
 **Key Characteristics:**
-- Double mode page : `.page-dark` (marketing / quiz) vs `.page-light` (lecture / formulaires)
-- Accent unique : braise beForensic (`#E8650A`) pour actions et états positifs
-- Rayons généreux : `card` 1.5rem, `panel` 2rem, boutons `2xl`
-- Inter forcé globalement ; titres marketing souvent `font-black`
-- Nav principale en barre fixe bas d’écran (mobile-first)
-- Admin hors charte publique : `slate-50` + sidebar `slate-900`
+- Dual Chamber : `.page-dark` (marketing / quiz) vs `.page-light` (lecture / formulaires)
+- Display **Source Serif 4** sur heroes marketing ; Inter pour UI / corps
+- Accent unique : braise beForensic (`#E8650A`)
+- Preuve humaine : portrait Serge + ligne crédibilité RCCU sur surfaces Persuade
+- Rayons généreux : `card` 1.5rem, `panel` 2rem
+- Nav bottom dock + safe-area ; admin hors charte publique
 
 ## Colors
 
-Palette courte : une braise d’action, un rose de dégradé rare, deux surfaces de mode, une échelle slate pour texte et bordures.
+Palette courte : une braise d’action, un rose de dégradé rare, deux surfaces de mode, slate pour texte.
 
 ### Primary
-- **Braise beForensic** (`#E8650A`) : CTA, liens actifs, badges, focus ring, halos marketing. Échelle Tailwind `brand-orange-50`…`900` pour fonds légers, hovers et texte sur fond clair (`600` = hover CTA).
+- **Braise beForensic** (`#E8650A`) : CTA, liens actifs, badges, focus, halos.
 
 ### Secondary
-- **Rose de flamme** (`#e11d48`) : uniquement dans `.text-gradient` (orange → rose). Pas d’usage comme CTA ni état système.
+- **Rose de flamme** (`#e11d48`) : uniquement `.text-gradient`.
 
 ### Neutral
-- **Ardoise nuit** (`#0F172A` / `surface-dark`) : fond pages marketing et quiz.
-- **Nuit profonde** (`#020617` / `surface-deep`) : accents très sombres / variables CSS.
-- **Papier atelier** (`#FAFAFA` / `surface-light`) : fond pages lecture + `body` par défaut.
-- **Blanc carte** (`#ffffff`) : cartes et formulaires en mode light.
-- **Slate texte** (`#64748b` / `#94a3b8` / `#cbd5e1` / `#1e293b`) : hiérarchie de texte et bordures selon le mode.
+- **Ardoise nuit** (`#0F172A`) / **Papier atelier** (`#FAFAFA`) / **Nuit profonde** (`#020617`) / blanc cartes / échelle slate.
 
 ### Named Rules
-**The One Flame Rule.** Un seul accent d’action : `brand-orange`. Pas d’emerald (ni autre vert succès) sur contact, coach, résultats ou CTA principaux.
+**The One Flame Rule.** Un seul accent d’action : `brand-orange`.
 
-**The Dual Chamber Rule.** Marketing / diagnostic → `.page-dark` + cartes glass / `surface-card-dark`. Lecture / formulaires / catalogue → `.page-light` + cartes blanches. Ne pas unifier globalement sans décision métier.
+**The Dual Chamber Rule.** Marketing / diagnostic → `.page-dark`. Lecture / formulaires → `.page-light`.
+
+**The Human First Rule.** Sur Home et surfaces Persuade, au moins une ancre humaine réelle (portrait / nom / expertise) avant ou à côté du catalogue d’outils.
 
 ## Typography
 
-**Display Font:** Inter (system-ui, sans-serif)  
+**Display Font:** Source Serif 4 (Georgia, serif) — classe `.font-display` / `font-display`  
 **Body Font:** Inter (system-ui, sans-serif)
 
-**Character:** Une seule famille, forcée en `!important` sur titres et corps. La hiérarchie passe par le poids (`font-black` / `font-bold`) et le tracking, pas par un second caractère.
+**Character:** Serif = voix humaine / institutionnelle belge. Inter = outil, boutons, labels.
 
 ### Hierarchy
-- **Display** (900, `clamp(3rem, 8vw, 4.5rem)`, lh 1.05) : hero Accueil — impact marketing.
-- **Headline** (900, `~1.875–2.25rem`) : sections et titres de page.
-- **Title** (700, `1.25rem`) : titres de cartes, modules.
-- **Body** (400, `1–1.125rem`, lh relaxed) : paragraphes ; slate-400/500 dark, slate-600/700 light. Max utile ~max-w-2xl / 65–75ch.
-- **Label** (900, `10px`, uppercase, tracking-widest) : chips, eyebrow « Accompagnement beForensic », badges type ressource.
+- **Display** (Source Serif 4, 600, `clamp(2.5rem, 7vw, 4.5rem)`) : heroes Accueil, Quiz, About.
+- **Headline** (Source Serif 4, 600) : titres de section marketing.
+- **Title / Body / Label** (Inter) : UI, cartes, formulaires.
 
 ### Named Rules
-**The Single Face Rule.** Pas de serif display ni de mono UI hors code admin. Inter partout ; la personnalité vient du poids et du contraste de mode.
+**The Two Faces Rule.** Display serif uniquement sur titres marketing (`h1` / sections Persuade). Corps et contrôles restent Inter. Pas de serif sur boutons ni nav.
 
 ## Layout
 
-Mobile-first. Conteneurs récurrents : `max-w-6xl` (home / thèmes), `max-w-5xl` (about), `max-w-4xl` / `max-w-3xl` (quiz, legal), `max-w-2xl` (nav bottom). Padding horizontal `px-4` / `px-6`. Sections marketing avec grands gaps (`mb-32`, `py-16`–`32`).
+Mobile-first. Conteneurs `max-w-6xl` / `5xl` / `4xl` / `3xl` / `2xl` (nav). `.nav-dock` + `.footer-with-nav` + `viewport-fit=cover`. CTA hero en colonne mobile.
 
-La navigation fixe bas utilise `.nav-dock` (safe-area bottom/left/right) et des cibles ≥44px. Le footer AppLayout utilise `.footer-with-nav` pour dégager la barre + encoche. Viewport : `viewport-fit=cover`.
-
-Densité marketing : aérée avec halos soft. Densité lecture : cartes empilées, plus de texte par viewport. Sur téléphone, les CTA hero Home passent en colonne pleine largeur (`flex-col` → `sm:flex-row`).
-
-Breakpoints Tailwind standards (`sm`, `md`, `lg`) : colonnes 1 → 2 → 3 sur grilles thèmes / ressources.
+Sur Home Persuade : hero → preuve humaine → parcours court → aperçu thèmes (≤4) → preuve Google passive → CTA contact (peak-end conversion).
 
 ### Named Rules
-**The Bottom Dock Rule.** La nav publique vit en bas d’écran. Ne pas la déplacer en top bar sans refonte explicitement demandée.
+**The Bottom Dock Rule.** Nav publique en bas.
+
+**The Catalogue Second Rule.** Sur l’accueil, le catalogue n’est jamais le premier acte : diagnostic et preuve humaine passent avant.
 
 ## Elevation & Depth
 
-Hybride. En dark : profondeur surtout **tonale** (slate-800/40–50, bordures slate-700/40–50) + halos orange flous décoratifs, pas de stack d’ombres lourdes. En light : cartes blanches avec `shadow-sm` au repos, `shadow-xl` + teinte orange faible au hover. CTA : `shadow-brand-orange/20–25` ; `.btn-glow` ajoute un halo `0 0 20px rgb(232 101 10 / 0.4)` + léger scale.
-
-### Shadow Vocabulary
-- **Card rest (light)** (`shadow-sm`) : cartes ressources au repos.
-- **Card hover (light)** (`shadow-xl` + `shadow-brand-orange/5`) : lift au survol.
-- **CTA lift** (`shadow-xl shadow-brand-orange/25`) : boutons contact / primary.
-- **Nav dock dark** (`0 -4px 24px rgba(0,0,0,0.35)`) : barre bas en mode sombre.
-- **Nav dock light** (`0 -4px 12px rgba(0,0,0,0.05)`) : barre bas en mode clair.
-- **CTA glow** (`0 0 20px rgb(232 101 10 / 0.4)`) : hover `.btn-glow` uniquement.
+Hybride : tonal en dark ; ombres soft en light ; glow CTA en état hover seulement.
 
 ### Named Rules
-**The Flat-By-Default Rule.** Surfaces dark plates (bordure + opacité). Ombres structurelles réservées au mode light et aux CTA ; le glow orange est un état, pas un décor permanent.
+**The Flat-By-Default Rule.** Surfaces dark plates ; glow = état, pas décor permanent.
 
 ## Shapes
 
-Forme **généreuse et amicale** : coins larges, silhouettes de panneau plutôt que de carte fine. `rounded-2xl` (1rem) boutons / champs / pastilles ; `rounded-card` (1.5rem) cartes ressources ; `rounded-panel` (2rem) panneaux quiz, bannières CTA, blocs hero secondaires. Chips / badges souvent `rounded-full` ou `rounded-xl`. Favoris : bouton circulaire.
-
-Bordures : dark `border-slate-700/40–50` ; light `border-slate-100` ; accents CTA `border-brand-orange/20–30`.
+Coins généreux (`card` / `panel` / `2xl`). Portrait : `rounded-3xl` avec bordure claire.
 
 ### Named Rules
-**The Soft Shell Rule.** Préférer `card` / `panel` aux petits rayons (4–8px) sur surfaces produit. Les coins serrés restent admin ou micro-contrôles.
+**The Soft Shell Rule.** Préférer `card` / `panel` aux petits rayons sur surfaces produit.
 
 ## Components
 
-Caractère global : **confiant et pédagogique** — grands hit targets, orange décisif, peu de variants.
-
 ### Buttons
-- **Shape:** `rounded-2xl` (1rem) ; parfois `rounded-xl` sur quiz court.
-- **Primary:** fond `brand-orange`, texte blanc, `font-bold` / `font-black`, padding ~`px-8 py-4`. Hover → `brand-orange-600` ; option `.btn-glow`.
-- **Secondary (dark):** `bg-slate-800/40` + bordure slate ; texte slate-200.
-- **Ghost / text:** underline ou texte slate, pas de fond.
-- **Focus:** toujours `.focus-ring` (ring orange + offset).
+Primary braise + `.btn-glow` ; secondary dark translucide ; ghost / lien texte pour tertiary. Toujours `.focus-ring`.
 
-### Chips
-- **Style:** pastilles `rounded-full` / `rounded-xl` ; fond `brand-orange/5–10` + bordure `brand-orange/10–20` en dark ; `brand-orange-50` en light.
-- **Label:** uppercase 10px tracking-widest, texte orange.
-
-### Cards / Containers
-- **Dark:** `.surface-card-dark` ou `.glass-card` — fond slate translucide, bordure discrète, `rounded-panel`.
-- **Light:** blanc, `rounded-card`, `border-slate-100`, ombre soft.
-- **CTA banner:** `rounded-panel`, bordure teintée orange, halo blur optionnel en dark.
-- **Internal padding:** souvent `p-6`–`p-8` (card) ou `p-8 md:p-10` (panel).
-
-### Inputs / Fields
-- **Style:** fond `slate-50` / surface light, `rounded-2xl`, souvent sans bordure forte (`border-none`).
-- **Focus:** `focus-ring` ou `ring-2 ring-brand-orange/20`.
-- **Error:** fond / texte rouge soft (`red-50` / `red-700`) — admin et contact.
+### Cards
+Dark : `.surface-card-dark`. Light : blanc + `border-slate-100`. Éviter de structurer une page marketing uniquement en rangées icône–titre–flèche.
 
 ### Navigation
-- Barre fixe bas, max-w-2xl, 6 items icône + label 10px.
-- Actif : texte `brand-orange` + pastille fond orange soft.
-- Contact : highlight orange même inactif.
-- Adaptée `isDarkSurface` (fond slate-900/95 vs blanc).
+Bottom dock 6 items, cibles ≥44px, safe-area.
+
+### Signature — Human Proof
+Bloc portrait Serge + nom + une ligne RCCU + lien « Qui est beForensic ? ». Obligatoire sur Home ; modèle pour About.
 
 ### Signature — Contact CTA Banner
-Panneau conversion beForensic : eyebrow uppercase, titre `font-black`, bouton « Me contacter » primary. Variants `dark` / `light` / `compact`. Signature du funnel gratuit → expert.
+Conversion gratuit → expert. Fin de parcours Persuade préférée.
 
 ### Signature — Dual page shell
-Racine de page = `.page-dark` ou `.page-light`. Toute nouvelle page publique choisit un mode avant tout autre styling.
+Racine = `.page-dark` ou `.page-light`.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** choisir `.page-dark` ou `.page-light` en racine de chaque page publique.
-- **Do** utiliser `brand-orange` pour CTA, focus et états positifs produit.
-- **Do** appliquer `.focus-ring` sur éléments interactifs.
-- **Do** garder Inter + tracking-tight ; titres marketing en `font-black` si besoin d’impact.
-- **Do** utiliser `rounded-card` / `rounded-panel` pour les surfaces produit.
-- **Do** traiter l’admin (`/admin`) comme console séparée (slate), hors modes page.
+- **Do** utiliser `font-display` sur les heroes marketing.
+- **Do** montrer une preuve humaine réelle sur Home.
+- **Do** choisir `.page-dark` ou `.page-light` en racine.
+- **Do** garder braise pour CTA / focus / états positifs.
+- **Do** limiter l’aperçu thèmes sur Home (≤4) + lien bibliothèque.
 
 ### Don't:
-- **Don't** unifier tout le site en dark ou light sans décision métier.
-- **Don't** introduire emerald (ou un second accent succès) sur les parcours principaux.
-- **Don't** utiliser `accent-rose` hors `.text-gradient`.
-- **Don't** ajouter une nouvelle couleur de marque sans mettre à jour ce fichier + `tailwind.config.js` + `:root`.
-- **Don't** empiler du glassmorphism / blur lourd sur toutes les cartes — blur = halo décoratif localisé.
-- **Don't** remplacer la bottom nav publique par une top bar générique SaaS.
+- **Don't** forcer Inter sur les titres display.
+- **Don't** structurer le hero comme un dashboard de cartes icônes.
+- **Don't** introduire emerald ou un second accent succès.
+- **Don't** unifier dark/light sans décision métier.
+- **Don't** terminer Home sur une demande d’avis : preuve passive puis conversion.

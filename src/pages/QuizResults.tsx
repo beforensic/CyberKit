@@ -63,7 +63,7 @@ export default function QuizResults() {
           <Shield size={14} /> Résultats du diagnostic
         </div>
 
-        <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+        <h1 className="font-display font-semibold text-[clamp(1.75rem,4vw,2.5rem)] md:text-[clamp(2.5rem,7vw,4.5rem)] text-white mb-4">
           Votre score de sécurité
         </h1>
         <p className="text-slate-400 mb-12">
@@ -72,7 +72,7 @@ export default function QuizResults() {
 
         <div className="surface-card-dark p-8 md:p-12 mb-8 text-center">
           <div
-            className={`inline-flex items-center justify-center w-40 h-40 rounded-full border-8 ${ringColor} mb-6`}
+            className={`inline-flex items-center justify-center w-40 h-40 rounded-full border-4 ${ringColor} mb-6`}
             role="img"
             aria-label={`Score de sécurité : ${score} pour cent`}
           >
