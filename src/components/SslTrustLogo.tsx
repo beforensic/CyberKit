@@ -19,6 +19,7 @@ export default function SslTrustLogo() {
           loading="lazy"
           decoding="async"
         />
+        <span className="sr-only"> (nouvel onglet)</span>
       </a>
     </div>
   );

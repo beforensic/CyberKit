@@ -31,11 +31,11 @@ export default function ContactCtaBanner({
       >
         <div className="flex items-center gap-3 min-w-0">
           <div className={`p-2 rounded-xl shrink-0 ${isDark ? 'bg-brand-orange text-white' : 'bg-brand-orange text-white'}`}>
-            <Mail className="w-5 h-5" />
+            <Mail className="w-5 h-5" aria-hidden="true" />
           </div>
           <span className="font-bold text-sm truncate">{title}</span>
         </div>
-        <ArrowRight className={`w-5 h-5 shrink-0 ${isDark ? 'text-brand-orange-400' : 'text-brand-orange'}`} />
+        <ArrowRight className={`w-5 h-5 shrink-0 ${isDark ? 'text-brand-orange-400' : 'text-brand-orange'}`} aria-hidden="true" />
       </Link>
     );
   }
@@ -54,7 +54,7 @@ export default function ContactCtaBanner({
 
       <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
         <div className={`p-4 rounded-2xl shrink-0 ${isDark ? 'bg-brand-orange text-white' : 'bg-brand-orange text-white'}`}>
-          <Shield className="w-8 h-8" />
+          <Shield className="w-8 h-8" aria-hidden="true" />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -77,9 +77,9 @@ export default function ContactCtaBanner({
           to={contactUrl}
           className="focus-ring inline-flex w-full md:w-auto items-center justify-center gap-3 px-8 py-4 bg-brand-orange text-white rounded-2xl font-black text-lg hover:bg-brand-orange-600 transition-all shadow-xl shadow-brand-orange/25 shrink-0 min-h-[48px]"
         >
-          <Mail className="w-5 h-5" />
+          <Mail className="w-5 h-5" aria-hidden="true" />
           Me contacter
-          <ArrowRight className="w-5 h-5" />
+          <ArrowRight className="w-5 h-5" aria-hidden="true" />
         </Link>
       </div>
     </div>

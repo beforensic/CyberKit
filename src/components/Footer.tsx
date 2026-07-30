@@ -19,13 +19,13 @@ export default function Footer({ withBottomNavOffset = true, variant = 'dark' }:
     >
       <div className="max-w-4xl mx-auto flex flex-col items-center gap-4 text-center">
         <SslTrustLogo />
-        <p className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+        <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
           © {new Date().getFullYear()} beForensic — CyberKit
         </p>
         <nav aria-label="Liens secondaires" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           <Link
             to="/about"
-            className={`text-sm font-medium transition-colors ${
+            className={`focus-ring text-sm font-medium transition-colors rounded-lg ${
               isDark ? 'text-slate-300 hover:text-brand-orange' : 'text-slate-600 hover:text-brand-orange'
             }`}
           >
@@ -33,7 +33,7 @@ export default function Footer({ withBottomNavOffset = true, variant = 'dark' }:
           </Link>
           <Link
             to="/legal"
-            className={`text-sm font-medium transition-colors ${
+            className={`focus-ring text-sm font-medium transition-colors rounded-lg ${
               isDark ? 'text-slate-300 hover:text-brand-orange' : 'text-slate-600 hover:text-brand-orange'
             }`}
           >

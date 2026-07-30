@@ -36,7 +36,7 @@ export default function Navigation({ isDarkSurface = false }: NavigationProps) {
           );
           const isHighlight = item.highlight && !isActive;
 
-          const idleText = isDarkSurface ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600';
+          const idleText = isDarkSurface ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-700';
           const activeText = 'text-brand-orange';
           const highlightText = isDarkSurface ? 'text-brand-orange-300 hover:text-brand-orange' : 'text-brand-orange/80 hover:text-brand-orange';
 
@@ -64,11 +64,7 @@ export default function Navigation({ isDarkSurface = false }: NavigationProps) {
               >
                 <Icon aria-hidden="true" className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'}`} />
               </div>
-              <span
-                className={`w-full text-center text-[10px] font-semibold leading-tight truncate ${
-                  isActive || isHighlight ? 'opacity-100' : 'opacity-80'
-                }`}
-              >
+              <span className="w-full text-center text-[10px] font-semibold leading-tight truncate">
                 {item.label}
               </span>
             </NavLink>

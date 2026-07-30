@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-30T16:34:00.000Z",
+  "generatedAt": "2026-07-30T16:59:06.000Z",
   "title": "Design System: CyberKit",
   "extensions": {
     "colorMeta": {
@@ -152,10 +152,22 @@
       }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "768px" },
-      { "name": "lg", "value": "1024px" },
-      { "name": "xl", "value": "1280px" }
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
     ]
   },
   "components": [
@@ -241,7 +253,10 @@
       "Rayons généreux : card 1.5rem, panel 2rem, boutons 2xl",
       "Inter forcé globalement ; titres marketing souvent font-black",
       "Nav principale en barre fixe bas d’écran (mobile-first)",
-      "Admin hors charte publique : slate-50 + sidebar slate-900"
+      "Admin hors charte publique : slate-50 + sidebar slate-900",
+      "Nav dock safe-area (.nav-dock) + cibles ≥44px",
+      "Footer .footer-with-nav dégage barre + encoche ; viewport-fit=cover",
+      "CTA hero Home : colonne full-width mobile → row sm+"
     ],
     "rules": [
       {

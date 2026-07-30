@@ -98,7 +98,7 @@ export default function Home() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
             <h2 className="text-3xl md:text-4xl font-black text-white">Thématiques clés</h2>
-            <p className="text-slate-500 mt-2">Cliquez sur un domaine pour renforcer votre protection.</p>
+            <p className="text-slate-400 mt-2">Cliquez sur un domaine pour renforcer votre protection.</p>
           </div>
           <div className="flex items-center gap-2 text-brand-orange-400 font-semibold bg-brand-orange/5 border border-brand-orange/10 px-4 py-2 rounded-xl text-xs">
             <CheckCircle className="w-4 h-4" aria-hidden="true" /> Ressources gratuites à disposition
@@ -120,16 +120,16 @@ export default function Home() {
                 }
                 className="focus-ring bg-slate-800/35 p-6 rounded-panel border border-slate-700/40 text-left hover:border-brand-orange/50 hover:bg-slate-800/50 transition-all group flex items-center gap-5"
               >
-                <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-500 group-hover:text-brand-orange-400 transition-colors shrink-0">
+                <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-brand-orange-400 transition-colors shrink-0">
                   <IconComponent className="w-7 h-7" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-slate-200 group-hover:text-white transition-colors">
                     {theme.title}
                   </h3>
-                  <p className="text-xs font-medium text-slate-500 mt-1">Accéder au module</p>
+                  <p className="text-xs font-medium text-slate-400 mt-1">Voir les ressources</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-slate-600 group-hover:text-brand-orange-400 group-hover:translate-x-1 transition-all" aria-hidden="true" />
+                <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-brand-orange-400 group-hover:translate-x-1 transition-all" aria-hidden="true" />
               </button>
             );
           })}

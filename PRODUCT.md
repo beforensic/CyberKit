@@ -52,9 +52,11 @@ Outil **100 % gratuit in-app** (pas d’abonnement, pas de paiement dans CyberKi
 - Contenu catalogue en Supabase (pas figé dans le repo)
 
 **Ouvert / à trancher**
-- Standard d’accessibilité formel (RGAA / WCAG) : non défini produit
 - Volume réel des ressources en prod : claim chiffré retiré de l’accueil ; chiffre exact à sourcer CMS avant réintroduction
-- Déploiement Edge Functions après changement de prompts IA (`aiPrompts.ts`) : à faire en prod séparément
+
+## Accessibility & Inclusion
+
+Cible produit : **WCAG 2.2 niveau AA** (web). Accessibilité de base déjà en place (skip link, focus route, ARIA nav, quiz/contact, `prefers-reduced-motion`). Continuer à traiter les écarts de contraste et labels au fil des passes audit.
 
 ## Brand Commitments
 
@@ -83,7 +85,3 @@ Outil **100 % gratuit in-app** (pas d’abonnement, pas de paiement dans CyberKi
 3. **Belgique d’abord** — FR-BE, contexte TPE/indépendants belges, ton local.
 4. **Preuves humaines** — expertise Serge / beForensic, pas de claims marketing non sourcés.
 5. **Vie privée par défaut** — pas de compte public requis ; consentement pour audience ; contact volontaire.
-
-## Accessibility & Inclusion
-
-Accessibilité de base déjà travaillée (skip link, focus, ARIA nav, quiz/contact) d’après l’audit projet. **Aucun standard formel (WCAG/RGAA) ni audience en situation de handicap spécifique n’a été confirmé** comme exigence produit — ouvert.
