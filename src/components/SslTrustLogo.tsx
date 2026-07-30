@@ -1,4 +1,4 @@
-const TRUST_LOGO_IMAGE = 'https://beforensic.be/wp-content/uploads/sectigo.png';
+const TRUST_LOGO_IMAGE = '/sectigo-trust-seal.svg';
 
 export default function SslTrustLogo() {
   return (
@@ -8,12 +8,13 @@ export default function SslTrustLogo() {
         target="_blank"
         rel="noopener noreferrer"
         className="inline-block focus-ring rounded-lg"
+        title="Secured by Sectigo"
       >
         <img
           src={TRUST_LOGO_IMAGE}
           alt="Secured by Sectigo"
-          width={132}
-          height={48}
+          width={140}
+          height={54}
           className="h-12 w-auto"
           loading="lazy"
           decoding="async"
