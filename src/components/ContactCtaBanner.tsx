@@ -23,7 +23,7 @@ export default function ContactCtaBanner({
     return (
       <Link
         to={contactUrl}
-        className={`flex items-center justify-between gap-4 p-5 rounded-2xl border transition-all ${
+        className={`focus-ring flex items-center justify-between gap-4 p-5 rounded-2xl border transition-all min-h-[48px] ${
           isDark
             ? 'bg-brand-orange/10 border-brand-orange/30 hover:border-brand-orange text-white'
             : 'bg-brand-orange-50 border-brand-orange/20 hover:border-brand-orange text-slate-900'
@@ -75,7 +75,7 @@ export default function ContactCtaBanner({
 
         <Link
           to={contactUrl}
-          className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand-orange text-white rounded-2xl font-black text-lg hover:bg-brand-orange-600 transition-all shadow-xl shadow-brand-orange/25 shrink-0"
+          className="focus-ring inline-flex w-full md:w-auto items-center justify-center gap-3 px-8 py-4 bg-brand-orange text-white rounded-2xl font-black text-lg hover:bg-brand-orange-600 transition-all shadow-xl shadow-brand-orange/25 shrink-0 min-h-[48px]"
         >
           <Mail className="w-5 h-5" />
           Me contacter

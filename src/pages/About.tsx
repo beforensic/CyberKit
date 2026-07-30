@@ -27,7 +27,7 @@ export default function About() {
   ];
 
   return (
-    <div className="page-light py-12 md:py-20 px-4 pb-32 text-left">
+    <div className="page-light py-12 md:py-20 px-4 pb-8 text-left">
       <div className="max-w-5xl mx-auto">
         <Link
           to="/"
@@ -67,7 +67,7 @@ export default function About() {
                   Ancien enquêteur à la <span className="text-slate-900 font-semibold underline decoration-brand-orange-200 underline-offset-4">Police Judiciaire Fédérale belge (RCCU)</span> pendant 22 ans, j'ai vu comment les cybercriminels exploitent l'humain plutôt que la machine.
                 </p>
                 <p>
-                  CyberKit est ma réponse : un outil gratuit pour que chaque PME belge puisse monter en compétence sans peur et sans jargon.
+                  CyberKit est ma réponse : un outil gratuit pour que chaque indépendant et TPE belge puisse monter en compétence sans peur et sans jargon.
                 </p>
               </div>
             </div>

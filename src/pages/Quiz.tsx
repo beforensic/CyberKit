@@ -162,7 +162,7 @@ export default function Quiz() {
   const progress = ((currentStep + 1) / activeQuestions.length) * 100;
 
   return (
-    <div className="page-dark pb-20 relative text-left">
+    <div className="page-dark pb-8 relative text-left">
       <div className="max-w-3xl mx-auto px-6 pt-16 relative z-10">
 
         <div className="mb-10" aria-live="polite" aria-atomic="true">

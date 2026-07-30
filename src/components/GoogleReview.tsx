@@ -21,10 +21,10 @@ export default function GoogleReview({ variant = 'default' }: GoogleReviewProps)
                   <Star key={i} size={14} fill="currentColor" />
                 ))}
               </div>
-              <span className="text-sm font-semibold text-white">CyberKit — 5/5 sur Google</span>
+              <span className="text-sm font-semibold text-white">beForensic — 5/5 sur Google</span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Votre avis nous aide à rendre la cybersécurité accessible à tous.
+              Votre avis aide beForensic à rendre la cybersécurité accessible à tous.
             </p>
           </div>
 
@@ -53,11 +53,11 @@ export default function GoogleReview({ variant = 'default' }: GoogleReviewProps)
             ))}
           </div>
           <h3 className="text-2xl font-bold text-white mb-4">
-            CyberKit est noté 5/5 sur Google
+            beForensic est noté 5/5 sur Google
           </h3>
           <p className="text-slate-400 leading-relaxed max-w-xl">
-            Rejoignez les entrepreneurs belges qui sécurisent déjà leur activité avec nos outils.
-            Votre avis nous aide à rendre la cybersécurité accessible à tous.
+            Rejoignez les entrepreneurs belges qui font confiance à beForensic, l’éditeur de CyberKit.
+            Votre avis aide à rendre la cybersécurité accessible à tous.
           </p>
         </div>
 

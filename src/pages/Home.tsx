@@ -18,47 +18,51 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="page-dark pb-20 text-left overflow-hidden">
+    <div className="page-dark relative pb-8 text-left overflow-hidden">
 
-      {/* --- HALOS DE LUMIÈRE DE FOND (L'effet vaporeux Stenow) --- */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">
+      {/* Halo ambiant — braise beForensic */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none" aria-hidden="true">
         <div className="absolute top-[-10%] left-[10%] w-[50%] h-[45%] bg-brand-orange/8 blur-[120px] rounded-full" />
       </div>
 
       {/* --- SECTION HERO --- */}
-      <div className="relative pt-24 pb-16 md:pt-32 md:pb-24 px-4 z-10">
+      <div className="relative pt-16 pb-12 sm:pt-24 sm:pb-16 md:pt-32 md:pb-24 px-4 z-10">
         <div className="max-w-6xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-orange/5 border border-brand-orange/10 text-brand-orange-400 text-xs font-semibold mb-8">
-            <Sparkles className="w-4 h-4" /> La sécurité numérique, en toute simplicité.
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-orange/5 border border-brand-orange/10 text-brand-orange-400 text-xs font-semibold mb-6 sm:mb-8">
+            <Sparkles className="w-4 h-4" aria-hidden="true" /> La sécurité numérique, en toute simplicité.
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tight leading-[1.05]">
-            Protégez votre activité <br />
+          <h1 className="text-[2.25rem] leading-[1.1] sm:text-5xl md:text-7xl font-black text-white mb-6 sm:mb-8 tracking-tight md:leading-[1.05] max-w-[18ch] sm:max-w-none">
+            Protégez votre activité{' '}
+            <br className="hidden sm:block" />
             <span className="text-brand-orange">en toute sérénité.</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-slate-400 mb-12 leading-relaxed max-w-2xl">
+          <p className="text-base sm:text-lg md:text-xl text-slate-400 mb-8 sm:mb-12 leading-relaxed max-w-2xl">
             CyberKit accompagne les indépendants et TPE belges avec un diagnostic clair
             et des outils concrets. Pas de jargon, juste de la protection.
           </p>
 
-          <div className="flex flex-wrap gap-5">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-5">
             <button
+              type="button"
               onClick={() => navigate('/quiz')}
-              className="px-8 py-4 bg-gradient-to-r from-brand-orange to-brand-orange-400 text-white rounded-2xl font-bold text-lg hover:shadow-[0_0_30px] hover:shadow-brand-orange/30 transition-all flex items-center gap-3 group"
+              className="focus-ring btn-glow w-full sm:w-auto justify-center px-8 py-4 bg-brand-orange text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-orange/25 transition-all flex items-center gap-3 group min-h-[48px]"
             >
               {score !== null ? 'Mettre à jour mon score' : 'Lancer mon diagnostic'}
-              <ChevronRight className="group-hover:translate-x-1 transition-transform" />
+              <ChevronRight className="group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </button>
             <button
+              type="button"
               onClick={() => navigate('/resources')}
-              className="px-8 py-4 bg-slate-800/40 border border-slate-700 text-slate-200 rounded-2xl font-bold text-lg hover:bg-slate-800/60 transition-all backdrop-blur-sm"
+              className="focus-ring w-full sm:w-auto justify-center px-8 py-4 bg-slate-800/40 border border-slate-700 text-slate-200 rounded-2xl font-bold text-lg hover:bg-slate-800/60 transition-all min-h-[48px]"
             >
               Explorer les outils
             </button>
             <button
+              type="button"
               onClick={() => navigate('/about')}
-              className="px-8 py-4 text-slate-400 rounded-2xl font-semibold text-lg hover:text-white transition-colors underline-offset-4 hover:underline"
+              className="focus-ring w-full sm:w-auto justify-center px-8 py-4 text-slate-400 rounded-2xl font-semibold text-lg hover:text-white transition-colors underline-offset-4 hover:underline min-h-[48px]"
             >
               Qui est beForensic ?
             </button>
@@ -71,16 +75,16 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Target, title: "Diagnostic", text: "Faites le point sur vos risques en quelques minutes.", color: "text-brand-orange-400" },
-              { icon: Lock, title: "Apprentissage", text: "Des fiches pratiques et mémos vidéo accessibles.", color: "text-blue-400" },
-              { icon: Activity, title: "Progression", text: "Suivez l'évolution de votre score de sécurité.", color: "text-brand-orange-400" }
+              { icon: Target, title: "Diagnostic", text: "Faites le point sur vos risques en quelques minutes." },
+              { icon: Lock, title: "Apprentissage", text: "Des fiches pratiques et mémos vidéo accessibles." },
+              { icon: Activity, title: "Progression", text: "Suivez l'évolution de votre score de sécurité." }
             ].map((step, i) => (
               <div key={i} className="surface-card-dark p-8 flex flex-col gap-5">
-                <div className={`w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center ${step.color}`}>
-                  <step.icon className="w-6 h-6" />
+                <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center text-brand-orange-400">
+                  <step.icon className="w-6 h-6" aria-hidden="true" />
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-white mb-2">{step.title}</h4>
+                  <h2 className="text-xl font-bold text-white mb-2">{step.title}</h2>
                   <p className="text-sm text-slate-400 leading-relaxed">{step.text}</p>
                 </div>
               </div>
@@ -97,7 +101,7 @@ export default function Home() {
             <p className="text-slate-500 mt-2">Cliquez sur un domaine pour renforcer votre protection.</p>
           </div>
           <div className="flex items-center gap-2 text-brand-orange-400 font-semibold bg-brand-orange/5 border border-brand-orange/10 px-4 py-2 rounded-xl text-xs">
-            <CheckCircle className="w-4 h-4" /> +50 ressources gratuites à disposition
+            <CheckCircle className="w-4 h-4" aria-hidden="true" /> Ressources gratuites à disposition
           </div>
         </div>
 
@@ -108,15 +112,16 @@ export default function Home() {
             return (
               <button
                 key={theme.id}
+                type="button"
                 onClick={() =>
                   navigate(`/resources?themeId=${theme.id}`, {
                     state: { themeId: theme.id },
                   })
                 }
-                className="bg-slate-800/35 p-6 rounded-panel border border-slate-700/40 text-left hover:border-brand-orange/50 hover:bg-slate-800/50 transition-all group flex items-center gap-5"
+                className="focus-ring bg-slate-800/35 p-6 rounded-panel border border-slate-700/40 text-left hover:border-brand-orange/50 hover:bg-slate-800/50 transition-all group flex items-center gap-5"
               >
                 <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-500 group-hover:text-brand-orange-400 transition-colors shrink-0">
-                  <IconComponent className="w-7 h-7" />
+                  <IconComponent className="w-7 h-7" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-slate-200 group-hover:text-white transition-colors">
@@ -124,7 +129,7 @@ export default function Home() {
                   </h3>
                   <p className="text-xs font-medium text-slate-500 mt-1">Accéder au module</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-slate-600 group-hover:text-brand-orange-400 group-hover:translate-x-1 transition-all" />
+                <ArrowRight className="w-5 h-5 text-slate-600 group-hover:text-brand-orange-400 group-hover:translate-x-1 transition-all" aria-hidden="true" />
               </button>
             );
           })}

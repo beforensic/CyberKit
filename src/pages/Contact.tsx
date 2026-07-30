@@ -110,7 +110,7 @@ export default function Contact() {
   }
 
   return (
-    <div className="page-light py-12 px-4 pb-32 text-left">
+    <div className="page-light py-12 px-4 pb-8 text-left">
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
@@ -145,7 +145,7 @@ export default function Contact() {
             <div className="mt-12 p-8 bg-slate-900 rounded-[2rem] text-white">
               <h3 className="font-bold text-xl mb-4">Serge Houtain</h3>
               <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                Expert en cybercriminalité et fondateur de beForensic. Ma mission : rendre la sécurité numérique accessible à tous les indépendants belges.
+                Expert en cybercriminalité et fondateur de beForensic. Ma mission : rendre la sécurité numérique accessible aux indépendants et TPE belges.
               </p>
               <Link
                 to="/about"
@@ -188,7 +188,7 @@ export default function Contact() {
                   autoComplete="name"
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all"
+                  className="focus-ring w-full px-6 py-4 bg-slate-50 border-none rounded-2xl transition-all"
                   placeholder="Jean Dupont"
                 />
               </div>
@@ -204,7 +204,7 @@ export default function Contact() {
                   autoComplete="email"
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all"
+                  className="focus-ring w-full px-6 py-4 bg-slate-50 border-none rounded-2xl transition-all"
                   placeholder="jean@exemple.be"
                 />
               </div>
@@ -219,7 +219,7 @@ export default function Contact() {
                   type="text"
                   value={formData.subject}
                   onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all"
+                  className="focus-ring w-full px-6 py-4 bg-slate-50 border-none rounded-2xl transition-all"
                   placeholder="Comment sécuriser mes emails ?"
                 />
               </div>
@@ -232,7 +232,7 @@ export default function Contact() {
                   rows={4}
                   value={formData.message}
                   onChange={e => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 transition-all resize-none"
+                  className="focus-ring w-full px-6 py-4 bg-slate-50 border-none rounded-2xl transition-all resize-none"
                   placeholder="Dites-nous en plus sur votre situation..."
                 />
               </div>

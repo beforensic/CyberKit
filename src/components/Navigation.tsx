@@ -26,9 +26,9 @@ export default function Navigation({ isDarkSurface = false }: NavigationProps) {
   return (
     <nav
       aria-label="Navigation principale"
-      className={`fixed bottom-0 left-0 right-0 border-t px-3 py-2 z-50 ${barClass}`}
+      className={`nav-dock fixed bottom-0 left-0 right-0 border-t pt-2 z-50 ${barClass}`}
     >
-      <div className="max-w-2xl mx-auto flex justify-between items-center gap-0.5">
+      <div className="max-w-2xl mx-auto flex justify-between items-stretch gap-0.5">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.path === '/quiz' ? isQuizActive : (
@@ -45,7 +45,7 @@ export default function Navigation({ isDarkSurface = false }: NavigationProps) {
               key={item.path}
               to={item.path}
               end={item.end}
-              className={`focus-ring flex flex-col items-center gap-1 p-2 transition-all rounded-xl ${
+              className={`focus-ring flex flex-1 min-w-0 flex-col items-center justify-center gap-1 px-0.5 py-1.5 min-h-[44px] transition-all rounded-xl ${
                 isActive ? activeText : isHighlight ? highlightText : idleText
               }`}
             >
@@ -65,7 +65,7 @@ export default function Navigation({ isDarkSurface = false }: NavigationProps) {
                 <Icon aria-hidden="true" className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[2px]'}`} />
               </div>
               <span
-                className={`text-[10px] font-semibold leading-none ${
+                className={`w-full text-center text-[10px] font-semibold leading-tight truncate ${
                   isActive || isHighlight ? 'opacity-100' : 'opacity-80'
                 }`}
               >

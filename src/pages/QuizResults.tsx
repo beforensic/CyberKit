@@ -103,7 +103,7 @@ export default function QuizResults() {
           <button
             type="button"
             onClick={() => navigate('/resources')}
-            className="focus-ring flex items-center justify-center gap-3 p-6 bg-slate-800/40 border border-slate-700 rounded-2xl text-white font-bold hover:border-brand-orange transition-all"
+            className="focus-ring flex items-center justify-center gap-3 p-6 min-h-[48px] bg-slate-800/40 border border-slate-700 rounded-2xl text-white font-bold hover:border-brand-orange transition-all"
           >
             <BookOpen size={20} className="text-brand-orange" aria-hidden="true" />
             Voir les ressources
@@ -112,7 +112,7 @@ export default function QuizResults() {
           <button
             type="button"
             onClick={() => navigate('/quiz')}
-            className="focus-ring flex items-center justify-center gap-3 p-6 bg-slate-800/40 border border-slate-700 rounded-2xl text-white font-bold hover:border-brand-orange transition-all"
+            className="focus-ring flex items-center justify-center gap-3 p-6 min-h-[48px] bg-slate-800/40 border border-slate-700 rounded-2xl text-white font-bold hover:border-brand-orange transition-all"
           >
             <RotateCcw size={20} className="text-brand-orange" aria-hidden="true" />
             Refaire le test

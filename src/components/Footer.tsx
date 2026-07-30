@@ -15,7 +15,7 @@ export default function Footer({ withBottomNavOffset = true, variant = 'dark' }:
         isDark
           ? 'border-slate-800 bg-surface-dark'
           : 'border-slate-200 bg-white'
-      } ${withBottomNavOffset ? 'pb-24' : 'pb-8'}`}
+      } ${withBottomNavOffset ? 'footer-with-nav' : 'pb-8'}`}
     >
       <div className="max-w-4xl mx-auto flex flex-col items-center gap-4 text-center">
         <SslTrustLogo />

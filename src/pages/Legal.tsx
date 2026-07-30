@@ -114,7 +114,11 @@ export default function Legal() {
               <ul className="space-y-2 text-slate-900">
                 <li className="flex items-start gap-2">
                   <span className="text-brand-orange font-bold">✓</span>
-                  <span><strong>Aucune donnée personnelle</strong> n'est collectée via l'application, à l'exception des informations transmises volontairement via le formulaire de contact</span>
+                  <span>
+                    <strong>Pas de compte public requis</strong> : le diagnostic, les favoris et la
+                    progression restent sur votre appareil ; les données personnelles d’identité
+                    (nom, e-mail) ne sont collectées que si vous les envoyez via le formulaire de contact
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-brand-orange font-bold">✓</span>
@@ -164,19 +168,32 @@ export default function Legal() {
               , hébergée sur nos propres serveurs (aucun transfert vers un CMP tiers payant).
             </p>
 
-            <h3 className="font-bold text-slate-900 text-lg pt-4">Stockage local uniquement</h3>
+            <h3 className="font-bold text-slate-900 text-lg pt-4">Stockage local (votre appareil)</h3>
             <p>
-              Les seules données enregistrées sont stockées <strong>localement sur votre appareil</strong> (via le stockage local de votre navigateur) et comprennent uniquement :
+              Certaines préférences sont enregistrées <strong>localement sur votre appareil</strong>{' '}
+              (stockage du navigateur), notamment :
             </p>
 
             <ul className="list-disc pl-6 space-y-2">
-              <li>Votre score au quiz de diagnostic (pour affichage personnel)</li>
-              <li>Vos réponses aux questions du quiz (pour votre suivi personnel)</li>
+              <li>Votre score au quiz de diagnostic</li>
+              <li>Vos réponses au quiz (suivi personnel)</li>
+              <li>Vos favoris et ressources consultées</li>
+              <li>Le thème d’intérêt retenu pour le parcours guidé</li>
             </ul>
 
             <p className="pt-4">
-              Ces données restent <strong>strictement confidentielles</strong>, ne quittent jamais votre appareil,
-              et peuvent être supprimées à tout moment en effaçant les données de votre navigateur.
+              Ces données locales restent sur votre appareil et peuvent être effacées en vidant les
+              données de votre navigateur. Elles ne constituent pas un compte utilisateur.
+            </p>
+
+            <h3 className="font-bold text-slate-900 text-lg pt-6">Fonctions d’aide IA (optionnelles)</h3>
+            <p>
+              Si vous utilisez l’analyse IA des résultats du diagnostic ou les infobulles sur les
+              mots-clés, un résumé non nominatif (profil choisi, score, points faibles ou terme
+              demandé) est transmis à nos serveurs (Supabase) puis à un prestataire d’IA (Anthropic)
+              uniquement pour générer la réponse. Une limitation technique par adresse IP peut
+              s’appliquer pour prévenir les abus. Ces traitements n’ont lieu que lorsque vous
+              déclenchez la fonctionnalité concernée.
             </p>
 
             <h3 className="font-bold text-slate-900 text-lg pt-6">Ressources externes</h3>
@@ -211,7 +228,7 @@ export default function Legal() {
 
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 mt-6">
               <p className="text-sm text-slate-600">
-                <strong>Dernière mise à jour :</strong> Mars 2026
+                <strong>Dernière mise à jour :</strong> Juillet 2026
               </p>
               <p className="text-sm text-slate-600 mt-2">
                 Pour toute question concernant la protection de vos données, contactez-nous à :

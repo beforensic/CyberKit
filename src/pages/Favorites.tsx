@@ -45,7 +45,7 @@ export default function Favorites() {
   const error = catalogError ? 'Impossible de charger vos favoris.' : null;
 
   return (
-    <div className="page-light py-12 px-4 pb-32 text-left">
+    <div className="page-light py-12 px-4 pb-8 text-left">
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
           <div>

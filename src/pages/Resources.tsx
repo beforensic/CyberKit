@@ -133,7 +133,7 @@ export default function Resources() {
     Boolean(activeThemeParam) && themes.length > 0 && !selectedThemeId;
 
   return (
-    <div className="page-light pb-32 text-left">
+    <div className="page-light pb-8 text-left">
       <div className="max-w-6xl mx-auto px-4 pt-6">
         <ContactCtaBanner
           variant="light"
@@ -175,7 +175,7 @@ export default function Resources() {
                 placeholder="Rechercher..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange/20 font-medium"
+                className="focus-ring w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl font-medium"
               />
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function Resources() {
                 type="button"
                 onClick={() => scroll('left')}
                 aria-label="Faire défiler les thèmes vers la gauche"
-                className="focus-ring absolute left-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-brand-orange transition-all -ml-2 border border-slate-100"
+                className="focus-ring absolute left-0 z-20 p-2.5 min-h-[44px] min-w-[44px] hidden sm:flex items-center justify-center bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-brand-orange transition-all -ml-2 border border-slate-100"
               >
                 <ChevronLeft size={20} aria-hidden="true" />
               </button>
@@ -207,7 +207,7 @@ export default function Resources() {
                 type="button"
                 onClick={() => handleThemeChange(null)}
                 aria-pressed={!selectedThemeId}
-                className={`focus-ring px-6 py-3 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+                className={`focus-ring px-5 py-3 min-h-[44px] rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                   !selectedThemeId
                     ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
@@ -221,7 +221,7 @@ export default function Resources() {
                   type="button"
                   onClick={() => handleThemeChange(theme.id)}
                   aria-pressed={selectedThemeId === theme.id}
-                  className={`focus-ring px-6 py-3 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+                  className={`focus-ring px-5 py-3 min-h-[44px] rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                     selectedThemeId === theme.id
                       ? 'bg-brand-orange text-white shadow-lg'
                       : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
@@ -238,7 +238,7 @@ export default function Resources() {
                 type="button"
                 onClick={() => scroll('right')}
                 aria-label="Faire défiler les thèmes vers la droite"
-                className="focus-ring absolute right-0 z-20 p-2 bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-brand-orange transition-all -mr-2 border border-slate-100"
+                className="focus-ring absolute right-0 z-20 p-2.5 min-h-[44px] min-w-[44px] hidden sm:flex items-center justify-center bg-white/90 backdrop-blur-sm shadow-md rounded-full text-slate-600 hover:text-brand-orange transition-all -mr-2 border border-slate-100"
               >
                 <ChevronRight size={20} aria-hidden="true" />
               </button>
