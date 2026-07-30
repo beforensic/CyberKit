@@ -43,26 +43,28 @@ export default function Home() {
             et des outils concrets. Pas de jargon, juste de la protection.
           </p>
 
-          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-5">
-            <button
-              type="button"
-              onClick={() => navigate('/quiz')}
-              className="focus-ring btn-glow w-full sm:w-auto justify-center px-8 py-4 bg-brand-orange text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-orange/25 transition-all flex items-center gap-3 group min-h-[48px]"
-            >
-              {score !== null ? 'Mettre à jour mon score' : 'Lancer mon diagnostic'}
-              <ChevronRight className="group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/resources')}
-              className="focus-ring w-full sm:w-auto justify-center px-8 py-4 bg-slate-800/40 border border-slate-700 text-slate-200 rounded-2xl font-bold text-lg hover:bg-slate-800/60 transition-all min-h-[48px]"
-            >
-              Explorer les outils
-            </button>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-5">
+              <button
+                type="button"
+                onClick={() => navigate('/quiz')}
+                className="focus-ring btn-glow w-full sm:w-auto justify-center px-8 py-4 bg-brand-orange text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-orange/25 transition-all flex items-center gap-3 group min-h-[48px]"
+              >
+                {score !== null ? 'Mettre à jour mon score' : 'Lancer mon diagnostic'}
+                <ChevronRight className="group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/resources')}
+                className="focus-ring w-full sm:w-auto justify-center px-8 py-4 bg-slate-800/40 border border-slate-700 text-slate-200 rounded-2xl font-bold text-lg hover:bg-slate-800/60 transition-all min-h-[48px]"
+              >
+                Explorer les outils
+              </button>
+            </div>
             <button
               type="button"
               onClick={() => navigate('/about')}
-              className="focus-ring w-full sm:w-auto justify-center px-8 py-4 text-slate-400 rounded-2xl font-semibold text-lg hover:text-white transition-colors underline-offset-4 hover:underline min-h-[48px]"
+              className="focus-ring self-start text-sm font-semibold text-slate-400 hover:text-white transition-colors underline-offset-4 hover:underline"
             >
               Qui est beForensic ?
             </button>
@@ -93,20 +95,22 @@ export default function Home() {
         </div>
       </div>
 
-      {/* --- SECTION THÉMATIQUES (La bibliothèque) --- */}
+      {/* --- SECTION THÉMATIQUES (aperçu, pas le catalogue entier) --- */}
       <div className="max-w-6xl mx-auto px-4 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <h2 className="text-3xl md:text-4xl font-black text-white">Thématiques clés</h2>
-            <p className="text-slate-400 mt-2">Cliquez sur un domaine pour renforcer votre protection.</p>
+            <h2 className="text-3xl md:text-4xl font-black text-white">Quelques thématiques</h2>
+            <p className="text-slate-400 mt-2">
+              Un aperçu pour démarrer. Le diagnostic indique ensuite où renforcer en priorité.
+            </p>
           </div>
           <div className="flex items-center gap-2 text-brand-orange-400 font-semibold bg-brand-orange/5 border border-brand-orange/10 px-4 py-2 rounded-xl text-xs">
-            <CheckCircle className="w-4 h-4" aria-hidden="true" /> Ressources gratuites à disposition
+            <CheckCircle className="w-4 h-4" aria-hidden="true" /> Ressources gratuites
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {themes.map((theme) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {themes.slice(0, 4).map((theme) => {
             const IconComponent = getIconComponent(theme.title);
 
             return (
@@ -135,13 +139,29 @@ export default function Home() {
           })}
         </div>
 
-        <div className="mt-20 mb-16">
-          <ContactCtaBanner variant="dark" />
+        {themes.length > 0 && (
+          <div className="mt-8 flex justify-center sm:justify-start">
+            <button
+              type="button"
+              onClick={() => navigate('/resources')}
+              className="focus-ring inline-flex items-center gap-2 px-6 py-3 rounded-2xl border border-slate-700 text-slate-200 font-semibold hover:border-brand-orange/50 hover:text-white transition-all min-h-[48px]"
+            >
+              Voir toute la bibliothèque
+              {themes.length > 4 ? (
+                <span className="text-slate-500 font-medium">({themes.length} thèmes)</span>
+              ) : null}
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </div>
+        )}
+
+        {/* Preuve passive — avant le CTA conversion (peak-end) */}
+        <div className="mt-16">
+          <GoogleReview />
         </div>
 
-        {/* --- SECTION GOOGLE REVIEWS --- */}
-        <div className="pt-16 border-t border-slate-800">
-          <GoogleReview />
+        <div className="mt-12 mb-8">
+          <ContactCtaBanner variant="dark" />
         </div>
       </div>
     </div>
