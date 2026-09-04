@@ -25,3 +25,4 @@ dist-ssr
 
 # Supabase CLI local state (regenerated on link / db push)
 supabase/.temp/
+.vercel
